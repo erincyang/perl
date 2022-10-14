@@ -1,0 +1,159 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AtomTypes::UFFAtomTypes.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TPSAAtomTypes.html" title="TPSAAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./BitVector.html" title="BitVector.html">Next</a></td><td width="34%" align="middle"><strong>AtomTypes::UFFAtomTypes.pm</strong></td><td width="33%" align="right"><a href="././code/UFFAtomTypes.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/UFFAtomTypes.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/UFFAtomTypes.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/UFFAtomTypes.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/UFFAtomTypes.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>UFFAtomTypes</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use AtomTypes::UFFAtomTypes;</p>
+<p>use AtomTypes::UFFAtomTypes qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>UFFAtomTypes</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#assignatomtypes">AssignAtomTypes</a>, <a href="#getallpossibleuffatomtypes">GetAllPossibleUFFAtomTypes</a>
+, <a href="#getallpossibleuffnonhydrogenatomtypes">GetAllPossibleUFFNonHydrogenAtomTypes</a>, <a href="#getuffatomtypesdata">GetUFFAtomTypesData</a>, <a href="#stringifyuffatomtypes">StringifyUFFAtomTypes</a>
+</p><p>The following functions are available:</p>
+<p>GetAllPossibleUFFAtomTypes,
+GetAllPossibleUFFNonHydrogenAtomTypes, GetUFFAtomTypesData</p>
+<p><strong>UFFAtomTypes</strong> is derived from <strong>AtomTypes</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>UFFAtomTypes</strong>, <strong>AtomTypes</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>The data file UFFAomTypes.csv distributed with MayaChemTools release contains
+all possible UFF [ Ref 81-82 ] atom types.</p>
+<p>Format of a Five-character mnemonic label used for UFF atom types:</p>
+<div class="OptionsBox">
+    o First two characters correspond to chemical symbol with an underscore
+      as second character for elements with one character symbol
+<br/>    o Third character describes hybridization or geometry: 1 - linear;
+      2 - trigonal; R - resonant; 3 = tetrahedral; 4 - square planar;
+      5 - trigonal bipyramidal; 6 - octahedral
+<br/>    o Fourth and fifth characters are used as indicators of alternate
+      parameters: formal oxidation state, bridging hydrogens and so on.</div>
+<p>Examples of UFF atom types:</p>
+<div class="OptionsBox">
+    C_3, C_2, C_R, N_3, N_R, O_3, O_2, and so on</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewUFFAtomTypes = new AtomTypes::UFFAtomTypes(%NamesAndValues);</div>
+<p>Using specified <em>UFFAtomTypes</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>UFFAtomTypes</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'UFF'
+<br/>    IgnoreHydrogens = 0</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $UFFAtomTypes = new AtomTypes::UFFAtomTypes(
+                              'Molecule' =&gt; $Molecule,
+                              'IgnoreHydrogens' =&gt; 0);</div>
+</dd>
+<dt><strong><a name="assignatomtypes" class="item"><strong>AssignAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UFFAtomTypes-&gt;AssignAtomTypes();</div>
+<p>Assigns UFF atom types to all the atoms in a molecule and returns
+<em>UFFAtomTypes</em>.</p>
+</dd>
+<dt><strong><a name="getallpossibleuffatomtypes" class="item"><strong>GetAllPossibleUFFAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AllAtomTypesDataRef = $UFFAtomTypes-&gt;
+                           GetAllPossibleUFFAtomTypes();
+<br/>    $AllAtomTypesDataRef = AtomTypes::UFFAtomTypes::
+                           GetAllPossibleUFFAtomTypes();</div>
+<p>Returns all possible UFF atom types corresponding to hydrogen and non-hydrogen
+atoms as an array reference.</p>
+</dd>
+<dt><strong><a name="getallpossibleuffnonhydrogenatomtypes" class="item"><strong>GetAllPossibleUFFNonHydrogenAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AtomTypesDataRef = $UFFAtomTypes-&gt;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                        GetAllPossibleUFFNonHydrogenAtomTypes();
+<br/>    $AtomTypesDataRef = AtomTypes::UFFAtomTypes::
+                        GetAllPossibleUFFNonHydrogenAtomTypes();</div>
+<p>Returns all possible UFF atom types corresponding to non-hydrogen atoms as
+an array reference.</p>
+</dd>
+<dt><strong><a name="getuffatomtypesdata" class="item"><strong>GetUFFAtomTypesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AtomTypesDataMapRef = $UFFAtomTypes-&gt;GetUFFAtomTypesData();
+<br/>    $AtomTypesDataMapRef = AtomTypes::UFFAtomTypes::GetUFFAtomTypesData();</div>
+<p>Returns UFF atom types and associated data loaded from UFF data file as
+a reference to hash with the following hash data format:</p>
+<div class="OptionsBox">
+    @{$UFFAtomTypesDataMap{AtomTypes}} - Array of all possible atom
+                              types for all atoms
+<br/>    @{$UFFAtomTypesDataMap{NonHydrogenAtomTypes}} - Array of all
+                              possible atom types for non-hydrogen atoms
+<br/>    @{$UFFAtomTypesDataMap-&gt;{ColLabels}} - Array of column labels
+<br/>    %{$UFFAtomTypesDataMap-&gt;{DataCol&lt;Num&gt;}} - Hash keys pair:
+                                              DataCol&lt;Num&gt;, AtomType</div>
+</dd>
+<dt><strong><a name="stringifyuffatomtypes" class="item"><strong>StringifyUFFAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $UFFAtomTypes-&gt;StringifyUFFAtomTypes();</div>
+<p>Returns a string containing information about <em>UFFAtomTypes</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AtomTypes.html">AtomTypes.pm</a>,&nbsp<a href="./AtomicInvariantsAtomTypes.html">AtomicInvariantsAtomTypes.pm</a>,&nbsp<a href="./DREIDINGAtomTypes.html">DREIDINGAtomTypes.pm</a>,&nbsp
+<a href="./EStateAtomTypes.html">EStateAtomTypes.pm</a>,&nbsp<a href="./FunctionalClassAtomTypes.html">FunctionalClassAtomTypes.pm</a>,&nbsp<a href="./MMFF94AtomTypes.html">MMFF94AtomTypes.pm</a>,&nbsp
+<a href="./SLogPAtomTypes.html">SLogPAtomTypes.pm</a>,&nbsp<a href="./SYBYLAtomTypes.html">SYBYLAtomTypes.pm</a>,&nbsp<a href="./TPSAAtomTypes.html">TPSAAtomTypes.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TPSAAtomTypes.html" title="TPSAAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./BitVector.html" title="BitVector.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AtomTypes::UFFAtomTypes.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

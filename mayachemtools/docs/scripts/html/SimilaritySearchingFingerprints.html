@@ -1,0 +1,1145 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:SimilaritySearchingFingerprints.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SimilarityMatricesFingerprints.html" title="SimilarityMatricesFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SortSDFiles.html" title="SortSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>SimilaritySearchingFingerprints.pl</strong></td><td width="33%" align="right"><a href="././code/SimilaritySearchingFingerprints.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SimilaritySearchingFingerprints.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SimilaritySearchingFingerprints.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SimilaritySearchingFingerprints.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SimilaritySearchingFingerprints.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SimilaritySearchingFingerprints.pl - Perform similarity search using fingerprints strings data in SD, FP and CSV/TSV text file(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>SimilaritySearchingFingerprints.pl ReferenceFPFile DatabaseFPFile</p>
+<p>SimilaritySearchingFingerprints.pl [<strong>--alpha</strong> <em>number</em>] [<strong>--beta</strong> <em>number</em>]
+[<strong>-b, --BitVectorComparisonMode</strong> <em>TanimotoSimilarity | TverskySimilarity | ...</em>]
+[<strong>--DatabaseColMode</strong> <em>ColNum | ColLabel</em>] [<strong>--DatabaseCompoundIDCol</strong> <em>col number | col name</em>]
+[<strong>--DatabaseCompoundIDPrefix</strong> <em>text</em>] [<strong>--DatabaseCompoundIDField</strong> <em>DataFieldName</em>]
+[<strong>--DatabaseCompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>]
+[<strong>--DatabaseDataCols</strong> <em>&quot;DataColNum1, DataColNum2,... &quot; | DataColLabel1, DataCoLabel2,... &quot;</em>]
+[<strong>--DatabaseDataColsMode</strong> <em>All | Specify | CompoundID</em>] [<strong>--DatabaseDataFields</strong> <em>&quot;FieldLabel1, FieldLabel2,... &quot;</em>]
+[<strong>--DatabaseDataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em>]
+[<strong>--DatabaseFingerprintsCol</strong> <em>col number | col name</em>] [<strong>--DatabaseFingerprintsField</strong> <em>FieldLabel</em>]
+[]<strong>--DistanceCutoff</strong> <em>number</em>] [<strong>-d, --detail</strong> <em>InfoLevel</em>] [<strong>-f, --fast</strong>]
+[<strong>--FingerprintsMode</strong> <em>AutoDetect | FingerprintsBitVectorString | FingerprintsVectorString</em>]
+[<strong>-g, --GroupFusionRule</strong> <em>Max, Mean, Median, Min, Sum, Euclidean</em>] [<strong>--GroupFusionApplyCutoff</strong> <em>Yes | No</em>]
+[<strong>-h, --help</strong>]  [<strong>--InDelim</strong> <em>comma | semicolon</em>] [<strong>-k, --KNN</strong> <em>all | number</em>]
+[<strong>-m, --mode</strong> <em>IndividualReference | MultipleReferences</em>]
+[<strong>-n, --NumOfSimilarMolecules</strong> <em>number</em>] [<strong>--OutDelim</strong> <em>comma | tab | semicolon</em>]
+[<strong>--output</strong> <em>SD | text | both</em>] [<strong>-o, --overwrite</strong>]
+[<strong>-p, --PercentSimilarMolecules</strong> <em>number</em>] [<strong>--precision</strong> <em>number</em>] [<strong>-q, --quote</strong> <em>Yes | No</em>]
+[<strong>--ReferenceColMode</strong> <em>ColNum | ColLabel</em>] [<strong>--ReferenceCompoundIDCol</strong> <em>col number | col name</em>]
+[<strong>--ReferenceCompoundIDPrefix</strong> <em>text</em>] [<strong>--ReferenceCompoundIDField</strong> <em>DataFieldName</em>]
+[<strong>--ReferenceCompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>]
+[<strong>--ReferenceFingerprintsCol</strong> <em>col number | col name</em>] [<strong>--ReferenceFingerprintsField</strong> <em>FieldLabel</em>]
+[<strong>-r, --root</strong> <em>RootName</em>] [<strong>-s, --SearchMode</strong> <em>SimilaritySearch | DissimilaritySearch</em>]
+[<strong>--SimilarCountMode</strong> <em>NumOfSimilar | PercentSimilar</em>] [<strong>--SimilarityCutoff</strong> <em>number</em>]
+[<strong>-v, --VectorComparisonMode</strong> <em>TanimotoSimilairy | ... | ManhattanDistance | ...</em>]
+[<strong>--VectorComparisonFormulism</strong> <em>AlgebraicForm | BinaryForm | SetTheoreticForm</em>]
+[<strong>-w, --WorkingDir</strong> dirname] ReferenceFingerprintsFile DatabaseFingerprintsFile</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Perform molecular similarity search [ Ref 94-113 ] using fingerprint bit-vector or vector strings
+data in <em>SD, FP, or CSV/TSV text</em> files corresponding to <em>ReferenceFingerprintsFile</em> and
+<em>DatabaseFingerprintsFile</em>, and generate SD and CSV/TSV text file(s) containing database
+molecules which are similar to reference molecule(s). The reference molecules are also referred
+to as query or seed molecules and database molecules as target molecules in the literature.</p>
+<p>The current release of MayaChemTools supports two types of similarity search modes:
+<em>IndividualReference or MultipleReferences</em>. For default value of <em>MultipleReferences</em> for <strong>-m, --mode</strong>
+option, reference molecules are considered as a set and <strong>-g, --GroupFusionRule</strong> is used to calculate
+similarity of a database molecule against reference molecules set. The group fusion rule is also
+referred to as data fusion or consensus scoring in the literature. However, for <em>IndividualReference</em>
+value of <strong>-m, --mode</strong> option, reference molecules are treated as individual molecules and each reference
+molecule is compared against a database molecule by itself to identify similar molecules.</p>
+<p>The molecular dissimilarity search can also be performed using <em>DissimilaritySearch</em> value for
+<strong>-s, --SearchMode</strong> option. During dissimilarity search or usage of distance comparison coefficient
+in similarity similarity search, the meaning of fingerprints comparison value is automatically reversed
+as shown below:</p>
+<div class="OptionsBox">
+    SeachMode      ComparisonCoefficient  ResultsSort   ComparisonValues</div>
+<div class="OptionsBox">
+    Similarity     SimilarityCoefficient  Descending    Higher value imples
+                                                        high similarity
+<br/>    Similarity     DistanceCoefficient    Ascending     Lower value implies
+                                                        high similarity</div>
+<div class="OptionsBox">
+    Dissimilarity  SimilarityCoefficient  Ascending     Lower value implies
+                                                        high dissimilarity
+<br/>    Dissimilarity  DistanceCoefficient    Descending    Higher value implies
+                                                        high dissimilarity</div>
+<p>During <em>IndividualReference</em> value of  <strong>-m, --Mode</strong> option for similarity search, fingerprints bit-vector
+or vector string of each reference molecule is compared with database molecules using specified
+similarity or distance coefficients to identify most similar molecules for each reference molecule.
+Based on value of <strong>--SimilarCountMode</strong>, up to <strong>--n, --NumOfSimilarMolecules</strong> or <strong>-p,
+--PercentSimilarMolecules</strong> at specified <strong>--SimilarityCutoff</strong> or <strong>--DistanceCutoff</strong> are
+identified for each reference molecule.</p>
+<p>During <em>MultipleReferences</em> value <strong>-m, --mode</strong> option for similarity search, all reference molecules
+are considered as a set and <strong>-g, --GroupFusionRule</strong> is used to calculate similarity of a database
+molecule against reference molecules set either using all reference molecules or number of k-nearest
+neighbors (k-NN) to a database molecule specified using <strong>-k, --kNN</strong>. The fingerprints bit-vector
+or vector string of each reference molecule in a set is compared with a database molecule using
+a similarity or distance coefficient specified via <strong>-b, --BitVectorComparisonMode</strong> or <strong>-v,
+--VectorComparisonMode</strong>. The reference molecules whose comparison values with a database
+molecule fall outside specified <strong>--SimilarityCutoff</strong> or <strong>--DistanceCutoff</strong> are ignored during <em>Yes</em>
+value of <strong>--GroupFusionApplyCutoff</strong>. The specified <strong>-g, --GroupFusionRule</strong> is applied to
+<strong>-k, --kNN</strong> reference molecules to calculate final similarity value between a database molecule
+and reference molecules set.</p>
+<p>The input fingerprints <em>SD, FP, or Text (CSV/TSV)</em> files for <em>ReferenceFingerprintsFile</em> and
+<em>DatabaseTextFile</em> must contain valid fingerprint bit-vector or vector strings data corresponding to
+same type of fingerprints.</p>
+<p>The valid fingerprints <em>SDFile</em> extensions are <em>.sdf</em> and <em>.sd</em>. The valid fingerprints <em>FPFile</em>
+extensions are <em>.fpf</em> and <em>.fp</em>. The valid fingerprints <em>TextFile (CSV/TSV)</em> extensions are
+<em>.csv</em> and <em>.tsv</em> for comma/semicolon and tab delimited text files respectively. The <strong>--indelim</strong>
+option determines the format of <em>TextFile</em>. Any file which doesn't correspond to the format indicated
+by <strong>--indelim</strong> option is ignored.</p>
+<p>Example of <em>FP</em> file containing fingerprints bit-vector string data:</p>
+<div class="OptionsBox">
+    #
+<br/>    # Package = MayaChemTools 7.4
+<br/>    # ReleaseDate = Oct 21, 2010
+<br/>    #
+<br/>    # TimeStamp =  Mon Mar 7 15:14:01 2011
+<br/>    #
+<br/>    # FingerprintsStringType = FingerprintsBitVector
+<br/>    #
+<br/>    # Description = PathLengthBits:AtomicInvariantsAtomTypes:MinLength1:...
+<br/>    # Size = 1024
+<br/>    # BitStringFormat = HexadecimalString
+<br/>    # BitsOrder = Ascending
+<br/>    #
+<br/>    Cmpd1 9c8460989ec8a49913991a6603130b0a19e8051c89184414953800cc21510...
+<br/>    Cmpd2 000000249400840040100042011001001980410c000000001010088001120...
+<br/>    ... ...
+<br/>    ... ..</div>
+<p>Example of <em>FP</em> file containing fingerprints vector string data:</p>
+<div class="OptionsBox">
+    #
+<br/>    # Package = MayaChemTools 7.4
+<br/>    # ReleaseDate = Oct 21, 2010
+<br/>    #
+<br/>    # TimeStamp =  Mon Mar 7 15:14:01 2011
+<br/>    #
+<br/>    # FingerprintsStringType = FingerprintsVector
+<br/>    #
+<br/>    # Description = PathLengthBits:AtomicInvariantsAtomTypes:MinLength1:...
+<br/>    # VectorStringFormat = IDsAndValuesString
+<br/>    # VectorValuesType = NumericalValues
+<br/>    #
+<br/>    Cmpd1 338;C F N O C:C C:N C=O CC CF CN CO C:C:C C:C:N C:CC C:CF C:CN C:
+<br/>    N:C C:NC CC:N CC=O CCC CCN CCO CNC NC=O O=CO C:C:C:C C:C:C:N C:C:CC...;
+<br/>    33 1 2 5 21 2 2 12 1 3 3 20 2 10 2 2 1 2 2 2 8 2 5 1 1 1 19 2 8 2 2 2 2
+<br/>    6 2 2 2 2 2 2 2 2 3 2 2 1 4 1 5 1 1 18 6 2 2 1 2 10 2 1 2 1 2 2 2 2 ...
+<br/>    Cmpd2 103;C N O C=N C=O CC CN CO CC=O CCC CCN CCO CNC N=CN NC=O NCN O=C
+<br/>    O C CC=O CCCC CCCN CCCO CCNC CNC=N CNC=O CNCN CCCC=O CCCCC CCCCN CC...;
+<br/>    15 4 4 1 2 13 5 2 2 15 5 3 2 2 1 1 1 2 17 7 6 5 1 1 1 2 15 8 5 7 2 2 2 2
+<br/>    1 2 1 1 3 15 7 6 8 3 4 4 3 2 2 1 2 3 14 2 4 7 4 4 4 4 1 1 1 2 1 1 1 ...
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Example of <em>SD</em> file containing fingerprints bit-vector string data:</p>
+<div class="OptionsBox">
+    ... ...
+<br/>    ... ...
+<br/>    $$$$
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...
+<br/>    41 44  0  0  0  0  0  0  0  0999 V2000
+     -3.3652    1.4499    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+<br/>    ... ...
+<br/>    2  3  1  0  0  0  0
+<br/>    ... ...
+<br/>    M  END
+<br/>    &gt;  &lt;CmpdID&gt;
+<br/>    Cmpd1</div>
+<div class="OptionsBox">
+    &gt;  &lt;PathLengthFingerprints&gt;
+<br/>    FingerprintsBitVector;PathLengthBits:AtomicInvariantsAtomTypes:MinLengt
+<br/>    h1:MaxLength8;1024;HexadecimalString;Ascending;9c8460989ec8a49913991a66
+<br/>    03130b0a19e8051c89184414953800cc2151082844a201042800130860308e8204d4028
+<br/>    00831048940e44281c00060449a5000ac80c894114e006321264401600846c050164462
+<br/>    08190410805000304a10205b0100e04c0038ba0fad0209c0ca8b1200012268b61c0026a
+<br/>    aa0660a11014a011d46</div>
+<div class="OptionsBox">
+    $$$$
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Example of CSV <em>TextFile</em> containing fingerprints bit-vector string data:</p>
+<div class="OptionsBox">
+    &quot;CompoundID&quot;,&quot;PathLengthFingerprints&quot;
+<br/>    &quot;Cmpd1&quot;,&quot;FingerprintsBitVector;PathLengthBits:AtomicInvariantsAtomTypes
+<br/>    :MinLength1:MaxLength8;1024;HexadecimalString;Ascending;9c8460989ec8a4
+<br/>    9913991a6603130b0a19e8051c89184414953800cc2151082844a20104280013086030
+<br/>    8e8204d402800831048940e44281c00060449a5000ac80c894114e006321264401...&quot;
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>The current release of MayaChemTools supports the following types of fingerprint
+bit-vector and vector strings:</p>
+<div class="OptionsBox">
+    FingerprintsVector;AtomNeighborhoods:AtomicInvariantsAtomTypes:MinRadi
+<br/>    us0:MaxRadius2;41;AlphaNumericalValues;ValuesString;NR0-C.X1.BO1.H3-AT
+<br/>    C1:NR1-C.X3.BO3.H1-ATC1:NR2-C.X1.BO1.H3-ATC1:NR2-C.X3.BO4-ATC1 NR0-C.X
+<br/>    1.BO1.H3-ATC1:NR1-C.X3.BO3.H1-ATC1:NR2-C.X1.BO1.H3-ATC1:NR2-C.X3.BO4-A
+<br/>    TC1 NR0-C.X2.BO2.H2-ATC1:NR1-C.X2.BO2.H2-ATC1:NR1-C.X3.BO3.H1-ATC1:NR2
+<br/>    -C.X2.BO2.H2-ATC1:NR2-N.X3.BO3-ATC1:NR2-O.X1.BO1.H1-ATC1 NR0-C.X2.B...</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:AtomicInvariantsAtomTypes:ArbitraryS
+<br/>    ize;10;NumericalValues;IDsAndValuesString;C.X1.BO1.H3 C.X2.BO2.H2 C.X2
+<br/>    .BO3.H1 C.X3.BO3.H1 C.X3.BO4 F.X1.BO1 N.X2.BO2.H1 N.X3.BO3 O.X1.BO1.H1
+<br/>    O.X1.BO2;2 4 14 3 10 1 1 1 3 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SLogPAtomTypes:ArbitrarySize;16;Nume
+<br/>    ricalValues;IDsAndValuesString;C1 C10 C11 C14 C18 C20 C21 C22 C5 CS F
+<br/>    N11 N4 O10 O2 O9;5 1 1 1 14 4 2 1 2 2 1 1 1 1 3 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SLogPAtomTypes:FixedSize;67;OrderedN
+<br/>    umericalValues;IDsAndValuesString;C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C
+<br/>    12 C13 C14 C15 C16 C17 C18 C19 C20 C21 C22 C23 C24 C25 C26 C27 CS N1 N
+<br/>    2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 NS O1 O2 O3 O4 O5 O6 O7 O8
+<br/>    O9 O10 O11 O12 OS F Cl Br I Hal P S1 S2 S3 Me1 Me2;5 0 0 0 2 0 0 0 0 1
+<br/>    1 0 0 1 0 0 0 14 0 4 2 1 0 0 0 0 0 2 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0...</div>
+<div class="OptionsBox">
+    FingerprintsVector;EStateIndicies:ArbitrarySize;11;NumericalValues;IDs
+<br/>    AndValuesString;SaaCH SaasC SaasN SdO SdssC SsCH3 SsF SsOH SssCH2 SssN
+<br/>    H SsssCH;24.778 4.387 1.993 25.023 -1.435 3.975 14.006 29.759 -0.073 3
+<br/>    .024 -2.270</div>
+<div class="OptionsBox">
+    FingerprintsVector;EStateIndicies:FixedSize;87;OrderedNumericalValues;
+<br/>    ValuesString;0 0 0 0 0 0 0 3.975 0 -0.073 0 0 24.778 -2.270 0 0 -1.435
+<br/>    4.387 0 0 0 0 0 0 3.024 0 0 0 0 0 0 0 1.993 0 29.759 25.023 0 0 0 0 1
+<br/>    4.006 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+<div class="OptionsBox">
+    FingerprintsVector;ExtendedConnectivity:AtomicInvariantsAtomTypes:Radi
+<br/>    us2;60;AlphaNumericalValues;ValuesString;73555770 333564680 352413391
+<br/>    666191900 1001270906 1371674323 1481469939 1977749791 2006158649 21414
+<br/>    08799 49532520 64643108 79385615 96062769 273726379 564565671 85514103
+<br/>    5 906706094 988546669 1018231313 1032696425 1197507444 1331250018 1338
+<br/>    532734 1455473691 1607485225 1609687129 1631614296 1670251330 17303...</div>
+<div class="OptionsBox">
+    FingerprintsVector;ExtendedConnectivityCount:AtomicInvariantsAtomTypes
+<br/>    :Radius2;60;NumericalValues;IDsAndValuesString;73555770 333564680 3524
+<br/>    13391 666191900 1001270906 1371674323 1481469939 1977749791 2006158649
+<br/>    2141408799 49532520 64643108 79385615 96062769 273726379 564565671...;
+<br/>    3 2 1 1 14 1 2 10 4 3 1 1 1 1 2 1 2 1 1 1 2 3 1 1 2 1 3 3 8 2 2 2 6 2
+<br/>    1 2 1 1 2 1 1 1 2 1 1 2 1 2 1 1 1 1 1 1 1 1 1 2 1 1</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;ExtendedConnectivityBits:AtomicInvariantsAtomTyp
+<br/>    es:Radius2;1024;BinaryString;Ascending;0000000000000000000000000000100
+<br/>    0000000001010000000110000011000000000000100000000000000000000000100001
+<br/>    1000000110000000000000000000000000010011000000000000000000000000010000
+<br/>    0000000000000000000000000010000000000000000001000000000000000000000000
+<br/>    0000000000010000100001000000000000101000000000000000100000000000000...</div>
+<div class="OptionsBox">
+    FingerprintsVector;ExtendedConnectivity:FunctionalClassAtomTypes:Radiu
+<br/>    s2;57;AlphaNumericalValues;ValuesString;24769214 508787397 850393286 8
+<br/>    62102353 981185303 1231636850 1649386610 1941540674 263599683 32920567
+<br/>    1 571109041 639579325 683993318 723853089 810600886 885767127 90326012
+<br/>    7 958841485 981022393 1126908698 1152248391 1317567065 1421489994 1455
+<br/>    632544 1557272891 1826413669 1983319256 2015750777 2029559552 20404...</div>
+<div class="OptionsBox">
+    FingerprintsVector;ExtendedConnectivity:EStateAtomTypes:Radius2;62;Alp
+<br/>    haNumericalValues;ValuesString;25189973 528584866 662581668 671034184
+<br/>    926543080 1347067490 1738510057 1759600920 2034425745 2097234755 21450
+<br/>    44754 96779665 180364292 341712110 345278822 386540408 387387308 50430
+<br/>    1706 617094135 771528807 957666640 997798220 1158349170 1291258082 134
+<br/>    1138533 1395329837 1420277211 1479584608 1486476397 1487556246 1566...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;MACCSKeyBits;166;BinaryString;Ascending;00000000
+<br/>    0000000000000000000000000000000001001000010010000000010010000000011100
+<br/>    0100101010111100011011000100110110000011011110100110111111111111011111
+<br/>    11111111111110111000</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;MACCSKeyBits;322;BinaryString;Ascending;11101011
+<br/>    1110011111100101111111000111101100110000000000000011100010000000000000
+<br/>    0000000000000000000000000000000000000000000000101000000000000000000000
+<br/>    0000000000000000000000000000000000000000000000000000000000000000000000
+<br/>    0000000000000000000000000000000000000011000000000000000000000000000000
+<br/>    0000000000000000000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;MACCSKeyCount;166;OrderedNumericalValues;ValuesStri
+<br/>    ng;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 1 0 0 3 0 0 0 0 4 0 0 2 0 0 0 0 0 0 0 0 2 0 0 2 0 0 0 0
+<br/>    0 0 0 0 1 1 8 0 0 0 1 0 0 1 0 1 0 1 0 3 1 3 1 0 0 0 1 2 0 11 1 0 0 0
+<br/>    5 0 0 1 2 0 1 1 0 0 0 0 0 1 1 0 1 1 1 1 0 4 0 0 1 1 0 4 6 1 1 1 2 1 1
+<br/>    3 5 2 2 0 5 3 5 1 1 2 5 1 2 1 2 4 8 3 5 5 2 2 0 3 5 4 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;MACCSKeyCount;322;OrderedNumericalValues;ValuesStri
+<br/>    ng;14 8 2 0 2 0 4 4 2 1 4 0 0 2 5 10 5 2 1 0 0 2 0 5 13 3 28 5 5 3 0 0
+<br/>    0 4 2 1 1 0 1 1 0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 22 5 3 0 0 0 1 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 11 0 2 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;PathLengthBits:AtomicInvariantsAtomTypes:MinLeng
+<br/>    th1:MaxLength8;1024;BinaryString;Ascending;001000010011010101011000110
+<br/>    0100010101011000101001011100110001000010001001101000001001001001001000
+<br/>    0010110100000111001001000001001010100100100000000011000000101001011100
+<br/>    0010000001000101010100000100111100110111011011011000000010110111001101
+<br/>    0101100011000000010001000011000010100011101100001000001000100000000...</div>
+<div class="OptionsBox">
+    FingerprintsVector;PathLengthCount:AtomicInvariantsAtomTypes:MinLength
+<br/>    1:MaxLength8;432;NumericalValues;IDsAndValuesPairsString;C.X1.BO1.H3 2
+<br/>    C.X2.BO2.H2 4 C.X2.BO3.H1 14 C.X3.BO3.H1 3 C.X3.BO4 10 F.X1.BO1 1 N.X
+<br/>    2.BO2.H1 1 N.X3.BO3 1 O.X1.BO1.H1 3 O.X1.BO2 2 C.X1.BO1.H3C.X3.BO3.H1
+<br/>    2 C.X2.BO2.H2C.X2.BO2.H2 1 C.X2.BO2.H2C.X3.BO3.H1 4 C.X2.BO2.H2C.X3.BO
+<br/>    4 1 C.X2.BO2.H2N.X3.BO3 1 C.X2.BO3.H1:C.X2.BO3.H1 10 C.X2.BO3.H1:C....</div>
+<div class="OptionsBox">
+    FingerprintsVector;PathLengthCount:MMFF94AtomTypes:MinLength1:MaxLengt
+<br/>    h8;463;NumericalValues;IDsAndValuesPairsString;C5A 2 C5B 2 C=ON 1 CB 1
+<br/>    8 COO 1 CR 9 F 1 N5 1 NC=O 1 O=CN 1 O=CO 1 OC=O 1 OR 2 C5A:C5B 2 C5A:N
+<br/>    5 2 C5ACB 1 C5ACR 1 C5B:C5B 1 C5BC=ON 1 C5BCB 1 C=ON=O=CN 1 C=ONNC=O 1
+<br/>    CB:CB 18 CBF 1 CBNC=O 1 COO=O=CO 1 COOCR 1 COOOC=O 1 CRCR 7 CRN5 1 CR
+<br/>    OR 2 C5A:C5B:C5B 2 C5A:C5BC=ON 1 C5A:C5BCB 1 C5A:N5:C5A 1 C5A:N5CR ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomPairs:AtomicInvariantsAtomTypes:MinD
+<br/>    istance1:MaxDistance10;223;NumericalValues;IDsAndValuesString;C.X1.BO1
+<br/>    .H3-D1-C.X3.BO3.H1 C.X2.BO2.H2-D1-C.X2.BO2.H2 C.X2.BO2.H2-D1-C.X3.BO3.
+<br/>    H1 C.X2.BO2.H2-D1-C.X3.BO4 C.X2.BO2.H2-D1-N.X3.BO3 C.X2.BO3.H1-D1-...;
+<br/>    2 1 4 1 1 10 8 1 2 6 1 2 2 1 2 1 2 2 1 2 1 5 1 10 12 2 2 1 2 1 9 1 3 1
+<br/>    1 1 2 2 1 3 6 1 6 14 2 2 2 3 1 3 1 8 2 2 1 3 2 6 1 2 2 5 1 3 1 23 1...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomPairs:FunctionalClassAtomTypes:MinDi
+<br/>    stance1:MaxDistance10;144;NumericalValues;IDsAndValuesString;Ar-D1-Ar
+<br/>    Ar-D1-Ar.HBA Ar-D1-HBD Ar-D1-Hal Ar-D1-None Ar.HBA-D1-None HBA-D1-NI H
+<br/>    BA-D1-None HBA.HBD-D1-NI HBA.HBD-D1-None HBD-D1-None NI-D1-None No...;
+<br/>    23 2 1 1 2 1 1 1 1 2 1 1 7 28 3 1 3 2 8 2 1 1 1 5 1 5 24 3 3 4 2 13 4
+<br/>    1 1 4 1 5 22 4 4 3 1 19 1 1 1 1 1 2 2 3 1 1 8 25 4 5 2 3 1 26 1 4 1 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomTorsions:AtomicInvariantsAtomTypes;3
+<br/>    3;NumericalValues;IDsAndValuesString;C.X1.BO1.H3-C.X3.BO3.H1-C.X3.BO4-
+<br/>    C.X3.BO4 C.X1.BO1.H3-C.X3.BO3.H1-C.X3.BO4-N.X3.BO3 C.X2.BO2.H2-C.X2.BO
+<br/>    2.H2-C.X3.BO3.H1-C.X2.BO2.H2 C.X2.BO2.H2-C.X2.BO2.H2-C.X3.BO3.H1-O...;
+<br/>    2 2 1 1 2 2 1 1 3 4 4 8 4 2 2 6 2 2 1 2 1 1 2 1 1 2 6 2 4 2 1 3 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomTorsions:EStateAtomTypes;36;Numerica
+<br/>    lValues;IDsAndValuesString;aaCH-aaCH-aaCH-aaCH aaCH-aaCH-aaCH-aasC aaC
+<br/>    H-aaCH-aasC-aaCH aaCH-aaCH-aasC-aasC aaCH-aaCH-aasC-sF aaCH-aaCH-aasC-
+<br/>    ssNH aaCH-aasC-aasC-aasC aaCH-aasC-aasC-aasN aaCH-aasC-ssNH-dssC a...;
+<br/>    4 4 8 4 2 2 6 2 2 2 4 3 2 1 3 3 2 2 2 1 2 1 1 1 2 1 1 1 1 1 1 1 2 1 1 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomTriplets:AtomicInvariantsAtomTypes:M
+<br/>    inDistance1:MaxDistance10;3096;NumericalValues;IDsAndValuesString;C.X1
+<br/>    .BO1.H3-D1-C.X1.BO1.H3-D1-C.X3.BO3.H1-D2 C.X1.BO1.H3-D1-C.X2.BO2.H2-D1
+<br/>    0-C.X3.BO4-D9 C.X1.BO1.H3-D1-C.X2.BO2.H2-D3-N.X3.BO3-D4 C.X1.BO1.H3-D1
+<br/>    -C.X2.BO2.H2-D4-C.X2.BO2.H2-D5 C.X1.BO1.H3-D1-C.X2.BO2.H2-D6-C.X3....;
+<br/>    1 2 2 2 2 2 2 2 8 8 4 8 4 4 2 2 2 2 4 2 2 2 4 2 2 2 2 1 2 2 4 4 4 2 2
+<br/>    2 4 4 4 8 4 4 2 4 4 4 2 4 4 2 2 2 2 2 2 2 2 1 2 2 2 2 2 2 2 2 2 2 8...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalAtomTriplets:SYBYLAtomTypes:MinDistance1
+<br/>    :MaxDistance10;2332;NumericalValues;IDsAndValuesString;C.2-D1-C.2-D9-C
+<br/>    .3-D10 C.2-D1-C.2-D9-C.ar-D10 C.2-D1-C.3-D1-C.3-D2 C.2-D1-C.3-D10-C.3-
+<br/>    D9 C.2-D1-C.3-D2-C.3-D3 C.2-D1-C.3-D2-C.ar-D3 C.2-D1-C.3-D3-C.3-D4 C.2
+<br/>    -D1-C.3-D3-N.ar-D4 C.2-D1-C.3-D3-O.3-D2 C.2-D1-C.3-D4-C.3-D5 C.2-D1-C.
+<br/>    3-D5-C.3-D6 C.2-D1-C.3-D5-O.3-D4 C.2-D1-C.3-D6-C.3-D7 C.2-D1-C.3-D7...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:ArbitrarySize:Min
+<br/>    Distance1:MaxDistance10;54;NumericalValues;IDsAndValuesString;H-D1-H H
+<br/>    -D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA H-D2-HBD HBA-D2-HBA HBA-D2-
+<br/>    HBD H-D3-H H-D3-HBA H-D3-HBD H-D3-NI HBA-D3-NI HBD-D3-NI H-D4-H H-D4-H
+<br/>    BA H-D4-HBD HBA-D4-HBA HBA-D4-HBD HBD-D4-HBD H-D5-H H-D5-HBA H-D5-...;
+<br/>    18 1 2 1 22 12 8 1 2 18 6 3 1 1 1 22 13 6 5 7 2 28 9 5 1 1 1 36 16 10
+<br/>    3 4 1 37 10 8 1 35 10 9 3 3 1 28 7 7 4 18 16 12 5 1 2 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:FixedSize:MinDist
+<br/>    ance1:MaxDistance10;150;OrderedNumericalValues;ValuesString;18 0 0 1 0
+<br/>    0 0 2 0 0 1 0 0 0 0 22 12 8 0 0 1 2 0 0 0 0 0 0 0 0 18 6 3 1 0 0 0 1
+<br/>    0 0 1 0 0 0 0 22 13 6 0 0 5 7 0 0 2 0 0 0 0 0 28 9 5 1 0 0 0 1 0 0 1 0
+<br/>    0 0 0 36 16 10 0 0 3 4 0 0 1 0 0 0 0 0 37 10 8 0 0 0 0 1 0 0 0 0 0 0
+<br/>    0 35 10 9 0 0 3 3 0 0 1 0 0 0 0 0 28 7 7 4 0 0 0 0 0 0 0 0 0 0 0 18...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:ArbitrarySize:
+<br/>    MinDistance1:MaxDistance10;696;NumericalValues;IDsAndValuesString;Ar1-
+<br/>    Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-H1-H1 Ar1-H1-HBA1 Ar1
+<br/>    -H1-HBD1 Ar1-HBA1-HBD1 H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-HBA1-HBA1 H1-
+<br/>    HBA1-HBD1 H1-HBA1-NI1 H1-HBD1-NI1 HBA1-HBA1-NI1 HBA1-HBD1-NI1 Ar1-...;
+<br/>    46 106 8 3 83 11 4 1 21 5 3 1 2 2 1 1 1 100 101 18 11 145 132 26 14 23
+<br/>    28 3 3 5 4 61 45 10 4 16 20 7 5 1 3 4 5 3 1 1 1 1 5 4 2 1 2 2 2 1 1 1
+<br/>    119 123 24 15 185 202 41 25 22 17 3 5 85 95 18 11 23 17 3 1 1 6 4 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:FixedSize:MinD
+<br/>    istance1:MaxDistance10;2692;OrderedNumericalValues;ValuesString;46 106
+<br/>    8 3 0 0 83 11 4 0 0 0 1 0 0 0 0 0 0 0 0 21 5 3 0 0 1 2 2 0 0 1 0 0 0
+<br/>    0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 101 18 11 0 0 145 132 26
+<br/>    14 0 0 23 28 3 3 0 0 5 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 61 45 10 4 0
+<br/>    0 16 20 7 5 1 0 3 4 5 3 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 5 ...</div>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>--alpha</strong> <em>number</em></strong></dt>
+<dd>
+<p>Value of alpha parameter for calculating <em>Tversky</em> similarity coefficient specified for
+<strong>-b, --BitVectorComparisonMode</strong> option. It corresponds to weights assigned for bits set
+to &quot;1&quot; in a pair of fingerprint bit-vectors during the calculation of similarity coefficient. Possible
+values: <em>0 to 1</em>. Default value: &lt;0.5&gt;.</p>
+</dd>
+<dt><strong><strong>--beta</strong> <em>number</em></strong></dt>
+<dd>
+<p>Value of beta parameter for calculating <em>WeightedTanimoto</em> and  <em>WeightedTversky</em>
+similarity coefficients specified for <strong>-b, --BitVectorComparisonMode</strong> option. It is used to
+weight the contributions of bits set to &quot;0&quot; during the calculation of similarity coefficients. Possible
+values: <em>0 to 1</em>. Default value of &lt;1&gt; makes <em>WeightedTanimoto</em> and  <em>WeightedTversky</em>
+equivalent to <em>Tanimoto</em> and  <em>Tversky</em>.</p>
+</dd>
+<dt><strong><strong>-b, --BitVectorComparisonMode</strong> <em>TanimotoSimilarity | TverskySimilarity | ...</em></strong></dt>
+<dd>
+<p>Specify what similarity coefficient to use for calculating similarity between fingerprints bit-vector
+string data values in <em>ReferenceFingerprintsFile</em> and <em>DatabaseFingerprintsFile</em> during similarity
+search. Possible values: <em>TanimotoSimilarity | TverskySimilarity | ...</em>. Default: <em>TanimotoSimilarity</em></p>
+<p>The current release supports the following similarity coefficients: <em>BaroniUrbaniSimilarity, BuserSimilarity,
+CosineSimilarity, DiceSimilarity, DennisSimilarity, ForbesSimilarity, FossumSimilarity, HamannSimilarity, JacardSimilarity,
+Kulczynski1Similarity, Kulczynski2Similarity, MatchingSimilarity, McConnaugheySimilarity, OchiaiSimilarity,
+PearsonSimilarity, RogersTanimotoSimilarity, RussellRaoSimilarity, SimpsonSimilarity, SkoalSneath1Similarity,
+SkoalSneath2Similarity, SkoalSneath3Similarity, TanimotoSimilarity, TverskySimilarity, YuleSimilarity,
+WeightedTanimotoSimilarity, WeightedTverskySimilarity</em>. These similarity coefficients are described below.</p>
+<p>For two fingerprint bit-vectors A and B of same size, let:</p>
+<div class="OptionsBox">
+    Na = Number of bits set to &quot;1&quot; in A
+<br/>    Nb = Number of bits set to &quot;1&quot; in B
+<br/>    Nc = Number of bits set to &quot;1&quot; in both A and B
+<br/>    Nd = Number of bits set to &quot;0&quot; in both A and B</div>
+<div class="OptionsBox">
+    Nt = Number of bits set to &quot;1&quot; or &quot;0&quot; in A or B (Size of A or B)
+<br/>    Nt = Na + Nb - Nc + Nd</div>
+<div class="OptionsBox">
+    Na - Nc = Number of bits set to &quot;1&quot; in A but not in B
+<br/>    Nb - Nc = Number of bits set to &quot;1&quot; in B but not in A</div>
+<p>Then, various similarity coefficients [ Ref. 40 - 42 ] for a pair of bit-vectors A and B are
+defined as follows:</p>
+<p><em>BaroniUrbaniSimilarity</em>: ( SQRT( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as Buser )</p>
+<p><em>BuserSimilarity</em>: ( SQRT ( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as BaroniUrbani )</p>
+<p><em>CosineSimilarity</em>: Nc / SQRT ( Na * Nb ) (same as Ochiai)</p>
+<p><em>DiceSimilarity</em>: (2 * Nc) / ( Na + Nb )</p>
+<p><em>DennisSimilarity</em>: ( Nc * Nd - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / SQRT ( Nt * Na * Nb)</p>
+<p><em>ForbesSimilarity</em>: ( Nt * Nc ) / ( Na * Nb )</p>
+<p><em>FossumSimilarity</em>: ( Nt * ( ( Nc - 1/2 ) ** 2 ) / ( Na * Nb )</p>
+<p><em>HamannSimilarity</em>: ( ( Nc + Nd ) - ( Na - Nc ) - ( Nb - Nc ) ) / Nt</p>
+<p><em>JaccardSimilarity</em>: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Tanimoto)</p>
+<p><em>Kulczynski1Similarity</em>: Nc / ( ( Na - Nc ) + ( Nb - Nc) ) = Nc / ( Na + Nb - 2Nc )</p>
+<p><em>Kulczynski2Similarity</em>: ( ( Nc / 2 ) * ( 2 * Nc + ( Na - Nc ) + ( Nb - Nc) ) ) / ( ( Nc + ( Na - Nc ) ) * ( Nc + ( Nb - Nc ) ) ) = 0.5 * ( Nc / Na + Nc / Nb )</p>
+<p><em>MatchingSimilarity</em>: ( Nc + Nd ) / Nt</p>
+<p><em>McConnaugheySimilarity</em>: ( Nc ** 2 - ( Na - Nc ) * ( Nb - Nc) ) / (  Na * Nb )</p>
+<p><em>OchiaiSimilarity</em>: Nc / SQRT ( Na * Nb ) (same as Cosine)</p>
+<p><em>PearsonSimilarity</em>: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) / SQRT ( Na * Nb * (  Na - Nc + Nd ) * ( Nb - Nc + Nd ) )</p>
+<p><em>RogersTanimotoSimilarity</em>: ( Nc + Nd ) / ( ( Na - Nc)  + ( Nb  - Nc) + Nt) = ( Nc + Nd ) / ( Na  + Nb  - 2Nc + Nt)</p>
+<p><em>RussellRaoSimilarity</em>: Nc / Nt</p>
+<p><em>SimpsonSimilarity</em>: Nc / MIN ( Na, Nb)</p>
+<p><em>SkoalSneath1Similarity</em>: Nc / ( Nc + 2 * ( Na - Nc)  + 2 * ( Nb - Nc) ) = Nc / ( 2 * Na + 2 * Nb - 3 * Nc )</p>
+<p><em>SkoalSneath2Similarity</em>: ( 2 * Nc + 2 * Nd ) / ( Nc + Nd + Nt )</p>
+<p><em>SkoalSneath3Similarity</em>: ( Nc + Nd ) / ( ( Na - Nc ) + ( Nb - Nc ) ) = ( Nc + Nd ) / ( Na + Nb - 2 * Nc  )</p>
+<p><em>TanimotoSimilarity</em>: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Jaccard)</p>
+<p><em>TverskySimilarity</em>: Nc / ( alpha * ( Na - Nc ) + ( 1 - alpha) * ( Nb - Nc) + Nc ) = Nc / ( alpha * ( Na - Nb )  + Nb)</p>
+<p><em>YuleSimilarity</em>: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / ( ( Nc * Nd ) + ( ( Na - Nc ) * ( Nb - Nc ) )  )</p>
+<p>Values of Tanimoto/Jaccard and Tversky coefficients are dependent on only those bit which
+are set to &quot;1&quot; in both A and B. In order to take into account all bit positions, modified versions
+of Tanimoto [ Ref. 42 ] and Tversky [  Ref. 43 ] have been developed.</p>
+<p>Let:</p>
+<div class="OptionsBox">
+    Na' = Number of bits set to &quot;0&quot; in A
+<br/>    Nb' = Number of bits set to &quot;0&quot; in B
+<br/>    Nc' = Number of bits set to &quot;0&quot; in both A and B</div>
+<p>Tanimoto': Nc' /  ( ( Na' - Nc') + ( Nb' - Nc' ) + Nc' ) = Nc' / ( Na' + Nb' - Nc' )</p>
+<p>Tversky': Nc' / ( alpha * ( Na' - Nc' ) + ( 1 - alpha) * ( Nb' - Nc' ) + Nc' ) = Nc' / ( alpha * ( Na' - Nb' )  + Nb')</p>
+<p>Then:</p>
+<p><em>WeightedTanimotoSimilarity</em> = beta * Tanimoto + (1 - beta) * Tanimoto'</p>
+<p><em>WeightedTverskySimilarity</em> = beta * Tversky + (1 - beta) * Tversky'</p>
+</dd>
+<dt><strong><strong>--DatabaseColMode</strong> <em>ColNum | ColLabel</em></strong></dt>
+<dd>
+<p>Specify how columns are identified in database fingerprints <em>TextFile</em>: using column
+number or column label. Possible values: <em>ColNum or ColLabel</em>. Default value: <em>ColNum</em>.</p>
+</dd>
+<dt><strong><strong>--DatabaseCompoundIDCol</strong> <em>col number | col name</em></strong></dt>
+<dd>
+<p>This value is <strong>--DatabaseColMode</strong> mode specific. It specifies column to use for retrieving compound
+ID from database fingerprints <em>TextFile</em> during similarity and dissimilarity search for output SD and
+CSV/TSV text files. Possible values: <em>col number or col label</em>. Default value: <em>first column containing
+the word compoundID in its column label or sequentially generated IDs</em>.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DatabaseDataColsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DatabaseCompoundIDPrefix</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID prefix to use during sequential generation of compound IDs for database fingerprints
+<em>SDFile</em> and <em>TextFile</em>. Default value: <em>Cmpd</em>. The default value generates compound IDs which look
+like Cmpd&lt;Number&gt;.</p>
+<p>For database fingerprints <em>SDFile</em>, this value is only used during <em>LabelPrefix | MolNameOrLabelPrefix</em>
+values of <strong>--DatabaseCompoundIDMode</strong> option; otherwise, it's ignored.</p>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--DatabaseCompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The values specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--DatabaseCompoundIDField</strong> <em>DataFieldName</em></strong></dt>
+<dd>
+<p>Specify database fingerprints <em>SDFile</em> datafield label for generating compound IDs. This value is
+only used during <em>DataField</em> value of <strong>--DatabaseCompoundIDMode</strong> option.</p>
+<p>Examples for <em>DataField</em> value of <strong>--DatabaseCompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+</dd>
+<dt><strong><strong>--DatabaseCompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs from database fingerprints <em>SDFile</em> during similarity and
+dissimilarity search for output SD and CSV/TSV text files: use a <em>SDFile</em> datafield value; use
+molname line from <em>SDFile</em>; generate a sequential ID with specific prefix; use combination of both
+MolName and LabelPrefix with usage of LabelPrefix values for empty molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--DatabaseCompoundIDMode</strong>, molname line in <em>SDFile</em> takes
+precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DatabaseDataFieldsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DatabaseDataCols</strong> <em>&quot;DataColNum1,DataColNum2,... &quot; | DataColLabel1,DataCoLabel2,... &quot;</em></strong></dt>
+<dd>
+<p>This value is <strong>--DatabaseColMode</strong> mode specific. It is a comma delimited list of database fingerprints
+<em>TextFile</em> data column numbers or labels to extract and write to SD and CSV/TSV text files along with
+other information for <em>SD | text | both</em> values of <strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DatabaseDataColsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    1,2,3
+<br/>    CompoundName,MolWt</div>
+</dd>
+<dt><strong><strong>--DatabaseDataColsMode</strong> <em>All | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data columns from database fingerprints <em>TextFile</em> are transferred to output SD and
+CSV/TSV text files along with other information for <em>SD | text | both</em> values of <strong>--output</strong> option:
+transfer all data columns; extract specified data columns; generate a compound ID database compound
+prefix. Possible values: <em>All | Specify | CompoundID</em>. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--DatabaseDataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,... &quot;</em></strong></dt>
+<dd>
+<p>Comma delimited list of database fingerprints <em>SDFile</em> data fields to extract and write to SD
+and CSV/TSV text files along with other information for <em>SD | text | both</em> values of
+<strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DatabaseDataFieldsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    Extreg
+<br/>    MolID,CompoundName</div>
+</dd>
+<dt><strong><strong>--DatabaseDataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data fields from database fingerprints <em>SDFile</em> are transferred to output SD and
+CSV/TSV text files along with other information for <em>SD | text | both</em> values of <strong>--output</strong>
+option: transfer all SD data field; transfer SD data files common to all compounds; extract
+specified data fields; generate a compound ID using molname line, a compound prefix, or a
+combination of both. Possible values: <em>All | Common | specify | CompoundID</em>. Default value:
+<em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--DatabaseFingerprintsCol</strong> <em>col number | col name</em></strong></dt>
+<dd>
+<p>This value is <strong>--DatabaseColMode</strong> specific. It specifies fingerprints column to use during similarity
+and dissimilarity search for database fingerprints <em>TextFile</em>. Possible values: <em>col number or col label</em>.
+Default value: <em>first column containing the word Fingerprints in its column label</em>.</p>
+</dd>
+<dt><strong><strong>--DatabaseFingerprintsField</strong> <em>FieldLabel</em></strong></dt>
+<dd>
+<p>Fingerprints field label to use during similarity and dissimilarity search for database fingerprints <em>SDFile</em>.
+Default value: <em>first data field label containing the word Fingerprints in its label</em></p>
+</dd>
+<dt><strong><strong>--DistanceCutoff</strong> <em>number</em></strong></dt>
+<dd>
+<p>Distance cutoff value to use during comparison of distance value between a pair of database
+and reference molecule calculated by distance comparison methods for fingerprints vector
+string data values. Possible values: <em>Any valid number</em>. Default value: <em>10</em>.</p>
+<p>The comparison value between a pair of database and reference molecule must meet the cutoff
+criterion as shown below:</p>
+<div class="OptionsBox">
+    SeachMode      CutoffCriterion  ComparisonValues</div>
+<div class="OptionsBox">
+    Similarity     &lt;=               Lower value implies high similarity
+<br/>    Dissimilarity  &gt;=               Higher value implies high dissimilarity</div>
+<p>This option is only used during distance coefficients values of <strong>-v, --VectorComparisonMode</strong>
+option.</p>
+<p>This option is ignored during <em>No</em> value of <strong>--GroupFusionApplyCutoff</strong> for <em>MultipleReferences</em>
+<strong>-m, --mode</strong>.</p>
+</dd>
+<dt><strong><strong>-d, --detail</strong> <em>InfoLevel</em></strong></dt>
+<dd>
+<p>Level of information to print about lines being ignored. Default: <em>1</em>. Possible values:
+<em>1, 2 or 3</em>.</p>
+</dd>
+<dt><strong><strong>-f, --fast</strong></strong></dt>
+<dd>
+<p>In this mode, fingerprints columns specified using <strong>--FingerprintsCol</strong> for reference and database
+fingerprints <em>TextFile(s)</em>, and <strong>--FingerprintsField</strong> for reference and database fingerprints <em>SDFile(s)</em>
+are assumed to contain valid fingerprints data and no checking is performed before performing similarity
+and dissimilarity search. By default, fingerprints data is validated before computing pairwise similarity and
+distance coefficients.</p>
+</dd>
+<dt><strong><strong>--FingerprintsMode</strong> <em>AutoDetect | FingerprintsBitVectorString | FingerprintsVectorString</em></strong></dt>
+<dd>
+<p>Format of fingerprint strings data in reference and database fingerprints <em>SD, FP, or Text (CSV/TSV)</em>
+files: automatically detect format of fingerprints string created by MayaChemTools fingerprints
+generation scripts or explicitly specify its format. Possible values: <em>AutoDetect | FingerprintsBitVectorString |
+FingerprintsVectorString</em>. Default value: <em>AutoDetect</em>.</p>
+</dd>
+<dt><strong><strong>-g, --GroupFusionRule</strong> <em>Max, Min, Mean, Median, Sum, Euclidean</em></strong></dt>
+<dd>
+<p>Specify what group fusion [ Ref 94-97, Ref 100, Ref 105 ] rule to use for calculating similarity of
+a database molecule against a set of reference molecules during <em>MultipleReferences</em> value of
+similarity search <strong>-m, --mode</strong>. Possible values: <em>Max, Min, Mean, Median, Sum, Euclidean</em>. Default
+value: <em>Max</em>. <em>Mean</em> value corresponds to average or arithmetic mean. The group fusion rule is
+also referred to as data fusion of consensus scoring in the literature.</p>
+<p>For a reference molecules set and a database molecule, let:</p>
+<div class="OptionsBox">
+    N = Number of reference molecules in a set</div>
+<div class="OptionsBox">
+    i = ith reference reference molecule in a set
+<br/>    n = Nth reference reference molecule in a set</div>
+<div class="OptionsBox">
+    d = dth database molecule</div>
+<div class="OptionsBox">
+    Crd = Fingerprints comparison value between rth reference and dth database
+          molecule - similarity/dissimilarity comparison using similarity or
+          distance coefficient</div>
+<p>Then, various group fusion rules to calculate fused similarity between a database molecule and
+reference molecules set are defined as follows:</p>
+<p><strong>Max</strong>: MAX ( C1d, C2d, ..., Cid, ..., Cnd )</p>
+<p><strong>Min</strong>: MIN ( C1d, C2d, ..., Cid, ..., Cnd )</p>
+<p><strong>Mean</strong>: SUM ( C1d, C2d, ..., Cid, ..., Cnd ) / N</p>
+<p><strong>Median</strong>: MEDIAN (  C1d, C2d, ..., Cid, ..., Cnd )</p>
+<p><strong>Sum</strong>: SUM (  C1d, C2d, ..., Cid, ..., Cnd )</p>
+<p><strong>Euclidean</strong>: SQRT( SUM( C1d ** 2, C2d ** 2, ..., Cid ** 2, ..., Cnd *** 2) )</p>
+<p>The fingerprints bit-vector or vector string of each reference molecule in a set is compared
+with a database molecule using a similarity or distance coefficient specified via <strong>-b,
+--BitVectorComparisonMode</strong> or <strong>-v, --VectorComparisonMode</strong>. The reference molecules
+whose comparison values with a database molecule fall outside specified <strong>--SimilarityCutoff</strong>
+or <strong>--DistanceCutoff</strong> are ignored during <em>Yes</em> value of <strong>--GroupFusionApplyCutoff</strong>. The
+specified <strong>-g, --GroupFusionRule</strong> is applied to <strong>-k, --kNN</strong> reference molecules to calculate
+final fused similarity value between a database molecule and reference molecules set.</p>
+<p>During dissimilarity search or usage of distance comparison coefficient in similarity search,
+the meaning of fingerprints comaprison value is automatically reversed as shown below:</p>
+<div class="OptionsBox">
+    SeachMode      ComparisonCoefficient  ComparisonValues</div>
+<div class="OptionsBox">
+    Similarity     SimilarityCoefficient  Higher value imples high similarity
+<br/>    Similarity     DistanceCoefficient    Lower value implies high similarity</div>
+<div class="OptionsBox">
+    Dissimilarity  SimilarityCoefficient  Lower value implies high
+                                          dissimilarity
+<br/>    Dissimilarity  DistanceCoefficient    Higher value implies high
+                                          dissimilarity</div>
+<p>Consequently, <em>Max</em> implies highest and lowest comparison value for usage of similarity and
+distance coefficient respectively during similarity search. And it corresponds to lowest and highest
+comparison value for usage of similarity and distance coefficient respectively during dissimilarity
+search. During <em>Min</em> fusion rule, the highest and lowest comparison values are appropriately
+reversed.</p>
+</dd>
+<dt><strong><strong>--GroupFusionApplyCutoff</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to apply <strong>--SimilarityCutoff</strong> or <strong>--DistanceCutoff</strong> values during application
+of <strong>-g, --GroupFusionRule</strong> to reference molecules set. Possible values: <em>Yes or No</em>. Default
+value: <em>Yes</em>.</p>
+<p>During <em>Yes</em> value of <strong>--GroupFusionApplyCutoff</strong>, the reference molecules whose comparison
+values with a database molecule fall outside specified <strong>--SimilarityCutoff</strong> or <strong>--DistanceCutoff</strong>
+are not used to calculate final fused similarity value between a database molecule and reference
+molecules set.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--InDelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for reference and database fingerprints CSV <em>TextFile(s)</em>. Possible values:
+<em>comma or semicolon</em>. Default value: <em>comma</em>. For TSV files, this option is ignored
+and <em>tab</em> is used as a delimiter.</p>
+</dd>
+<dt><strong><strong>-k, --kNN</strong> <em>all | number</em></strong></dt>
+<dd>
+<p>Number of k-nearest neighbors (k-NN) reference molecules to use during <strong>-g, --GroupFusionRule</strong>
+for calculating similarity of a database molecule against a set of reference molecules. Possible values:
+<em>all | positive integers</em>. Default: <em>all</em>.</p>
+<p>After ranking similarity values between a database molecule and reference molecules during
+<em>MultipleReferences</em> value of similarity search <strong>-m, --mode</strong> option, a top <strong>-k, --KNN</strong> reference
+molecule are selected and used during <strong>-g, --GroupFusionRule</strong>.</p>
+<p>This option is <strong>-s, --SearchMode</strong> dependent: It corresponds to dissimilar molecules during
+<em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>IndividualReference | MultipleReferences</em></strong></dt>
+<dd>
+<p>Specify how to treat reference molecules in <em>ReferenceFingerprintsFile</em> during similarity search:
+Treat each reference molecule individually during similarity search or perform similarity
+search by treating multiple reference molecules as a set. Possible values: <em>IndividualReference
+| MultipleReferences</em>. Default value: <em>MultipleReferences</em>.</p>
+<p>During <em>IndividualReference</em> value of  <strong>-m, --Mode</strong> for similarity search, fingerprints bit-vector
+or vector string of each reference molecule is compared with database molecules using specified
+similarity or distance coefficients to identify most similar molecules for each reference molecule.
+Based on value of <strong>--SimilarCountMode</strong>, upto <strong>--n, NumOfSimilarMolecules</strong> or <strong>-p,
+--PercentSimilarMolecules</strong> at specified &lt;--SimilarityCutoff&gt; or <strong>--DistanceCutoff</strong> are
+identified for each reference molecule.</p>
+<p>During <em>MultipleReferences</em> value <strong>-m, --mode</strong> for similarity search, all reference molecules
+are considered as a set and <strong>-g, --GroupFusionRule</strong> is used to calculate similarity of a database
+molecule against reference molecules set either using all reference molecules or number of k-nearest
+neighbors (k-NN) to a database molecule specified using <strong>-k, --kNN</strong>. The fingerprints bit-vector
+or vector string of each reference molecule in a set is compared with a database molecule using
+a similarity or distance coefficient specified via <strong>-b, --BitVectorComparisonMode</strong> or <strong>-v,
+--VectorComparisonMode</strong>. The reference molecules whose comparison values with a database
+molecule fall outside specified <strong>--SimilarityCutoff</strong> or <strong>--DistanceCutoff</strong> are ignored. The
+specified <strong>-g, --GroupFusionRule</strong> is applied to rest of <strong>-k, --kNN</strong> reference molecules to calculate
+final similarity value between a database molecule and reference molecules set.</p>
+<p>The meaning of similarity and distance is automatically reversed during <em>DissimilaritySearch</em> value
+of <strong>-s, --SearchMode</strong> along with appropriate handling of <strong>--SimilarityCutoff</strong> or
+<strong>--DistanceCutoff</strong> values.</p>
+</dd>
+<dt><strong><strong>-n, --NumOfSimilarMolecules</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum number of most similar database molecules to find for each reference molecule or set of
+reference molecules based on <em>IndividualReference</em> or <em>MultipleReferences</em> value of similarity
+search <strong>-m, --mode</strong> option. Default: <em>10</em>. Valid values: positive integers.</p>
+<p>This option is ignored during <em>PercentSimilar</em> value of <strong>--SimilarCountMode</strong> option.</p>
+<p>This option is <strong>-s, --SearchMode</strong> dependent: It corresponds to dissimilar molecules during
+<em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--OutDelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Delimiter for output CSV/TSV text file. Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>SD | text | both</em></strong></dt>
+<dd>
+<p>Type of output files to generate. Possible values: <em>SD, text, or both</em>. Default value: <em>text</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files</p>
+</dd>
+<dt><strong><strong>-p, --PercentSimilarMolecules</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum percent of mosy similar database molecules to find for each reference molecule or set of
+reference molecules based on <em>IndividualReference</em> or <em>MultipleReferences</em> value of similarity
+search <strong>-m, --mode</strong> option. Default: <em>1</em> percent of database molecules. Valid values: non-zero values
+in between <em>0 to 100</em>.</p>
+<p>This option is ignored during <em>NumOfSimilar</em> value of <strong>--SimilarCountMode</strong> option.</p>
+<p>During <em>PercentSimilar</em> value of <strong>--SimilarCountMode</strong> option, the number of molecules
+in <em>DatabaseFingerprintsFile</em> is counted and number of similar molecules correspond to
+<strong>--PercentSimilarMolecules</strong> of the total number of database molecules.</p>
+<p>This option is <strong>-s, --SearchMode</strong> dependent: It corresponds to dissimilar molecules during
+<em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--precision</strong> <em>number</em></strong></dt>
+<dd>
+<p>Precision of calculated similarity values for comparison and generating output files. Default: up to <em>2</em>
+decimal places. Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Put quote around column values in output CSV/TSV text file. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+</dd>
+<dt><strong><strong>--ReferenceColMode</strong> <em>ColNum | ColLabel</em></strong></dt>
+<dd>
+<p>Specify how columns are identified in reference fingerprints <em>TextFile</em>: using column
+number or column label. Possible values: <em>ColNum or ColLabel</em>. Default value: <em>ColNum</em>.</p>
+</dd>
+<dt><strong><strong>--ReferenceCompoundIDCol</strong> <em>col number | col name</em></strong></dt>
+<dd>
+<p>This value is <strong>--ReferenceColMode</strong> mode specific. It specifies column to use for retrieving compound
+ID from reference fingerprints <em>TextFile</em> during similarity and dissimilarity search for output SD and CSV/TSV
+text files. Possible values: <em>col number or col label</em>. Default value: <em>first column containing the word compoundID
+in its column label or sequentially generated IDs</em>.</p>
+</dd>
+<dt><strong><strong>--ReferenceCompoundIDPrefix</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID prefix to use during sequential generation of compound IDs for reference fingerprints
+<em>SDFile</em> and <em>TextFile</em>. Default value: <em>Cmpd</em>. The default value generates compound IDs which looks
+like Cmpd&lt;Number&gt;.</p>
+<p>For reference fingerprints <em>SDFile</em>, this value is only used during <em>LabelPrefix | MolNameOrLabelPrefix</em>
+values of <strong>--ReferenceCompoundIDMode</strong> option; otherwise, it's ignored.</p>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--DatabaseCompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The values specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--ReferenceCompoundIDField</strong> <em>DataFieldName</em></strong></dt>
+<dd>
+<p>Specify reference fingerprints <em>SDFile</em> datafield label for generating compound IDs.
+This value is only used during <em>DataField</em> value of <strong>--ReferenceCompoundIDMode</strong> option.</p>
+<p>Examples for <em>DataField</em> value of <strong>--ReferenceCompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+</dd>
+<dt><strong><strong>--ReferenceCompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs from reference fingerprints <em>SDFile</em> during similarity and
+dissimilarity search for output SD and CSV/TSV text files: use a <em>SDFile</em> datafield value; use
+molname line from <em>SDFile</em>; generate a sequential ID with specific prefix; use combination of both
+MolName and LabelPrefix with usage of LabelPrefix values for empty molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--ReferenceCompoundIDMode</strong>, molname line in <em>SDFiles</em>
+takes precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+</dd>
+<dt><strong><strong>--ReferenceFingerprintsCol</strong> <em>col number | col name</em></strong></dt>
+<dd>
+<p>This value is <strong>--ReferenceColMode</strong> specific. It specifies fingerprints column to use during similarity
+and dissimilarity search for reference fingerprints <em>TextFile</em>. Possible values: <em>col number or col label</em>.
+Default value: <em>first column containing the word Fingerprints in its column label</em>.</p>
+</dd>
+<dt><strong><strong>--ReferenceFingerprintsField</strong> <em>FieldLabel</em></strong></dt>
+<dd>
+<p>Fingerprints field label to use during similarity and dissimilarity search for reference fingerprints <em>SDFile</em>.
+Default value: <em>first data field label containing the word Fingerprints in its label</em></p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>RootName</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file name:
+&lt;ReferenceFileName&gt;SimilaritySearching.&lt;Ext&gt;. The output file type determines &lt;Ext&gt;
+value. The sdf, csv, and tsv &lt;Ext&gt; values are used for SD, comma/semicolon, and tab delimited
+text files respectively.</p>
+</dd>
+<dt><strong><strong>-s, --SearchMode</strong> <em>SimilaritySearch | DissimilaritySearch</em></strong></dt>
+<dd>
+<p>Specify how to find molecules from database molecules for individual reference molecules or
+set of reference molecules: Find similar molecules or dissimilar molecules from database molecules.
+Possible values: <em>SimilaritySearch | DissimilaritySearch</em>. Default value: <em>SimilaritySearch</em>.</p>
+<p>During <em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option, the meaning of the following
+options is switched and they correspond to dissimilar molecules instead of similar molecules:
+<strong>--SimilarCountMode</strong>, <strong>-n, --NumOfSimilarMolecules</strong>, <strong>--PercentSimilarMolecules</strong>,
+<strong>-k, --kNN</strong>.</p>
+</dd>
+<dt><strong><strong>--SimilarCountMode</strong> <em>NumOfSimilar | PercentSimilar</em></strong></dt>
+<dd>
+<p>Specify method used to count similar molecules found from database molecules for individual
+reference molecules or set of reference molecules: Find number of similar molecules or percent
+of similar molecules from database molecules. Possible values: <em>NumOfSimilar | PercentSimilar</em>.
+Default value: <em>NumOfSimilar</em>.</p>
+<p>The values for number of similar molecules and percent similar molecules are specified
+using options <strong>-n, NumOfSimilarMolecule</strong> and <strong>--PercentSimilarMolecules</strong>.</p>
+<p>This option is <strong>-s, --SearchMode</strong> dependent: It corresponds to dissimilar molecules during
+<em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--SimilarityCutoff</strong> <em>number</em></strong></dt>
+<dd>
+<p>Similarity cutoff value to use during comparison of similarity value between a pair of database
+and reference molecules calculated by similarity comparison methods for fingerprints bit-vector
+vector strings data values. Possible values: <em>Any valid number</em>. Default value: <em>0.75</em>.</p>
+<p>The comparison value between a pair of database and reference molecule must meet the cutoff
+criterion as shown below:</p>
+<div class="OptionsBox">
+    SeachMode      CutoffCriterion  ComparisonValues</div>
+<div class="OptionsBox">
+    Similarity     &gt;=               Higher value implies high similarity
+<br/>    Dissimilarity  &lt;=               Lower value implies high dissimilarity</div>
+<p>This option is ignored during <em>No</em> value of <strong>--GroupFusionApplyCutoff</strong> for <em>MultipleReferences</em>
+<strong>-m, --mode</strong>.</p>
+<p>This option is <strong>-s, --SearchMode</strong> dependent: It corresponds to dissimilar molecules during
+<em>DissimilaritySearch</em> value of <strong>-s, --SearchMode</strong> option.</p>
+</dd>
+<dt><strong><strong>-v, --VectorComparisonMode</strong> <em>SupportedSimilarityName | SupportedDistanceName</em></strong></dt>
+<dd>
+<p>Specify what similarity or distance coefficient to use for calculating similarity between fingerprint
+vector strings data values in <em>ReferenceFingerprintsFile</em> and <em>DatabaseFingerprintsFile</em> during
+similarity search. Possible values:  <em>TanimotoSimilairy | ... | ManhattanDistance | ...</em>. Default
+value: <em>TanimotoSimilarity</em>.</p>
+<p>The value of <strong>-v, --VectorComparisonMode</strong>, in conjunction with <strong>--VectorComparisonFormulism</strong>,
+decides which type of similarity and distance coefficient formulism gets used.</p>
+<p>The current releases supports the following similarity and distance coefficients: <em>CosineSimilarity,
+CzekanowskiSimilarity, DiceSimilarity, OchiaiSimilarity, JaccardSimilarity, SorensonSimilarity, TanimotoSimilarity,
+CityBlockDistance, EuclideanDistance, HammingDistance, ManhattanDistance, SoergelDistance</em>. These
+similarity and distance coefficients are described below.</p>
+<p><strong>FingerprintsVector.pm</strong> module, used to calculate similarity and distance coefficients,
+provides support to perform comparison between vectors containing three different types of
+values:</p>
+<p>Type I: OrderedNumericalValues</p>
+<div class="OptionsBox">
+    . Size of two vectors are same
+<br/>    . Vectors contain real values in a specific order. For example: MACCS keys
+      count, Topological pharmnacophore atom pairs and so on.</div>
+<p>Type II: UnorderedNumericalValues</p>
+<div class="OptionsBox">
+    . Size of two vectors might not be same
+<br/>    . Vectors contain unordered real value identified by value IDs. For example:
+      Toplogical atom pairs, Topological atom torsions and so on</div>
+<p>Type III: AlphaNumericalValues</p>
+<div class="OptionsBox">
+    . Size of two vectors might not be same
+<br/>    . Vectors contain unordered alphanumerical values. For example: Extended
+      connectivity fingerprints, atom neighborhood fingerprints.</div>
+<p>Before performing similarity or distance calculations between vectors containing UnorderedNumericalValues
+or AlphaNumericalValues, the vectors are transformed into vectors containing unique OrderedNumericalValues
+using value IDs for UnorderedNumericalValues and values itself for AlphaNumericalValues.</p>
+<p>Three forms of similarity and distance calculation between two vectors, specified using <strong>--VectorComparisonFormulism</strong>
+option, are supported: <em>AlgebraicForm, BinaryForm or SetTheoreticForm</em>.</p>
+<p>For <em>BinaryForm</em>, the ordered list of processed final vector values containing the value or
+count of each unique value type is simply converted into a binary vector containing 1s and 0s
+corresponding to presence or absence of values before calculating similarity or distance between
+two vectors.</p>
+<p>For two fingerprint vectors A and B of same size containing OrderedNumericalValues, let:</p>
+<div class="OptionsBox">
+    N = Number values in A or B</div>
+<div class="OptionsBox">
+    Xa = Values of vector A
+<br/>    Xb = Values of vector B</div>
+<div class="OptionsBox">
+    Xai = Value of ith element in A
+<br/>    Xbi = Value of ith element in B</div>
+<div class="OptionsBox">
+   SUM = Sum of i over N values</div>
+<p>For SetTheoreticForm of calculation between two vectors, let:</p>
+<div class="OptionsBox">
+    SetIntersectionXaXb = SUM ( MIN ( Xai, Xbi ) )
+<br/>    SetDifferenceXaXb = SUM ( Xai ) + SUM ( Xbi ) - SUM ( MIN ( Xai, Xbi ) )</div>
+<p>For BinaryForm of calculation between two vectors, let:</p>
+<div class="OptionsBox">
+    Na = Number of bits set to &quot;1&quot; in A = SUM ( Xai )
+<br/>    Nb = Number of bits set to &quot;1&quot; in B = SUM ( Xbi )
+<br/>    Nc = Number of bits set to &quot;1&quot; in both A and B = SUM ( Xai * Xbi )
+<br/>    Nd = Number of bits set to &quot;0&quot; in both A and B
+       = SUM ( 1 - Xai - Xbi + Xai * Xbi)</div>
+<div class="OptionsBox">
+    N = Number of bits set to &quot;1&quot; or &quot;0&quot; in A or B = Size of A or B = Na + Nb - Nc + Nd</div>
+<p>Additionally, for BinaryForm various values also correspond to:</p>
+<div class="OptionsBox">
+    Na = | Xa |
+<br/>    Nb = | Xb |
+<br/>    Nc = | SetIntersectionXaXb |
+<br/>    Nd = N - | SetDifferenceXaXb |</div>
+<div class="OptionsBox">
+    | SetDifferenceXaXb | = N - Nd = Na + Nb - Nc + Nd - Nd = Na + Nb - Nc
+                          =  | Xa | + | Xb | - | SetIntersectionXaXb |</div>
+<p>Various similarity and distance coefficients [ Ref 40, Ref 62, Ref 64 ] for a pair of vectors A and B
+in <em>AlgebraicForm, BinaryForm and SetTheoreticForm</em> are defined as follows:</p>
+<p><strong>CityBlockDistance</strong>: ( same as HammingDistance and ManhattanDistance)</p>
+<p><em>AlgebraicForm</em>: SUM ( ABS ( Xai - Xbi ) )</p>
+<p><em>BinaryForm</em>: ( Na - Nc ) + ( Nb - Nc ) = Na + Nb - 2 * Nc</p>
+<p><em>SetTheoreticForm</em>: | SetDifferenceXaXb | - | SetIntersectionXaXb | = SUM ( Xai ) + SUM ( Xbi ) - 2 * ( SUM ( MIN ( Xai, Xbi ) ) )</p>
+<p><strong>CosineSimilarity</strong>:  ( same as OchiaiSimilarityCoefficient)</p>
+<p><em>AlgebraicForm</em>: SUM ( Xai * Xbi ) / SQRT ( SUM ( Xai ** 2) * SUM ( Xbi ** 2) )</p>
+<p><em>BinaryForm</em>: Nc / SQRT ( Na * Nb)</p>
+<p><em>SetTheoreticForm</em>: | SetIntersectionXaXb | / SQRT ( |Xa| * |Xb| ) = SUM ( MIN ( Xai, Xbi ) ) / SQRT ( SUM ( Xai ) * SUM ( Xbi ) )</p>
+<p><strong>CzekanowskiSimilarity</strong>: ( same as DiceSimilarity and SorensonSimilarity)</p>
+<p><em>AlgebraicForm</em>: ( 2 * ( SUM ( Xai * Xbi ) )  ) / ( SUM ( Xai ** 2) + SUM ( Xbi **2 ) )</p>
+<p><em>BinaryForm</em>: 2 * Nc / ( Na + Nb )</p>
+<p><em>SetTheoreticForm</em>: 2 * | SetIntersectionXaXb | / ( |Xa| + |Xb| ) = 2 * ( SUM ( MIN ( Xai, Xbi ) ) ) / ( SUM ( Xai ) + SUM ( Xbi ) )</p>
+<p><strong>DiceSimilarity</strong>: ( same as CzekanowskiSimilarity and SorensonSimilarity)</p>
+<p><em>AlgebraicForm</em>: ( 2 * ( SUM ( Xai * Xbi ) )  ) / ( SUM ( Xai ** 2) + SUM ( Xbi **2 ) )</p>
+<p><em>BinaryForm</em>: 2 * Nc / ( Na + Nb )</p>
+<p><em>SetTheoreticForm</em>: 2 * | SetIntersectionXaXb | / ( |Xa| + |Xb| ) = 2 * ( SUM ( MIN ( Xai, Xbi ) ) ) / ( SUM ( Xai ) + SUM ( Xbi ) )</p>
+<p><strong>EuclideanDistance</strong>:</p>
+<p><em>AlgebraicForm</em>: SQRT ( SUM ( ( ( Xai - Xbi ) ** 2 ) ) )</p>
+<p><em>BinaryForm</em>: SQRT ( ( Na - Nc ) + ( Nb - Nc ) ) = SQRT ( Na + Nb - 2 * Nc )</p>
+<p><em>SetTheoreticForm</em>: SQRT ( | SetDifferenceXaXb | - | SetIntersectionXaXb | ) = SQRT (  SUM ( Xai ) + SUM ( Xbi ) - 2 * ( SUM ( MIN ( Xai, Xbi ) ) ) )</p>
+<p><strong>HammingDistance</strong>:  ( same as CityBlockDistance and ManhattanDistance)</p>
+<p><em>AlgebraicForm</em>: SUM ( ABS ( Xai - Xbi ) )</p>
+<p><em>BinaryForm</em>: ( Na - Nc ) + ( Nb - Nc ) = Na + Nb - 2 * Nc</p>
+<p><em>SetTheoreticForm</em>: | SetDifferenceXaXb | - | SetIntersectionXaXb | = SUM ( Xai ) + SUM ( Xbi ) - 2 * ( SUM ( MIN ( Xai, Xbi ) ) )</p>
+<p><strong>JaccardSimilarity</strong>: ( same as TanimotoSimilarity)</p>
+<p><em>AlgebraicForm</em>:  SUM ( Xai * Xbi ) / ( SUM ( Xai ** 2 ) + SUM ( Xbi ** 2 ) - SUM ( Xai * Xbi ) )</p>
+<p><em>BinaryForm</em>:  Nc / ( ( Na - Nc ) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc )</p>
+<p><em>SetTheoreticForm</em>: | SetIntersectionXaXb | / | SetDifferenceXaXb | = SUM ( MIN ( Xai, Xbi ) ) / (  SUM ( Xai ) + SUM ( Xbi ) - SUM ( MIN ( Xai, Xbi ) ) )</p>
+<p><strong>ManhattanDistance</strong>:  ( same as CityBlockDistance and HammingDistance)</p>
+<p><em>AlgebraicForm</em>: SUM ( ABS ( Xai - Xbi ) )</p>
+<p><em>BinaryForm</em>: ( Na - Nc ) + ( Nb - Nc ) = Na + Nb - 2 * Nc</p>
+<p><em>SetTheoreticForm</em>: | SetDifferenceXaXb | - | SetIntersectionXaXb | = SUM ( Xai ) + SUM ( Xbi ) - 2 * ( SUM ( MIN ( Xai, Xbi ) ) )</p>
+<p><strong>OchiaiSimilarity</strong>:  ( same as CosineSimilarity)</p>
+<p><em>AlgebraicForm</em>: SUM ( Xai * Xbi ) / SQRT ( SUM ( Xai ** 2) * SUM ( Xbi ** 2) )</p>
+<p><em>BinaryForm</em>: Nc / SQRT ( Na * Nb)</p>
+<p><em>SetTheoreticForm</em>: | SetIntersectionXaXb | / SQRT ( |Xa| * |Xb| ) = SUM ( MIN ( Xai, Xbi ) ) / SQRT ( SUM ( Xai ) * SUM ( Xbi ) )</p>
+<p><strong>SorensonSimilarity</strong>: ( same as CzekanowskiSimilarity and DiceSimilarity)</p>
+<p><em>AlgebraicForm</em>: ( 2 * ( SUM ( Xai * Xbi ) )  ) / ( SUM ( Xai ** 2) + SUM ( Xbi **2 ) )</p>
+<p><em>BinaryForm</em>: 2 * Nc / ( Na + Nb )</p>
+<p><em>SetTheoreticForm</em>: 2 * | SetIntersectionXaXb | / ( |Xa| + |Xb| ) = 2 * ( SUM ( MIN ( Xai, Xbi ) ) ) / ( SUM ( Xai ) + SUM ( Xbi ) )</p>
+<p><strong>SoergelDistance</strong>:</p>
+<p><em>AlgebraicForm</em>:  SUM ( ABS ( Xai - Xbi ) ) / SUM ( MAX ( Xai, Xbi ) )</p>
+<p><em>BinaryForm</em>: 1 - Nc / ( Na + Nb - Nc ) = ( Na + Nb - 2 * Nc ) / ( Na + Nb - Nc )</p>
+<p><em>SetTheoreticForm</em>: ( | SetDifferenceXaXb | - | SetIntersectionXaXb | ) / | SetDifferenceXaXb | = ( SUM ( Xai ) + SUM ( Xbi ) - 2 * ( SUM ( MIN ( Xai, Xbi ) ) ) ) / ( SUM ( Xai ) + SUM ( Xbi ) - SUM ( MIN ( Xai, Xbi ) ) )</p>
+<p><strong>TanimotoSimilarity</strong>:  ( same as JaccardSimilarity)</p>
+<p><em>AlgebraicForm</em>:  SUM ( Xai * Xbi ) / ( SUM ( Xai ** 2 ) + SUM ( Xbi ** 2 ) - SUM ( Xai * Xbi ) )</p>
+<p><em>BinaryForm</em>:  Nc / ( ( Na - Nc ) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc )</p>
+<p><em>SetTheoreticForm</em>: | SetIntersectionXaXb | / | SetDifferenceXaXb | = SUM ( MIN ( Xai, Xbi ) ) / (  SUM ( Xai ) + SUM ( Xbi ) - SUM ( MIN ( Xai, Xbi ) ) )</p>
+</dd>
+<dt><strong><strong>--VectorComparisonFormulism</strong> <em>AlgebraicForm | BinaryForm | SetTheoreticForm</em></strong></dt>
+<dd>
+<p>Specify fingerprints vector comparison formulism to use for calculation similarity and distance
+coefficients during <strong>-v, --VectorComparisonMode</strong>. Possible values: <em>AlgebraicForm | BinaryForm |
+SetTheoreticForm</em>. Default value: <em>AlgebraicForm</em>.</p>
+<p>For fingerprint vector strings containing <strong>AlphaNumericalValues</strong> data values - <strong>ExtendedConnectivityFingerprints</strong>,
+<strong>AtomNeighborhoodsFingerprints</strong> and so on - all three formulism result in same value during similarity and distance
+calculations.</p>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>DirName</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To perform similarity search using Tanimoto coefficient by treating all reference molecules as a set
+to find 10 most similar database molecules with application of Max group fusion rule and similarity
+cutoff to supported fingerprints strings data in SD fingerprints files present in a data fields with
+Fingerprint substring in their labels, and create a ReferenceFPHexSimilaritySearching.csv file containing
+sequentially generated database compound IDs with Cmpd prefix, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -o ReferenceSampleFPHex.sdf
+      DatabaseSampleFPHex.sdf</div>
+<p>To perform similarity search using Tanimoto coefficient by treating all reference molecules as a set
+to find 10 most similar database molecules with application of Max group fusion rule and similarity
+cutoff to supported fingerprints strings data in FP fingerprints files, and create a
+SimilaritySearchResults.csv file containing database compound IDs retireved from FP file, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -r SimilaritySearchResults -o
+      ReferenceSampleFPBin.fpf DatabaseSampleFPBin.fpf</div>
+<p>To perform similarity search using Tanimoto coefficient by treating all reference molecules as a set
+to find 10 most similar database database molecules with application of Max group fusion rule and
+similarity cutoff to supported fingerprints strings data in text fingerprints files present in a column
+names containing Fingerprint substring in their names, and create a ReferenceFPHexSimilaritySearching.csv
+file containing database compound IDs retireved column name containing CompoundID substring or
+sequentially generated compound IDs, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -o ReferenceSampleFPCount.csv
+      DatabaseSampleFPCount.csv</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find 10 most similar database molecules for each reference molecule with application of similarity cutoff to
+supported fingerprints strings data in SD fingerprints files present in a data fields with Fingerprint substring
+in their labels, and create a ReferenceFPHexSimilaritySearching.csv file containing sequentially generated
+reference and database compound IDs with Cmpd prefix, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -mode IndividualReference -o
+      ReferenceSampleFPHex.sdf DatabaseSampleFPHex.sdf</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find 10 most similar database molecules for each reference molecule with application of similarity cutoff to
+supported fingerprints strings data in FP fingerprints files, and create a ReferenceFPHexSimilaritySearching.csv
+file containing references and database compound IDs retireved from FP file, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -mode IndividualReference -o
+      ReferenceSampleFPHex.fpf DatabaseSampleFPHex.fpf</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find 10 most similar database molecules for each reference molecule with application of similarity cutoff to
+supported fingerprints strings data in text fingerprints files present in a column names containing Fingerprint
+substring in their names, and create a ReferenceFPHexSimilaritySearching.csv file containing reference and
+database compound IDs retrieved column name containing CompoundID substring or sequentially generated
+compound IDs, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -mode IndividualReference -o
+      ReferenceSampleFPHex.csv DatabaseSampleFPHex.csv</div>
+<p>To perform dissimilarity search using Tanimoto coefficient by treating all reference molecules as a set
+to find 10 most dissimilar database molecules with application of Max group fusion rule and similarity
+cutoff to supported fingerprints strings data in SD fingerprints files present in a data fields with
+Fingerprint substring in their labels, and create a ReferenceFPHexSimilaritySearching.csv file containing
+sequentially generated database compound IDs with Cmpd prefix, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl --mode MultipleReferences --SearchMode
+      DissimilaritySearch -o ReferenceSampleFPHex.sdf DatabaseSampleFPHex.sdf</div>
+<p>To perform similarity search using CityBlock distance by treating reference molecules as individual molecules
+to find 10 most similar database molecules for each reference molecule with application of distance cutoff
+to supported vector fingerprints strings data in SD fingerprints files present in a data fields with Fingerprint
+substring in their labels, and create a ReferenceFPHexSimilaritySearching.csv file containing sequentially generated
+reference and database compound IDs with Cmpd prefix, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl -mode IndividualReference
+      --VectorComparisonMode CityBlockDistance --VectorComparisonFormulism
+      AlgebraicForm --DistanceCutoff 10 -o
+      ReferenceSampleFPCount.sdf DatabaseSampleFPCount.sdf</div>
+<p>To perform similarity search using Tanimoto coefficient by treating all reference molecules as a set
+to find 100 most similar database molecules with application of Mean group fusion rule to to top 10
+reference molecules with in similarity cutoff of 0.75 to supported fingerprints strings data in FP fingerprints
+files, and create a ReferenceFPHexSimilaritySearching.csv file containing database compound IDs retrieved
+from FP file, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl --mode MultipleReferences --SearchMode
+      SimilaritySearch --BitVectorComparisonMode TanimotoSimilarity
+      --GroupFusionRule Mean --GroupFusionApplyCutoff Yes --kNN 10
+      --SimilarityCutoff 0.75 --SimilarCountMode NumOfSimilar
+      --NumOfSimilarMolecules 100 -o
+      ReferenceSampleFPHex.fpf DatabaseSampleFPHex.fpf</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find 2 percent of most similar database molecules for each reference molecule with application of similarity
+cutoff of 0.85 to supported fingerprints strings data in text fingerprints files present in specific columns and
+create a ReferenceFPHexSimilaritySearching.csv file containing reference and database compoundIDs retrieved
+from specific columns, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl --mode IndividualReference --SearchMode
+      SimilaritySearch --BitVectorComparisonMode TanimotoSimilarity
+      --ReferenceColMode ColLabel --ReferenceFingerprintsCol Fingerprints
+      --ReferenceCompoundIDCol CompoundID --DatabaseColMode Collabel
+      --DatabaseCompoundIDCol CompoundID --DatabaseFingerprintsCol
+      Fingerprints --SimilarityCutoff 0.85 --SimilarCountMode PercentSimilar
+      --PercentSimilarMolecules 2 -o
+      ReferenceSampleFPHex.csv DatabaseSampleFPHex.csv</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find top 50 most similar database molecules for each reference molecule with application of similarity
+cutoff of 0.85 to supported fingerprints strings data in SD fingerprints files present in specific data fields and
+create both ReferenceFPHexSimilaritySearching.csv and ReferenceFPHexSimilaritySearching.sdf files containing
+reference and database compoundIDs retrieved from specific data fields, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl --mode IndividualReference --SearchMode
+      SimilaritySearch --BitVectorComparisonMode TanimotoSimilarity
+      --ReferenceFingerprintsField Fingerprints
+      --DatabaseFingerprintsField Fingerprints
+      --ReferenceCompoundIDMode DataField --ReferenceCompoundIDField CmpdID
+      --DatabaseCompoundIDMode DataField --DatabaseCompoundIDField CmpdID
+      --SimilarityCutoff 0.85 --SimilarCountMode NumOfSimilar
+      --NumOfSimilarMolecules 50 --output both -o
+      ReferenceSampleFPHex.sdf DatabaseSampleFPHex.sdf</div>
+<p>To perform similarity search  using Tanimoto coefficient by treating reference molecules as individual molecules
+to find 1 percent of  most similar database molecules for each reference molecule with application of similarity
+cutoff to supported fingerprints strings data in SD fingerprints files present in specific data field labels, and create
+both ReferenceFPHexSimilaritySearching.csv ReferenceFPHexSimilaritySearching.sdf files containing reference and
+database compound IDs retrieved from specific data field labels along with other specific data for database
+molecules, type:</p>
+<div class="ExampleBox">
+    % SimilaritySearchingFingerprints.pl --mode IndividualReference --SearchMode
+      SimilaritySearch --BitVectorComparisonMode TanimotoSimilarity
+      --ReferenceFingerprintsField Fingerprints
+      --DatabaseFingerprintsField Fingerprints
+      --ReferenceCompoundIDMode DataField --ReferenceCompoundIDField CmpdID
+      --DatabaseCompoundIDMode DataField --DatabaseCompoundIDField CmpdID
+      --DatabaseDataFieldsMode Specify --DatabaseDataFields &quot;TPSA,SLogP&quot;
+      --SimilarityCutoff 0.75 --SimilarCountMode PercentSimilar
+      --PercentSimilarMolecules 1 --output both --OutDelim comma --quote Yes
+      --precision 3 -o ReferenceSampleFPHex.sdf DatabaseSampleFPHex.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoFingerprintsFiles.html">InfoFingerprintsFiles.pl</a>,&nbsp<a href="./SimilarityMatricesFingerprints.html">SimilarityMatricesFingerprints.pl</a>,&nbsp<a href="./AtomNeighborhoodsFingerprints.html">AtomNeighborhoodsFingerprints.pl</a>,&nbsp
+<a href="./ExtendedConnectivityFingerprints.html">ExtendedConnectivityFingerprints.pl</a>,&nbsp<a href="./MACCSKeysFingerprints.html">MACCSKeysFingerprints.pl</a>,&nbsp<a href="./PathLengthFingerprints.html">PathLengthFingerprints.pl</a>,&nbsp
+<a href="./TopologicalAtomPairsFingerprints.html">TopologicalAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalAtomTorsionsFingerprints.html">TopologicalAtomTorsionsFingerprints.pl</a>,&nbsp
+<a href="./TopologicalPharmacophoreAtomPairsFingerprints.html">TopologicalPharmacophoreAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html">TopologicalPharmacophoreAtomTripletsFingerprints.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SimilarityMatricesFingerprints.html" title="SimilarityMatricesFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SortSDFiles.html" title="SortSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>SimilaritySearchingFingerprints.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

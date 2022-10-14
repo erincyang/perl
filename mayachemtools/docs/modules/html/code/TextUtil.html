@@ -1,0 +1,613 @@
+<html>
+<head>
+<title>MayaChemTools:Code:TextUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-TextUtil-"></a>   1 <span class="k">package </span><span class="i">TextUtil</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: TextUtil.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:58:01 $</span>
+   5 <span class="c"># $Revision: 1.48 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Text::ParseWords</span><span class="sc">;</span>
+  32 
+  33 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  34 
+  35 <span class="i">@ISA</span> = <span class="q">qw(Exporter)</span><span class="sc">;</span>
+  36 <span class="i">@EXPORT</span> = <span class="q">qw(AddNumberSuffix ContainsWhiteSpaces GetTextLine GetTextFileDataByUniqueKey GetTextFileDataByNonUniqueKey HashCode IsEmpty IsNumberPowerOfNumber IsInteger IsPositiveInteger IsFloat IsNotEmpty IsNumerical JoinWords SplitWords  QuoteAWord RemoveLeadingWhiteSpaces RemoveTrailingWhiteSpaces RemoveLeadingAndTrailingWhiteSpaces WrapText)</span><span class="sc">;</span>
+  37 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  38 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  39 
+  40 <span class="c"># Add number suffix...</span>
+<a name="AddNumberSuffix-"></a>  41 <span class="k">sub </span><span class="m">AddNumberSuffix</span> <span class="s">{</span>
+  42   <span class="k">my</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  43   <span class="k">my</span><span class="s">(</span><span class="i">$ValueWithSuffix</span><span class="cm">,</span> <span class="i">$Suffix</span><span class="s">)</span><span class="sc">;</span>
+  44 
+  45   <span class="i">$ValueWithSuffix</span> = <span class="i">$Value</span><span class="sc">;</span>
+  46   <span class="k">if</span> <span class="s">(</span>!<span class="i">IsPositiveInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+  47     <span class="k">return</span> <span class="i">$ValueWithSuffix</span><span class="sc">;</span>
+  48   <span class="s">}</span>
+  49   <span class="i">$Suffix</span> = <span class="q">&quot;th&quot;</span><span class="sc">;</span>
+  50   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> &lt; <span class="n">10</span> || <span class="i">$Value</span> &gt; <span class="n">20</span><span class="s">)</span> <span class="s">{</span>
+  51     <span class="k">my</span> <span class="i">$Remainder</span> = <span class="i">$Value</span> % <span class="n">10</span><span class="sc">;</span>
+  52     <span class="i">$Suffix</span> = <span class="s">(</span><span class="i">$Remainder</span> == <span class="n">1</span><span class="s">)</span> ? <span class="q">&quot;st&quot;</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="i">$Remainder</span> == <span class="n">2</span><span class="s">)</span> ? <span class="q">&quot;nd&quot;</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="i">$Remainder</span> == <span class="n">3</span><span class="s">)</span> ? <span class="q">&quot;rd&quot;</span> <span class="co">:</span> <span class="q">&quot;th&quot;</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+  53   <span class="s">}</span>
+  54   <span class="i">$ValueWithSuffix</span> = <span class="q">&quot;${ValueWithSuffix}${Suffix}&quot;</span><span class="sc">;</span>
+  55   <span class="k">return</span> <span class="i">$ValueWithSuffix</span><span class="sc">;</span>
+  56 <span class="s">}</span>
+  57 
+  58 <span class="c"># Check out the string: Doen it contain any white space characters?</span>
+<a name="ContainsWhiteSpaces-"></a>  59 <span class="k">sub </span><span class="m">ContainsWhiteSpaces</span> <span class="s">{</span>
+  60   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  61   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">0</span><span class="sc">;</span>
+  62 
+  63   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+  64     <span class="i">$Status</span> = <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[ \t\r\n\f]/</span> <span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+  65   <span class="s">}</span>
+  66   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+  67 <span class="s">}</span>
+  68 
+  69 <span class="c"># Read the line, change to UNIX new line char, and chop off new line char as well...</span>
+<a name="GetTextLine-"></a>  70 <span class="k">sub </span><span class="m">GetTextLine</span> <span class="s">{</span>
+  71   <span class="k">my</span><span class="s">(</span><span class="i">$TextFileRef</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  72   <span class="k">my</span><span class="s">(</span><span class="i">$Line</span><span class="s">)</span> = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  73 
+  74   <span class="c"># Get the next non empty line...</span>
+  75   <span class="j">LINE:</span> <span class="k">while</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$_</span> = <span class="q">&lt;$TextFileRef&gt;</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+  76     <span class="c"># Change Windows and Mac new line char to UNIX...</span>
+  77     <span class="q">s/(\r\n)|(\r)/\n/g</span><span class="sc">;</span>
+  78 
+  79     <span class="c"># Take out any new line char at the end by explicitly removing it instead of using</span>
+  80     <span class="c"># chomp, which might not always work correctly on files generated on a system</span>
+  81     <span class="c"># with a value of input line separator different from the current system...</span>
+  82     <span class="q">s/\n$//g</span><span class="sc">;</span>
+  83 
+  84     <span class="c"># Doesn&#39;t hurt to chomp...</span>
+  85     <span class="k">chomp</span><span class="sc">;</span>
+  86 
+  87     <span class="i">$Line</span> = <span class="i">$_</span><span class="sc">;</span>
+  88     <span class="k">if</span> <span class="s">(</span><span class="k">length</span> <span class="i">$Line</span><span class="s">)</span> <span class="s">{</span>
+  89       <span class="k">last</span> <span class="j">LINE</span><span class="sc">;</span>
+  90     <span class="s">}</span>
+  91   <span class="s">}</span>
+  92   <span class="k">return</span> <span class="i">$Line</span><span class="sc">;</span>
+  93 <span class="s">}</span>
+  94 
+  95 <span class="c"># Load data from a CSV file into the specified hash reference using a specific</span>
+  96 <span class="c"># column for unique data key values.</span>
+  97 <span class="c">#</span>
+  98 <span class="c"># The lines starting with # are treated as comments and ignored. First line</span>
+  99 <span class="c"># not starting with # must contain column labels and the number of columns in</span>
+ 100 <span class="c"># all other data rows must match the number of column labels.</span>
+ 101 <span class="c">#</span>
+ 102 <span class="c"># The first column is assumed to contain data key value by default; all other columns</span>
+ 103 <span class="c"># contain data as indicated in their column labels.</span>
+ 104 <span class="c">#</span>
+ 105 <span class="c"># In order to avoid dependence of data access on the specified column labels, the</span>
+ 106 <span class="c"># column data is loaded into hash with Column&lt;Num&gt; hash keys, where column number</span>
+ 107 <span class="c"># start from 1. The data key column is not available as Colnum&lt;Num&gt; hash key;</span>
+ 108 <span class="c">#</span>
+ 109 <span class="c"># The format of the data structure loaded into a specified hash reference is:</span>
+ 110 <span class="c">#</span>
+ 111 <span class="c"># @{$TextDataMapRef-&gt;{DataKeys}} - Array of unique data keys</span>
+ 112 <span class="c"># @{$TextDataMapRef-&gt;{ColLabels}} - Array of column labels</span>
+ 113 <span class="c"># @{$TextDataMapRef-&gt;{DataColIDs}} - Array of data column IDs</span>
+ 114 <span class="c"># $TextDataMapRef-&gt;{NumOfCols} - Number of columns</span>
+ 115 <span class="c"># %{$TextDataMapRef-&gt;{DataKey}} - Hash keys pair: &lt;DataKey, DataKey&gt;</span>
+ 116 <span class="c"># %{$TextDataMapRef-&gt;{DataCol&lt;Num&gt;}} - Hash keys pair: &lt;DataCol&lt;Num&gt;, DataKey&gt;</span>
+ 117 <span class="c">#</span>
+ 118 <span class="c"># Caveats:</span>
+ 119 <span class="c">#   . The column number start from 1.</span>
+ 120 <span class="c">#   . Column data for data key column column is not loaded into &lt;Column&lt;Num&gt;, DataKey&gt; hash keys pairs.</span>
+ 121 <span class="c">#</span>
+<a name="GetTextFileDataByUniqueKey-"></a> 122 <span class="k">sub </span><span class="m">GetTextFileDataByUniqueKey</span> <span class="s">{</span>
+ 123   <span class="k">my</span><span class="s">(</span><span class="i">$TextDataFile</span><span class="cm">,</span> <span class="i">$TextDataMapRef</span><span class="cm">,</span> <span class="i">$DataKeyColNum</span><span class="cm">,</span> <span class="i">$InDelim</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 124 
+ 125   <span class="k">return</span> <span class="i">_GetTextFileData</span><span class="s">(</span><span class="q">&quot;UniqueKey&quot;</span><span class="cm">,</span> <span class="i">$TextDataFile</span><span class="cm">,</span> <span class="i">$TextDataMapRef</span><span class="cm">,</span> <span class="i">$DataKeyColNum</span><span class="cm">,</span> <span class="i">$InDelim</span><span class="s">)</span><span class="sc">;</span>
+ 126 <span class="s">}</span>
+ 127 
+ 128 <span class="c"># Load data from a CSV file into the specified hash reference using a specific</span>
+ 129 <span class="c"># column for non-unique data key values.</span>
+ 130 <span class="c">#</span>
+ 131 <span class="c"># The lines starting with # are treated as comments and ignored. First line</span>
+ 132 <span class="c"># not starting with # must contain column labels and the number of columns in</span>
+ 133 <span class="c"># all other data rows must match the number of column labels.</span>
+ 134 <span class="c">#</span>
+ 135 <span class="c"># The first column is assumed to contain data key value by default; all other columns</span>
+ 136 <span class="c"># contain data as indicated in their column labels.</span>
+ 137 <span class="c">#</span>
+ 138 <span class="c"># In order to avoid dependence of data access on the specified column labels, the</span>
+ 139 <span class="c"># column data is loaded into hash with Column&lt;Num&gt; hash keys, where column number</span>
+ 140 <span class="c"># start from 1. The data key column is not available as Colnum&lt;Num&gt; hash key;</span>
+ 141 <span class="c">#</span>
+ 142 <span class="c"># The format of the data structure loaded into a specified hash reference is:</span>
+ 143 <span class="c">#</span>
+ 144 <span class="c"># @{$TextDataMapRef-&gt;{DataKeys}} - Array of unique data keys</span>
+ 145 <span class="c"># @{$TextDataMapRef-&gt;{ColLabels}} - Array of column labels</span>
+ 146 <span class="c"># @{$TextDataMapRef-&gt;{DataColIDs}} - Array of data column IDs</span>
+ 147 <span class="c"># $TextDataMapRef-&gt;{NumOfCols} - Number of columns</span>
+ 148 <span class="c"># %{$TextDataMapRef-&gt;{DataKey}} - Hash keys pair: &lt;DataKey, DataKey&gt;</span>
+ 149 <span class="c"># @{$TextDataMapRef-&gt;{DataCol&lt;Num&gt;}} - Hash keys pair with data as an array: &lt;DataCol&lt;Num&gt;, DataKey&gt;</span>
+ 150 <span class="c">#</span>
+ 151 <span class="c"># Caveats:</span>
+ 152 <span class="c">#   . The column number start from 1.</span>
+ 153 <span class="c">#   . Column data for data key column column is not loaded into &lt;Column&lt;Num&gt;, DataKey&gt; hash keys pairs.</span>
+ 154 <span class="c">#</span>
+<a name="GetTextFileDataByNonUniqueKey-"></a> 155 <span class="k">sub </span><span class="m">GetTextFileDataByNonUniqueKey</span> <span class="s">{</span>
+ 156   <span class="k">my</span><span class="s">(</span><span class="i">$TextDataFile</span><span class="cm">,</span> <span class="i">$TextDataMapRef</span><span class="cm">,</span> <span class="i">$DataKeyColNum</span><span class="cm">,</span> <span class="i">$InDelim</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 157 
+ 158   <span class="k">return</span> <span class="i">_GetTextFileData</span><span class="s">(</span><span class="q">&quot;NonUniqueKey&quot;</span><span class="cm">,</span> <span class="i">$TextDataFile</span><span class="cm">,</span> <span class="i">$TextDataMapRef</span><span class="cm">,</span> <span class="i">$DataKeyColNum</span><span class="cm">,</span> <span class="i">$InDelim</span><span class="s">)</span><span class="sc">;</span>
+ 159 <span class="s">}</span>
+ 160 
+ 161 <span class="c"># Loadtext file data using unique or non-uniqye data column key...</span>
+ 162 <span class="c">#</span>
+<a name="_GetTextFileData-"></a> 163 <span class="k">sub </span><span class="m">_GetTextFileData</span> <span class="s">{</span>
+ 164   <span class="k">my</span><span class="s">(</span><span class="i">$DataKeyMode</span><span class="cm">,</span> <span class="i">$TextDataFile</span><span class="cm">,</span> <span class="i">$TextDataMapRef</span><span class="cm">,</span> <span class="i">$DataKeyColNum</span><span class="cm">,</span> <span class="i">$InDelim</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 165   <span class="k">my</span><span class="s">(</span><span class="i">$DataKeyColIndex</span><span class="cm">,</span> <span class="i">$LineCount</span><span class="cm">,</span> <span class="i">$IgnoredLineCount</span><span class="cm">,</span> <span class="i">$UniqueDataKeyMode</span><span class="cm">,</span> <span class="i">$DataKey</span><span class="cm">,</span> <span class="i">$Line</span><span class="cm">,</span> <span class="i">$NumOfCols</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$ColNum</span><span class="cm">,</span> <span class="i">$ColID</span><span class="cm">,</span> <span class="i">$ColValue</span><span class="cm">,</span> <span class="i">@LineWords</span><span class="cm">,</span> <span class="i">@ColLabels</span><span class="cm">,</span> <span class="i">@DataColIDs</span><span class="cm">,</span> <span class="i">@DataColNums</span><span class="s">)</span><span class="sc">;</span>
+ 166 
+ 167   <span class="k">print</span> <span class="q">&quot;\nProcessing text data file $TextDataFile...\n&quot;</span><span class="sc">;</span>
+ 168 
+ 169   <span class="i">$UniqueDataKeyMode</span> = <span class="n">0</span><span class="sc">;</span>
+ 170   <span class="k">if</span> <span class="s">(</span><span class="i">$DataKeyMode</span> =~ <span class="q">/^UniqueKey$/i</span><span class="s">)</span> <span class="s">{</span>
+ 171     <span class="i">$UniqueDataKeyMode</span> = <span class="n">1</span><span class="sc">;</span>
+ 172   <span class="s">}</span>
+ 173 
+ 174   <span class="c"># Setup default values...</span>
+ 175   <span class="i">$DataKeyColNum</span> = <span class="k">defined</span>  <span class="i">$DataKeyColNum</span> ? <span class="i">$DataKeyColNum</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 176 
+ 177   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span> <span class="i">$InDelim</span><span class="s">)</span> <span class="s">{</span>
+ 178     <span class="k">if</span> <span class="s">(</span><span class="i">$InDelim</span> =~ <span class="q">/^tab$/i</span><span class="s">)</span> <span class="s">{</span>
+ 179       <span class="i">$InDelim</span> = <span class="q">&quot;\t&quot;</span><span class="sc">;</span>
+ 180     <span class="s">}</span>
+ 181     <span class="k">elsif</span> <span class="s">(</span><span class="i">$InDelim</span> =~ <span class="q">/^semicolon$/i</span><span class="s">)</span> <span class="s">{</span>
+ 182       <span class="i">$InDelim</span> = <span class="q">&quot;\;&quot;</span><span class="sc">;</span>
+ 183     <span class="s">}</span>
+ 184     <span class="k">elsif</span> <span class="s">(</span><span class="i">$InDelim</span> =~ <span class="q">/^comma$/i</span><span class="s">)</span> <span class="s">{</span>
+ 185       <span class="i">$InDelim</span> = <span class="q">&quot;\,&quot;</span><span class="sc">;</span>
+ 186     <span class="s">}</span>
+ 187     <span class="k">else</span> <span class="s">{</span>
+ 188       <span class="k">warn</span> <span class="q">&quot;Warning: Ignoring specified input delimiter: $InDelim. Supported values: comma, semicolon or tab. Using default comma delimiter...&quot;</span><span class="sc">;</span>
+ 189       <span class="i">$InDelim</span> = <span class="q">&quot;\,&quot;</span><span class="sc">;</span>
+ 190     <span class="s">}</span>
+ 191   <span class="s">}</span>
+ 192   <span class="k">else</span> <span class="s">{</span>
+ 193     <span class="k">if</span> <span class="s">(</span><span class="i">$TextDataFile</span> =~ <span class="q">/\.tsv$/i</span><span class="s">)</span> <span class="s">{</span>
+ 194       <span class="i">$InDelim</span> = <span class="q">&quot;\t&quot;</span><span class="sc">;</span>
+ 195     <span class="s">}</span>
+ 196     <span class="k">elsif</span> <span class="s">(</span><span class="i">$TextDataFile</span> =~ <span class="q">/\.csv$/i</span><span class="s">)</span> <span class="s">{</span>
+ 197       <span class="i">$InDelim</span> = <span class="q">&quot;\,&quot;</span><span class="sc">;</span>
+ 198     <span class="s">}</span>
+ 199     <span class="k">else</span> <span class="s">{</span>
+ 200       <span class="k">warn</span> <span class="q">&quot;Warning: Unknown file extension. Using default comma delimiter...&quot;</span><span class="sc">;</span>
+ 201       <span class="i">$InDelim</span> = <span class="q">&quot;\,&quot;</span><span class="sc">;</span>
+ 202     <span class="s">}</span>
+ 203   <span class="s">}</span>
+ 204 
+ 205   <span class="s">(</span><span class="i">$LineCount</span><span class="cm">,</span> <span class="i">$IgnoredLineCount</span><span class="s">)</span> = <span class="s">(</span><span class="n">0</span><span class="s">)</span> x <span class="n">2</span><span class="sc">;</span>
+ 206 
+ 207   <span class="k">open</span> <span class="w">TEXTDATAFILE</span><span class="cm">,</span> <span class="q">&quot;$TextDataFile&quot;</span> <span class="k">or</span> <span class="k">die</span> <span class="q">&quot;Couldn&#39;t open $TextDataFile: $! ...&quot;</span><span class="sc">;</span>
+ 208 
+ 209   <span class="c"># Skip lines up to column labels...</span>
+ 210   <span class="j">LINE:</span> <span class="k">while</span> <span class="s">(</span><span class="i">$Line</span> = <span class="i">TextUtil::GetTextLine</span><span class="s">(</span>\<span class="i">*TEXTDATAFILE</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 211     <span class="i">$LineCount</span>++<span class="sc">;</span>
+ 212     <span class="k">if</span> <span class="s">(</span><span class="i">$Line</span> =~ <span class="q">/^#/</span><span class="s">)</span> <span class="s">{</span>
+ 213       <span class="i">$IgnoredLineCount</span>++<span class="sc">;</span>
+ 214     <span class="s">}</span>
+ 215     <span class="k">else</span> <span class="s">{</span>
+ 216       <span class="k">last</span> <span class="j">LINE</span><span class="sc">;</span>
+ 217     <span class="s">}</span>
+ 218   <span class="s">}</span>
+ 219 
+ 220   <span class="c"># Initialize data map...</span>
+ 221   <span class="i">%</span>{<span class="i">$TextDataMapRef</span>} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 222   <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKeys</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 223   <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">ColLabels</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 224   <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataColIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 225   <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">NumOfCols</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 226 
+ 227   <span class="c"># Process column labels...</span>
+ 228   <span class="i">@ColLabels</span>= <span class="i">quotewords</span><span class="s">(</span><span class="i">$InDelim</span><span class="cm">,</span> <span class="n">0</span><span class="cm">,</span> <span class="i">$Line</span><span class="s">)</span><span class="sc">;</span>
+ 229   <span class="i">$NumOfCols</span> = <span class="i">@ColLabels</span><span class="sc">;</span>
+ 230 
+ 231   <span class="k">if</span> <span class="s">(</span><span class="i">$DataKeyColNum</span> &lt; <span class="n">1</span> || <span class="i">$DataKeyColNum</span> &gt; <span class="i">$NumOfCols</span><span class="s">)</span> <span class="s">{</span>
+ 232     <span class="k">warn</span> <span class="q">&quot;Warning: Ignoring text data file $TextDataFile: Invalid data key column number, $DataKeyColNum, specified. It must be &gt; 0 or &lt;= $NumOfCols, number of columns in the text file ...&quot;</span><span class="sc">;</span>
+ 233     <span class="k">return</span><span class="sc">;</span>
+ 234   <span class="s">}</span>
+ 235   <span class="i">$DataKeyColIndex</span> = <span class="i">$DataKeyColNum</span> - <span class="n">1</span><span class="sc">;</span>
+ 236 
+ 237   <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">NumOfCols</span>} = <span class="i">$NumOfCols</span><span class="sc">;</span>
+ 238   <span class="k">push</span> <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">ColLabels</span>}}<span class="cm">,</span> <span class="i">@ColLabels</span><span class="sc">;</span>
+ 239 
+ 240   <span class="c"># Set up column data IDs for tracking the data...</span>
+ 241   <span class="i">@DataColNums</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 242   <span class="i">@DataColIDs</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 243   <span class="j">COLNUM:</span> <span class="k">for</span> <span class="i">$ColNum</span> <span class="s">(</span><span class="n">1</span> .. <span class="i">$NumOfCols</span><span class="s">)</span> <span class="s">{</span>
+ 244     <span class="k">if</span> <span class="s">(</span><span class="i">$ColNum</span> == <span class="i">$DataKeyColNum</span><span class="s">)</span> <span class="s">{</span>
+ 245       <span class="k">next</span> <span class="j">COLNUM</span><span class="sc">;</span>
+ 246     <span class="s">}</span>
+ 247     <span class="k">push</span> <span class="i">@DataColNums</span><span class="cm">,</span> <span class="i">$ColNum</span><span class="sc">;</span>
+ 248     <span class="i">$ColID</span> = <span class="q">&quot;DataCol${ColNum}&quot;</span><span class="sc">;</span>
+ 249     <span class="k">push</span> <span class="i">@DataColIDs</span><span class="cm">,</span> <span class="i">$ColID</span><span class="sc">;</span>
+ 250   <span class="s">}</span>
+ 251   <span class="k">push</span> <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataColIDs</span>}}<span class="cm">,</span> <span class="i">@DataColIDs</span><span class="sc">;</span>
+ 252 
+ 253   <span class="c"># Initialize column data hash...</span>
+ 254   <span class="i">%</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKey</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 255   <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#DataColNums</span><span class="s">)</span> <span class="s">{</span>
+ 256     <span class="i">$ColNum</span> = <span class="i">$DataColNums</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 257     <span class="i">$ColID</span> = <span class="i">$DataColIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 258     <span class="i">%</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="i">$ColID</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 259   <span class="s">}</span>
+ 260 
+ 261   <span class="j">LINE:</span> <span class="k">while</span> <span class="s">(</span><span class="i">$Line</span> = <span class="i">TextUtil::GetTextLine</span><span class="s">(</span>\<span class="i">*TEXTDATAFILE</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 262     <span class="i">$LineCount</span>++<span class="sc">;</span>
+ 263     <span class="k">if</span> <span class="s">(</span><span class="i">$Line</span> =~ <span class="q">/^#/</span><span class="s">)</span> <span class="s">{</span>
+ 264       <span class="i">$IgnoredLineCount</span>++<span class="sc">;</span>
+ 265       <span class="k">next</span> <span class="j">LINE</span><span class="sc">;</span>
+ 266     <span class="s">}</span>
+ 267 
+ 268     <span class="i">@LineWords</span> = <span class="i">quotewords</span><span class="s">(</span><span class="i">$InDelim</span><span class="cm">,</span> <span class="n">0</span><span class="cm">,</span> <span class="i">$Line</span><span class="s">)</span><span class="sc">;</span>
+ 269     <span class="k">if</span> <span class="s">(</span><span class="i">@LineWords</span> != <span class="i">$NumOfCols</span><span class="s">)</span> <span class="s">{</span>
+ 270       <span class="i">$IgnoredLineCount</span>++<span class="sc">;</span>
+ 271       <span class="k">warn</span> <span class="q">&quot;Warning: The number of data fields, @LineWords, in $TextDataFile must be $NumOfCols.\nIgnoring line number $LineCount: $Line...\n&quot;</span><span class="sc">;</span>
+ 272       <span class="k">next</span> <span class="j">LINE</span><span class="sc">;</span>
+ 273     <span class="s">}</span>
+ 274     <span class="i">$DataKey</span> = <span class="i">$LineWords</span>[<span class="i">$DataKeyColIndex</span>]<span class="sc">;</span>
+ 275 
+ 276     <span class="k">if</span> <span class="s">(</span><span class="i">$UniqueDataKeyMode</span><span class="s">)</span> <span class="s">{</span>
+ 277       <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKey</span>}{<span class="i">$DataKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 278         <span class="i">$IgnoredLineCount</span>++<span class="sc">;</span>
+ 279         <span class="k">warn</span> <span class="q">&quot;Warning: The data key, $DataKey, in data column key number, $DataKeyColNum, is already present.\nIgnoring line number $LineCount: $Line...\n&quot;</span><span class="sc">;</span>
+ 280         <span class="k">next</span> <span class="j">LINE</span><span class="sc">;</span>
+ 281       <span class="s">}</span>
+ 282       <span class="k">push</span> <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKeys</span>}}<span class="cm">,</span> <span class="i">$DataKey</span><span class="sc">;</span>
+ 283       <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKey</span>}{<span class="i">$DataKey</span>} = <span class="i">$DataKey</span><span class="sc">;</span>
+ 284     <span class="s">}</span>
+ 285     <span class="k">else</span> <span class="s">{</span>
+ 286       <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKey</span>}{<span class="i">$DataKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 287         <span class="k">push</span> <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKeys</span>}}<span class="cm">,</span> <span class="i">$DataKey</span><span class="sc">;</span>
+ 288         <span class="i">$TextDataMapRef</span>-&gt;{<span class="w">DataKey</span>}{<span class="i">$DataKey</span>} = <span class="i">$DataKey</span><span class="sc">;</span>
+ 289 
+ 290         <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#DataColNums</span><span class="s">)</span> <span class="s">{</span>
+ 291           <span class="i">$ColNum</span> = <span class="i">$DataColNums</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 292           <span class="i">$ColID</span> = <span class="i">$DataColIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 293           <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="i">$ColID</span>}{<span class="i">$DataKey</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 294         <span class="s">}</span>
+ 295       <span class="s">}</span>
+ 296     <span class="s">}</span>
+ 297 
+ 298     <span class="c"># Track column data values...</span>
+ 299     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#DataColNums</span><span class="s">)</span> <span class="s">{</span>
+ 300       <span class="i">$ColID</span> = <span class="i">$DataColIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 301 
+ 302       <span class="i">$ColNum</span> = <span class="i">$DataColNums</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 303       <span class="i">$ColValue</span> = <span class="i">$LineWords</span>[<span class="i">$ColNum</span> - <span class="n">1</span>]<span class="sc">;</span>
+ 304 
+ 305       <span class="k">if</span> <span class="s">(</span><span class="i">$UniqueDataKeyMode</span><span class="s">)</span> <span class="s">{</span>
+ 306         <span class="i">$TextDataMapRef</span>-&gt;{<span class="i">$ColID</span>}{<span class="i">$DataKey</span>} = <span class="i">$ColValue</span><span class="sc">;</span>
+ 307       <span class="s">}</span>
+ 308       <span class="k">else</span> <span class="s">{</span>
+ 309         <span class="k">push</span> <span class="i">@</span>{<span class="i">$TextDataMapRef</span>-&gt;{<span class="i">$ColID</span>}{<span class="i">$DataKey</span>}}<span class="cm">,</span> <span class="i">$ColValue</span><span class="sc">;</span>
+ 310       <span class="s">}</span>
+ 311     <span class="s">}</span>
+ 312 
+ 313   <span class="s">}</span>
+ 314 
+ 315   <span class="k">print</span> <span class="q">&quot;\nTotal number of lines in file $TextDataFile: $LineCount\n&quot;</span><span class="sc">;</span>
+ 316   <span class="k">print</span> <span class="q">&quot;Total number of lines ignored: $IgnoredLineCount\n&quot;</span><span class="sc">;</span>
+ 317 
+ 318   <span class="k">close</span> <span class="w">TEXTDATAFILE</span><span class="sc">;</span>
+ 319 <span class="s">}</span>
+ 320 
+ 321 <span class="c"># Returns a 32 bit integer hash code using One-at-a-time algorithm By Bob Jenkins [Ref 38]. It&#39;s also implemented in</span>
+ 322 <span class="c"># Perl for internal hash keys in hv.h include file.</span>
+ 323 <span class="c">#</span>
+ 324 <span class="c"># It&#39;s not clear how to force Perl perform unsigned integer arithmetic irrespective of the OS/Platform and</span>
+ 325 <span class="c"># the value of use64bitint flag used during its compilation.</span>
+ 326 <span class="c">#</span>
+ 327 <span class="c"># In order to generate a consistent 32 bit has code across OS/platforms, the following methodology appear</span>
+ 328 <span class="c"># to work:</span>
+ 329 <span class="c">#</span>
+ 330 <span class="c">#    o Use MaxHashCodeMask to retrieve appropriate bits after left shifting by bit operators and additions</span>
+ 331 <span class="c">#    o Stay away from &quot;use integer&quot; to avoid signed integer arithmetic for bit operators</span>
+ 332 <span class="c">#</span>
+ 333 <span class="c">#</span>
+ 334 <span class="c">#   MaxHashCodeMask (2147483647) corresponds to the maximum value which can be stored in 31 bits</span>
+ 335 <span class="c">#</span>
+ 336 <span class="k">my</span><span class="s">(</span><span class="i">$MaxHashCodeMask</span><span class="s">)</span><span class="sc">;</span>
+ 337 <span class="i">$MaxHashCodeMask</span> = <span class="n">2</span>**<span class="n">31</span> - <span class="n">1</span><span class="sc">;</span>
+ 338 
+<a name="HashCode-"></a> 339 <span class="k">sub </span><span class="m">HashCode</span> <span class="s">{</span>
+ 340   <span class="k">my</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 341   <span class="k">my</span><span class="s">(</span><span class="i">$HashCode</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$ShiftedHashCode</span><span class="s">)</span><span class="sc">;</span>
+ 342 
+ 343   <span class="i">$HashCode</span> = <span class="n">0</span><span class="sc">;</span>
+ 344   <span class="k">for</span> <span class="i">$Value</span> <span class="s">(</span><span class="k">unpack</span><span class="s">(</span><span class="q">&#39;C*&#39;</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 345     <span class="i">$HashCode</span> += <span class="i">$Value</span><span class="sc">;</span>
+ 346 
+ 347     <span class="i">$ShiftedHashCode</span> = <span class="i">$HashCode</span> &lt;&lt; <span class="n">10</span><span class="sc">;</span>
+ 348     <span class="k">if</span> <span class="s">(</span><span class="i">$ShiftedHashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 349       <span class="i">$ShiftedHashCode</span> = <span class="i">$ShiftedHashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 350     <span class="s">}</span>
+ 351 
+ 352     <span class="i">$HashCode</span> += <span class="i">$ShiftedHashCode</span><span class="sc">;</span>
+ 353     <span class="k">if</span> <span class="s">(</span><span class="i">$HashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 354       <span class="i">$HashCode</span> = <span class="i">$HashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 355     <span class="s">}</span>
+ 356 
+ 357     <span class="i">$HashCode</span> ^= <span class="s">(</span><span class="i">$HashCode</span> &gt;&gt; <span class="n">6</span><span class="s">)</span><span class="sc">;</span>
+ 358   <span class="s">}</span>
+ 359 
+ 360   <span class="i">$ShiftedHashCode</span> = <span class="i">$HashCode</span> &lt;&lt; <span class="n">3</span><span class="sc">;</span>
+ 361   <span class="k">if</span> <span class="s">(</span><span class="i">$ShiftedHashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 362     <span class="i">$ShiftedHashCode</span> = <span class="i">$ShiftedHashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 363   <span class="s">}</span>
+ 364 
+ 365   <span class="i">$HashCode</span> += <span class="i">$ShiftedHashCode</span><span class="sc">;</span>
+ 366   <span class="k">if</span> <span class="s">(</span><span class="i">$HashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 367     <span class="i">$HashCode</span> = <span class="i">$HashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 368   <span class="s">}</span>
+ 369   <span class="i">$HashCode</span> ^= <span class="s">(</span><span class="i">$HashCode</span> &gt;&gt; <span class="n">11</span><span class="s">)</span><span class="sc">;</span>
+ 370 
+ 371   <span class="i">$ShiftedHashCode</span> = <span class="i">$HashCode</span> &lt;&lt; <span class="n">15</span><span class="sc">;</span>
+ 372   <span class="k">if</span> <span class="s">(</span><span class="i">$ShiftedHashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 373     <span class="i">$ShiftedHashCode</span> = <span class="i">$ShiftedHashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 374   <span class="s">}</span>
+ 375 
+ 376   <span class="i">$HashCode</span> += <span class="i">$ShiftedHashCode</span><span class="sc">;</span>
+ 377   <span class="k">if</span> <span class="s">(</span><span class="i">$HashCode</span> &gt; <span class="i">$MaxHashCodeMask</span><span class="s">)</span> <span class="s">{</span>
+ 378     <span class="i">$HashCode</span> = <span class="i">$HashCode</span> &amp; <span class="i">$MaxHashCodeMask</span><span class="sc">;</span>
+ 379   <span class="s">}</span>
+ 380   <span class="k">return</span> <span class="i">$HashCode</span><span class="sc">;</span>
+ 381 <span class="s">}</span>
+ 382 
+ 383 <span class="c"># Check out the string: Is it defined and has a non zero length?</span>
+<a name="IsEmpty-"></a> 384 <span class="k">sub </span><span class="m">IsEmpty</span> <span class="s">{</span>
+ 385   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 386   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">1</span><span class="sc">;</span>
+ 387 
+ 388   <span class="i">$Status</span> = <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 389 
+ 390   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 391 <span class="s">}</span>
+ 392 
+ 393 <span class="c"># Is first specified number power of second specified number...</span>
+<a name="IsNumberPowerOfNumber-"></a> 394 <span class="k">sub </span><span class="m">IsNumberPowerOfNumber</span> <span class="s">{</span>
+ 395   <span class="k">my</span><span class="s">(</span><span class="i">$FirstNum</span><span class="cm">,</span> <span class="i">$SecondNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 396   <span class="k">my</span><span class="s">(</span><span class="i">$PowerValue</span><span class="s">)</span><span class="sc">;</span>
+ 397 
+ 398   <span class="i">$PowerValue</span> = <span class="k">log</span><span class="s">(</span><span class="i">$FirstNum</span><span class="s">)</span>/<span class="k">log</span><span class="s">(</span><span class="i">$SecondNum</span><span class="s">)</span><span class="sc">;</span>
+ 399 
+ 400   <span class="k">return</span> <span class="i">IsInteger</span><span class="s">(</span><span class="i">$PowerValue</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 401 <span class="s">}</span>
+ 402 
+ 403 <span class="c"># Check out the string: Is it an integer?</span>
+<a name="IsInteger-"></a> 404 <span class="k">sub </span><span class="m">IsInteger</span> <span class="s">{</span>
+ 405   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 406   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">0</span><span class="sc">;</span>
+ 407 
+ 408   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 409     <span class="i">$TheString</span> = <span class="i">RemoveLeadingAndTrailingWhiteSpaces</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="sc">;</span>
+ 410     <span class="i">$TheString</span> =~ <span class="q">s/^[+-]//</span><span class="sc">;</span>
+ 411     <span class="i">$Status</span> = <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[^0-9]/</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 412   <span class="s">}</span>
+ 413   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 414 <span class="s">}</span>
+ 415 
+ 416 <span class="c"># Check out the string: Is it an integer with value &gt; 0?</span>
+<a name="IsPositiveInteger-"></a> 417 <span class="k">sub </span><span class="m">IsPositiveInteger</span> <span class="s">{</span>
+ 418   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 419   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">0</span><span class="sc">;</span>
+ 420 
+ 421   <span class="i">$Status</span> = <span class="i">IsInteger</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> ? <span class="s">(</span><span class="i">$TheString</span> &gt; <span class="n">0</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 422 
+ 423   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 424 <span class="s">}</span>
+ 425 
+ 426 
+ 427 <span class="c"># Check out the string: Is it a float?</span>
+<a name="IsFloat-"></a> 428 <span class="k">sub </span><span class="m">IsFloat</span> <span class="s">{</span>
+ 429   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 430   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">0</span><span class="sc">;</span>
+ 431 
+ 432   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 433     <span class="i">$TheString</span> = <span class="i">RemoveLeadingAndTrailingWhiteSpaces</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="sc">;</span>
+ 434     <span class="i">$TheString</span> =~ <span class="q">s/^[+-]//</span><span class="sc">;</span>
+ 435     <span class="i">$Status</span> = <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[^0-9.eE]/</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[.eE]/</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 436   <span class="s">}</span>
+ 437   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 438 <span class="s">}</span>
+ 439 
+ 440 <span class="c"># Check out the string: Is it defined and has a non zero length?</span>
+<a name="IsNotEmpty-"></a> 441 <span class="k">sub </span><span class="m">IsNotEmpty</span> <span class="s">{</span>
+ 442   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 443   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span><span class="sc">;</span>
+ 444 
+ 445   <span class="i">$Status</span> = <span class="i">IsEmpty</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 446 
+ 447   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 448 <span class="s">}</span>
+ 449 
+ 450 <span class="c"># Check out the string: Does it only contain numerical data?</span>
+<a name="IsNumerical-"></a> 451 <span class="k">sub </span><span class="m">IsNumerical</span> <span class="s">{</span>
+ 452   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 453   <span class="k">my</span><span class="s">(</span><span class="i">$Status</span><span class="s">)</span> = <span class="n">0</span><span class="sc">;</span>
+ 454 
+ 455   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 456     <span class="i">$TheString</span> = <span class="i">RemoveLeadingAndTrailingWhiteSpaces</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span><span class="sc">;</span>
+ 457     <span class="i">$TheString</span> =~ <span class="q">s/^[+-]//</span><span class="sc">;</span>
+ 458     <span class="i">$Status</span> = <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[^0-9.eE]/</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$TheString</span><span class="s">)</span> == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$TheString</span> =~ <span class="q">/[.eE]/</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 459   <span class="s">}</span>
+ 460   <span class="k">return</span> <span class="i">$Status</span><span class="sc">;</span>
+ 461 <span class="s">}</span>
+ 462 
+ 463 <span class="c"># Join different words using delimiter and quote parameters. And return as</span>
+ 464 <span class="c"># a string value.</span>
+<a name="JoinWords-"></a> 465 <span class="k">sub </span><span class="m">JoinWords</span> <span class="s">{</span>
+ 466   <span class="k">my</span><span class="s">(</span><span class="i">$Words</span><span class="cm">,</span> <span class="i">$Delim</span><span class="cm">,</span> <span class="i">$Quote</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 467 
+ 468   <span class="k">if</span> <span class="s">(</span>!<span class="i">@$Words</span><span class="s">)</span> <span class="s">{</span>
+ 469     <span class="k">return</span> <span class="q">&quot;&quot;</span><span class="sc">;</span>
+ 470   <span class="s">}</span>
+ 471 
+ 472   <span class="i">$Quote</span> = <span class="i">$Quote</span> ? <span class="q">&quot;\&quot;&quot;</span> <span class="co">:</span> <span class="q">&quot;&quot;</span><span class="sc">;</span>
+ 473   <span class="k">my</span><span class="s">(</span><span class="i">@NewWords</span><span class="s">)</span> = <span class="k">map</span> <span class="s">{</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$_</span><span class="s">)</span> &amp;&amp; <span class="k">length</span><span class="s">(</span><span class="i">$_</span><span class="s">)</span><span class="s">)</span> ? <span class="q">&quot;${Quote}$_${Quote}&quot;</span> <span class="co">:</span> <span class="q">&quot;${Quote}${Quote}&quot;</span> <span class="s">}</span> <span class="i">@$Words</span><span class="sc">;</span>
+ 474 
+ 475   <span class="k">return</span> <span class="k">join</span> <span class="i">$Delim</span><span class="cm">,</span> <span class="i">@NewWords</span><span class="sc">;</span>
+ 476 <span class="s">}</span>
+ 477 
+ 478 <span class="c"># Split string value containing quoted or unquoted words in to an array containing</span>
+ 479 <span class="c"># unquoted words.</span>
+ 480 <span class="c">#</span>
+ 481 <span class="c"># This function is used to split strings generated by JoinWords.</span>
+ 482 <span class="c">#</span>
+<a name="SplitWords-"></a> 483 <span class="k">sub </span><span class="m">SplitWords</span> <span class="s">{</span>
+ 484   <span class="k">my</span><span class="s">(</span><span class="i">$Line</span><span class="cm">,</span> <span class="i">$Delim</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 485 
+ 486   <span class="k">if</span> <span class="s">(</span>!<span class="i">$Line</span><span class="s">)</span> <span class="s">{</span>
+ 487     <span class="k">return</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 488   <span class="s">}</span>
+ 489 
+ 490   <span class="c"># Is it a quoted string?</span>
+ 491   <span class="k">if</span> <span class="s">(</span><span class="i">$Line</span> =~ <span class="q">/^\&quot;/</span><span class="s">)</span> <span class="s">{</span>
+ 492     <span class="c"># Take out first and last quote...</span>
+ 493     <span class="i">$Line</span> =~ <span class="q">s/^\&quot;//</span><span class="sc">;</span> <span class="i">$Line</span> =~ <span class="q">s/\&quot;$//</span><span class="sc">;</span>
+ 494 
+ 495     <span class="i">$Delim</span> = <span class="q">&quot;\&quot;$Delim\&quot;&quot;</span><span class="sc">;</span>
+ 496   <span class="s">}</span>
+ 497   <span class="k">return</span> <span class="k">split</span> <span class="q">/$Delim/</span><span class="cm">,</span> <span class="i">$Line</span><span class="sc">;</span>
+ 498 <span class="s">}</span>
+ 499 
+ 500 <span class="c"># Based on quote parameter, figure out what to do</span>
+<a name="QuoteAWord-"></a> 501 <span class="k">sub </span><span class="m">QuoteAWord</span> <span class="s">{</span>
+ 502   <span class="k">my</span><span class="s">(</span><span class="i">$Word</span><span class="cm">,</span> <span class="i">$Quote</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 503   <span class="k">my</span><span class="s">(</span><span class="i">$QuotedWord</span><span class="s">)</span><span class="sc">;</span>
+ 504 
+ 505   <span class="i">$QuotedWord</span> = <span class="q">&quot;&quot;</span><span class="sc">;</span>
+ 506   <span class="k">if</span> <span class="s">(</span><span class="i">$Word</span><span class="s">)</span> <span class="s">{</span>
+ 507     <span class="i">$QuotedWord</span> = <span class="i">$Word</span><span class="sc">;</span>
+ 508   <span class="s">}</span>
+ 509   <span class="k">if</span> <span class="s">(</span><span class="i">$Quote</span><span class="s">)</span> <span class="s">{</span>
+ 510     <span class="i">$QuotedWord</span> = <span class="q">&quot;\&quot;$QuotedWord\&quot;&quot;</span><span class="sc">;</span>
+ 511   <span class="s">}</span>
+ 512   <span class="k">return</span> <span class="s">(</span><span class="i">$QuotedWord</span><span class="s">)</span><span class="sc">;</span>
+ 513 <span class="s">}</span>
+ 514 
+ 515 <span class="c"># Remove leading white space characters from the string...</span>
+<a name="RemoveLeadingWhiteSpaces-"></a> 516 <span class="k">sub </span><span class="m">RemoveLeadingWhiteSpaces</span> <span class="s">{</span>
+ 517   <span class="k">my</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 518   <span class="k">my</span><span class="s">(</span><span class="i">$OutString</span><span class="cm">,</span> <span class="i">$TrailingString</span><span class="cm">,</span> <span class="i">$LeadingWhiteSpace</span><span class="s">)</span><span class="sc">;</span>
+ 519 
+ 520   <span class="i">$OutString</span> = <span class="i">$InString</span><span class="sc">;</span>
+ 521   <span class="k">if</span> <span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> &amp;&amp; <span class="i">ContainsWhiteSpaces</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 522     <span class="i">$OutString</span> =~ <span class="q">s/^([ \t\r\n\f]*)(.*?)$/$2/</span><span class="sc">;</span>
+ 523   <span class="s">}</span>
+ 524   <span class="k">return</span> <span class="i">$OutString</span><span class="sc">;</span>
+ 525 <span class="s">}</span>
+ 526 
+ 527 <span class="c"># Remove Trailing white space characters from the string...</span>
+<a name="RemoveTrailingWhiteSpaces-"></a> 528 <span class="k">sub </span><span class="m">RemoveTrailingWhiteSpaces</span> <span class="s">{</span>
+ 529   <span class="k">my</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 530   <span class="k">my</span><span class="s">(</span><span class="i">$OutString</span><span class="cm">,</span> <span class="i">$LeadingString</span><span class="cm">,</span> <span class="i">$TrailingWhiteSpace</span><span class="s">)</span><span class="sc">;</span>
+ 531 
+ 532   <span class="i">$OutString</span> = <span class="i">$InString</span><span class="sc">;</span>
+ 533   <span class="k">if</span> <span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> &amp;&amp; <span class="i">ContainsWhiteSpaces</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 534     <span class="i">$OutString</span> =~ <span class="q">s/^(.*?)([ \t\r\n\f]*)$/$1/</span><span class="sc">;</span>
+ 535   <span class="s">}</span>
+ 536   <span class="k">return</span> <span class="i">$OutString</span><span class="sc">;</span>
+ 537 <span class="s">}</span>
+ 538 
+ 539 <span class="c"># Remove both leading and trailing white space characters from the string...</span>
+<a name="RemoveLeadingAndTrailingWhiteSpaces-"></a> 540 <span class="k">sub </span><span class="m">RemoveLeadingAndTrailingWhiteSpaces</span> <span class="s">{</span>
+ 541   <span class="k">my</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 542   <span class="k">my</span><span class="s">(</span><span class="i">$OutString</span><span class="s">)</span><span class="sc">;</span>
+ 543 
+ 544   <span class="i">$OutString</span> = <span class="i">$InString</span><span class="sc">;</span>
+ 545   <span class="k">if</span> <span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> &amp;&amp; <span class="i">ContainsWhiteSpaces</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 546     <span class="i">$OutString</span> =~ <span class="q">s/^([ \t\r\n\f]*)(.*?)([ \t\r\n\f]*)$/$2/</span><span class="sc">;</span>
+ 547   <span class="s">}</span>
+ 548   <span class="k">return</span> <span class="i">$OutString</span><span class="sc">;</span>
+ 549 <span class="s">}</span>
+ 550 
+ 551 <span class="c"># Wrap text string...</span>
+<a name="WrapText-"></a> 552 <span class="k">sub </span><span class="m">WrapText</span> <span class="s">{</span>
+ 553   <span class="k">my</span><span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="cm">,</span> <span class="i">$WrapDelimiter</span><span class="s">)</span><span class="sc">;</span>
+ 554   <span class="k">my</span><span class="s">(</span><span class="i">$OutString</span><span class="s">)</span><span class="sc">;</span>
+ 555 
+ 556   <span class="i">$WrapLength</span> = <span class="n">40</span><span class="sc">;</span>
+ 557   <span class="i">$WrapDelimiter</span> = <span class="q">&quot;\n&quot;</span><span class="sc">;</span>
+ 558   <span class="k">if</span> <span class="s">(</span><span class="i">@_</span> == <span class="n">3</span><span class="s">)</span> <span class="s">{</span>
+ 559     <span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="cm">,</span> <span class="i">$WrapDelimiter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 560   <span class="s">}</span>
+ 561   <span class="k">elsif</span> <span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> <span class="s">{</span>
+ 562     <span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 563   <span class="s">}</span>
+ 564   <span class="k">else</span> <span class="s">{</span>
+ 565     <span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 566   <span class="s">}</span>
+ 567   <span class="i">$OutString</span> = <span class="i">$InString</span><span class="sc">;</span>
+ 568   <span class="k">if</span> <span class="s">(</span><span class="i">$InString</span> &amp;&amp; <span class="s">(</span><span class="k">length</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span> &gt; <span class="i">$WrapLength</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 569     <span class="i">$OutString</span> = <span class="q">&quot;&quot;</span><span class="sc">;</span>
+ 570     <span class="k">my</span><span class="s">(</span><span class="i">$Index</span><span class="cm">,</span> <span class="i">$Length</span><span class="cm">,</span> <span class="i">$FirstPiece</span><span class="cm">,</span> <span class="i">$StringPiece</span><span class="s">)</span><span class="sc">;</span>
+ 571     <span class="i">$Index</span> = <span class="n">0</span><span class="sc">;</span> <span class="i">$Length</span> = <span class="k">length</span><span class="s">(</span><span class="i">$InString</span><span class="s">)</span><span class="sc">;</span>
+ 572     <span class="i">$FirstPiece</span> = <span class="n">1</span><span class="sc">;</span>
+ 573     <span class="k">for</span> <span class="s">(</span><span class="i">$Index</span> = <span class="n">0</span><span class="sc">;</span> <span class="i">$Index</span> &lt; <span class="i">$Length</span><span class="sc">;</span> <span class="i">$Index</span> += <span class="i">$WrapLength</span><span class="s">)</span> <span class="s">{</span>
+ 574       <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">$Index</span> + <span class="i">$WrapLength</span><span class="s">)</span> &lt; <span class="i">$Length</span><span class="s">)</span> <span class="s">{</span>
+ 575         <span class="i">$StringPiece</span> = <span class="k">substr</span><span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$Index</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="s">)</span><span class="sc">;</span>
+ 576       <span class="s">}</span>
+ 577       <span class="k">else</span> <span class="s">{</span>
+ 578         <span class="c"># Last piece of the string...</span>
+ 579         <span class="i">$StringPiece</span> = <span class="k">substr</span><span class="s">(</span><span class="i">$InString</span><span class="cm">,</span> <span class="i">$Index</span><span class="cm">,</span> <span class="i">$WrapLength</span><span class="s">)</span><span class="sc">;</span>
+ 580       <span class="s">}</span>
+ 581       <span class="k">if</span> <span class="s">(</span><span class="i">$FirstPiece</span><span class="s">)</span> <span class="s">{</span>
+ 582         <span class="i">$FirstPiece</span> = <span class="n">0</span><span class="sc">;</span>
+ 583         <span class="i">$OutString</span> = <span class="i">$StringPiece</span><span class="sc">;</span>
+ 584       <span class="s">}</span>
+ 585       <span class="k">else</span> <span class="s">{</span>
+ 586         <span class="i">$OutString</span> .= <span class="q">&quot;${WrapDelimiter}${StringPiece}&quot;</span><span class="sc">;</span>
+ 587       <span class="s">}</span>
+ 588     <span class="s">}</span>
+ 589   <span class="s">}</span>
+ 590   <span class="k">return</span> <span class="i">$OutString</span><span class="sc">;</span>
+ 591 <span class="s">}</span>
+ 592 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

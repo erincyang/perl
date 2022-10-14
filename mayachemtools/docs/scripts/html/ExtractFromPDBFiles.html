@@ -1,0 +1,360 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ExtractFromPDBFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtendedConnectivityFingerprints.html" title="ExtendedConnectivityFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ExtractFromSDFiles.html" title="ExtractFromSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>ExtractFromPDBFiles.pl</strong></td><td width="33%" align="right"><a href="././code/ExtractFromPDBFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ExtractFromPDBFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ExtractFromPDBFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ExtractFromPDBFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ExtractFromPDBFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ExtractFromPDBFiles.pl - Extract specific data from PDBFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>ExtractFromPDBFiles.pl PDBFile(s)...</p>
+<p>ExtractFromPDBFiles.pl [<strong>-a, --Atoms</strong> &quot;AtomNum, [AtomNum...]&quot; | &quot;StartAtomNum, EndAtomNum&quot; |
+&quot;AtomName, [AtomName...]&quot;] [<strong>-c, --chains</strong> First | All | &quot;ChainID, [ChainID,...]&quot;]
+[&lt;--CombineChains&gt; yes | no] [<strong>-d, --distance</strong> number] [<strong>--DistanceMode</strong> Atom | Hetatm | Residue | XYZ]
+[<strong>--DistanceOrigin</strong> &quot;AtomNumber, AtomName&quot; | &quot;HetatmNumber, HetAtmName&quot; | &quot;ResidueNumber, ResidueName, [ChainID]&quot; | &quot;X,Y,Z&quot;&gt;]
+[&lt;--DistanceSelectionMode&gt; ByAtom | ByResidue] [<strong>-h, --help</strong>] [<strong>-k, --KeepOldRecords</strong> yes | no]
+[<strong>-m, --mode </strong> Chains | Sequences | Atoms | CAlphas | AtomNums | AtomsRange | AtomNames |
+ResidueNums | ResiduesRange | ResidueNames | Distance | NonWater | NonHydrogens]
+[<strong>--ModifyHeader</strong> yes | no] [<strong>--NonStandardKeep</strong> yes | no] [<strong>--NonStandardCode</strong> character]
+[<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> rootname] <strong>--RecordMode</strong> <em>Atom | Hetatm | AtomAndHetatm</em>]
+[<strong>--Residues</strong> &quot;ResidueNum,[ResidueNum...]&quot; | StartResidueNum,EndResiduNum ]
+[<strong>--SequenceLength</strong> number] [<strong>--SequenceRecords</strong> Atom | SeqRes]
+[<strong>--SequenceIDPrefix</strong> FileName | HeaderRecord | Automatic]
+[<strong>--WaterResidueNames</strong> Automatic | &quot;ResidueName, [ResidueName,...]&quot;]
+[<strong>-w, --WorkingDir</strong> dirname] PDBFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Extract specific data from <em>PDBFile(s)</em> and generate appropriate PDB or sequence file(s).
+Multiple PDBFile names are separated by spaces. The valid file extension is <em>.pdb</em>.
+All other file name extensions are ignored during the wild card expansion. All the PDB files
+in a current directory can be specified either by <em>*.pdb</em> or the current directory name.</p>
+<p>During <em>Chains</em> and <em>Sequences</em> values of <strong>-m, --mode</strong> option, all ATOM/HETAM records
+for chains after the first model in PDB fils containing data for multiple models are ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --Atoms</strong> <em>&quot;AtomNum,[AtomNum...]&quot; | &quot;StartAtomNum,EndAtomNum&quot; | &quot;AtomName,[AtomName...]&quot;</em></strong></dt>
+<dd>
+<p>Specify which atom records to extract from <em>PDBFiles(s)</em> during <em>AtomNums</em>,
+<em>AtomsRange</em>, and <em>AtomNames</em> value of <strong>-m, --mode</strong> option: extract records
+corresponding to atom numbers specified in a comma delimited list of atom numbers/names,
+or with in the range of start and end atom numbers. Possible values: <em>&quot;AtomNum[,AtomNum,..]&quot;</em>,
+<em>StartAtomNum,EndAtomNum</em>, or <em>&quot;AtomName[,AtomName,..]&quot;</em>. Default: <em>None</em>. Examples:</p>
+<div class="OptionsBox">
+    10
+<br/>    15,20
+<br/>    N,CA,C,O</div>
+</dd>
+<dt><strong><strong>-c, --chains</strong> <em>First | All | ChainID,[ChainID,...]</em></strong></dt>
+<dd>
+<p>Specify which chains to extract from <em>PDBFile(s)</em> during <em>Chains | Sequences</em> value of
+<strong>-m, --mode</strong> option: first chain, all chains, or a specific list of comma delimited chain IDs.
+Possible values: <em>First | All | ChainID,[ChainID,...]</em>. Default: <em>First</em>. Examples:</p>
+<div class="OptionsBox">
+    A
+<br/>    A,B
+<br/>    All</div>
+</dd>
+<dt><strong><strong>--CombineChains</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to combine extracted chains data into a single file during <em>Chains</em> or
+<em>Sequences</em> value of <strong>-m, --mode</strong> option. Possible values: <em>yes | no</em>. Default: <em>no</em>.</p>
+<p>During <em>Chains</em> value of &lt;-m, --mode&gt; option with <em>Yes</em> value of &lt;--CombineChains&gt;,
+extracted data for specified chains is written into a single file instead of individual file for each
+chain.</p>
+<p>During <em>Sequences</em> value of &lt;-m, --mode&gt; option with <em>Yes</em> value of &lt;--CombineChains&gt;,
+residues sequences for specified chains are extracted and concatenated into a single sequence
+file instead of  individual file for each chain.</p>
+</dd>
+<dt><strong><strong>-d, --distance</strong> <em>number</em></strong></dt>
+<dd>
+<p>Specify distance used to extract ATOM/HETATM recods during <em>Distance</em> value of
+<strong>-m, --mode</strong> option. Default: <em>10.0</em> angstroms.</p>
+<p><strong>--RecordMode</strong> option controls type of record lines to extract from <em>PDBFile(s)</em>:
+ATOM, HETATM or both.</p>
+</dd>
+<dt><strong><strong>--DistanceMode</strong> <em>Atom | Hetatm | Residue | XYZ</em></strong></dt>
+<dd>
+<p>Specify how to extract ATOM/HETATM records from <em>PDBFile(s)</em> during <em>Distance</em> value of
+<strong>-m, --mode</strong> option: extract all the records within a certain distance specifed by <strong>-d, --distance</strong>
+from an atom or hetro atom record, a residue, or any artbitrary point. Possible values: <em>Atom |
+Hetatm | Residue | XYZ</em>. Default: <em>XYZ</em>.</p>
+<p>During <em>Residue</em> value of <strong>--distancemode</strong>, distance of ATOM/HETATM records is calculated from
+all the atoms in the residue and the records are selected as long as any atom of the residue lies with
+in the distace specified using <strong>-d, --distance</strong> option.</p>
+<p><strong>--RecordMode</strong> option controls type of record lines to extract from <em>PDBFile(s)</em>:
+ATOM, HETATM or both.</p>
+</dd>
+<dt><strong><strong>--DistanceSelectionMode</strong> <em>ByAtom | ByResidue</em></strong></dt>
+<dd>
+<p>Specify how how to extract ATOM/HETATM records from <em>PDBFile(s)</em> during <em>Distance</em> value of
+<strong>-m, --mode</strong> option for all values of <strong>--DistanceMode</strong> option: extract only those ATOM/HETATM
+records that meet specified distance criterion; extract all records corresponding to a residue as
+long as one of the ATOM/HETATM record in the residue satisfies specified distance criterion. Possible
+values: <em>ByAtom, ByResidue</em>. Default value: <em>ByAtom</em>.</p>
+</dd>
+<dt><strong><strong>--DistanceOrigin</strong> <em>&quot;AtomNumber,AtomName&quot; | &quot;HetatmNumber,HetAtmName&quot; | &quot;ResidueNumber,ResidueName[,ChainID]&quot; | &quot;X,Y,Z&quot;</em></strong></dt>
+<dd>
+<p>This value is <strong>--distancemode</strong> specific. In general, it identifies a point used to select
+other ATOM/HETATMS with in a specific distance from this point.</p>
+<p>For <em>Atom</em> value of <strong>--distancemode</strong>, this option corresponds to an atom specification.
+Format: <em>AtomNumber,AtomName</em>. Example:</p>
+<div class="OptionsBox">
+    455,CA</div>
+<p>For <em>Hetatm</em> value of <strong>--distancemode</strong>, this option corresponds to a hetatm specification.
+Format: <em>HetatmNumber,HetAtmName</em>. Example:</p>
+<div class="OptionsBox">
+    5295,C1</div>
+<p>For <em>Residue</em> value of <strong>--distancemode</strong>, this option corresponds to a residue specification.
+Format: <em>ResidueNumber, ResidueName[,ChainID]</em>. Example:</p>
+<div class="OptionsBox">
+    78,MSE
+<br/>    977,RET,A
+<br/>    978,RET,B</div>
+<p>For <em>XYZ</em> value of <strong>--distancemode</strong>, this option corresponds to a coordinate of an
+arbitrary point. Format: <em>X,Y,X</em>. Example:</p>
+<div class="OptionsBox">
+    10.044,19.261,-4.292</div>
+<p><strong>--RecordMode</strong> option controls type of record lines to extract from <em>PDBFile(s)</em>:
+ATOM, HETATM or both.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-k, --KeepOldRecords</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to transfer old non ATOM and HETATM records from input PDBFile(s) to new
+PDBFile(s) during <em>Chains | Atoms | HetAtms | CAlphas | Distance| NonWater | NonHydrogens</em>
+value of <strong>-m --mode</strong> option. By default, except for the HEADER record, all
+other unnecessary non ATOM/HETATM records are dropped during the
+generation of new PDB files. Possible values: <em>yes | no</em>. Default: <em>no</em>.</p>
+</dd>
+<dt><strong><strong>-m, --mode </strong> <em>Chains | Sequences | Atoms | CAlphas | AtomNums | AtomsRange | AtomNames | ResidueNums | ResiduesRange | ResidueNames | Distance | NonWater | NonHydrogens</em></strong></dt>
+<dd>
+<p>Specify what to extract from <em>PDBFile(s)</em>: <em>Chains</em> - retrieve records for
+specified chains; <em>Sequences</em> - generate sequence files for specific chains;
+<em>Atoms</em> - extract atom records; <em>CAlphas</em> - extract atom records for alpha
+carbon atoms; <em>AtomNums</em> - extract atom records for specified atom numbers;
+<em>AtomsRange</em> - extract atom records between specified atom number range;
+<em>AtomNames</em> - extract atom records for specified atom names; <em>ResidueNums</em>
+- extract records for specified residue numbers; <em>ResiduesRange</em> - extract records
+for residues between specified residue number range; <em>ResidueNames</em> - extract
+records for specified residue names; <em>Distance</em> - extract records with in a
+certain distance from a specific position; <em>NonWater</em> - extract records corresponding
+to residues other than water; <em>NonHydrogens</em> - extract non-hydrogen records.</p>
+<p>Possible values: <em>Chains, Sequences Atoms, CAlphas, AtomNums, AtomsRange,
+AtomNames, ResidueNums, ResiduesRange, ResidueNames, Distance, NonWater,
+NonHydrogens</em>. Default value: <em>NonWater</em></p>
+<p>During the generation of new PDB files, unnecessay CONECT records are dropped.</p>
+<p>For <em>Chains</em> mode, data for appropriate chains specified by <strong>--c --chains</strong> option
+is extracted from <em>PDBFile(s)</em> and placed into new PDB file(s).</p>
+<p>For <em>Sequences</em> mode, residues names using various sequence related options are
+extracted for chains specified by <strong>--c --chains</strong> option from <em>PDBFile(s)</em> and
+FASTA sequence file(s) are generated.</p>
+<p>For <em>Distance</em> mode, all ATOM/HETATM records with in a distance specified
+by <strong>-d --distance</strong> option from a specific atom, residue or a point indicated by
+<strong>--distancemode</strong> are extracted and placed into new PDB file(s).</p>
+<p>For <em>NonWater</em> mode, non water ATOM/HETATM record lines, identified using value of
+<strong>--WaterResidueNames</strong>, are extracted and written to new PDB file(s).</p>
+<p>For <em>NonHydrogens</em> mode, ATOM/HETATOM record lines containing element symbol
+other than <em>H</em> are extracted and written to new PDB file(s).</p>
+<p>For all other options, appropriate ATOM/HETATM records are extracted to generate new
+PDB file(s).</p>
+<p><strong>--RecordMode</strong> option controls type of record lines to extract and process from
+<em>PDBFile(s)</em>: ATOM, HETATM or both.</p>
+</dd>
+<dt><strong><strong>--ModifyHeader</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to modify HEADER record during the generation of new PDB files
+for <strong>-m, --mode</strong> values of <em>Chains | Atoms | CAlphas | Distance</em>. Possible values:
+<em>yes | no</em>.  Default: <em>yes</em>. By default, Classification data is replaced by <em>Data extracted
+using MayaChemTools</em> before writing out HEADER record.</p>
+</dd>
+<dt><strong><strong>--NonStandardKeep</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to include and convert non-standard three letter residue codes into
+a code specified using <strong>--nonstandardcode</strong> option and include them into sequence file(s)
+generated during <em>Sequences</em> value of <strong>-m, --mode</strong> option. Possible values: <em>yes | no</em>.
+Default: <em>yes</em>.</p>
+<p>A warning is also printed about the presence of non-standard residues. Any residue other
+than standard 20 amino acids and 5 nucleic acid is considered non-standard; additionally,
+HETATM residues in chains also tagged as non-standard.</p>
+</dd>
+<dt><strong><strong>--NonStandardCode</strong> <em>character</em></strong></dt>
+<dd>
+<p>A single character code to use for non-standard residues. Default: <em>X</em>. Possible values:
+<em>?, -, or X</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New PDB and sequence file name is generated using the root: &lt;Root&gt;&lt;Mode&gt;.&lt;Ext&gt;.
+Default new file name: &lt;PDBFileName&gt;Chain&lt;ChainID&gt;.pdb for <em>Chains</em> <strong>mode</strong>;
+&lt;PDBFileName&gt;SequenceChain&lt;ChainID&gt;.fasta for <em>Sequences</em> <strong>mode</strong>;
+&lt;PDBFileName&gt;DistanceBy&lt;DistanceMode&gt;.pdb for <em>Distance</em> <strong>-m, --mode</strong>
+&lt;PDBFileName&gt;&lt;Mode&gt;.pdb for <em>Atoms | CAlphas | NonWater | NonHydrogens</em> <strong>-m, --mode</strong>
+values. This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>--RecordMode</strong> <em>Atom | Hetatm | AtomAndHetatm</em></strong></dt>
+<dd>
+<p>Specify type of record lines to extract and process from <em>PDBFile(s)</em> during various
+values of <strong>-m, --mode</strong> option: extract only ATOM record lines; extract only HETATM
+record lines; extract both ATOM and HETATM lines. Possible values: <em>Atom | Hetatm
+| AtomAndHetatm | XYZ</em>. Default during <em>Atoms, CAlphas, AtomNums, AtomsRange,
+AtomNames</em> values of <strong>-m, --mode</strong> option: <em>Atom</em>; otherwise: <em>AtomAndHetatm</em>.</p>
+<p>This option is ignored during <em>Chains, Sequences</em> values of <strong>-m, --mode</strong> option.</p>
+</dd>
+<dt><strong><strong>--Residues</strong> <em>&quot;ResidueNum,[ResidueNum...]&quot; | &quot;StartResidueNum,EndResiduNum&quot; | &quot;ResidueName,[ResidueName...]&quot;</em></strong></dt>
+<dd>
+<p>Specify which resiude records to extract from <em>PDBFiles(s)</em> during <em>ResidueNums</em>,
+<em>ResiduesRange</em>,and <em>ResidueNames</em> value of <strong>-m, --mode</strong> option: extract records
+corresponding to residue numbers specified in a comma delimited list of residue numbers/names,
+or with in the range of start and end residue numbers. Possible values: <em>&quot;ResidueNum[,ResidueNum,..]&quot;</em>,
+<em>StartResidueNum,EndResiduNum</em>, or <em>&lt;&quot;ResidueName[,ResidueName,..]&quot;</em>. Default: <em>None</em>. Examples:</p>
+<div class="OptionsBox">
+    20
+<br/>    5,10
+<br/>    TYR,SER,THR</div>
+<p><strong>--RecordMode</strong> option controls type of record lines to extract from <em>PDBFile(s)</em>:
+ATOM, HETATM or both.</p>
+</dd>
+<dt><strong><strong>--SequenceLength</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum sequence length per line in sequence file(s). Default: <em>80</em>.</p>
+</dd>
+<dt><strong><strong>--SequenceRecords</strong> <em>Atom | SeqRes</em></strong></dt>
+<dd>
+<p>Specify which records to use for extracting residue names from <em>PDBFiles(s)</em> during
+<em>Sequences</em> value of <strong>-m, --mode</strong> option: use ATOM records to compile a list
+of residues in a chain or parse SEQRES record to get a list of residues. Possible values:
+<em>Atom | SeqRes</em>. Default: <em>Atom</em>.</p>
+</dd>
+<dt><strong><strong>--SequenceIDPrefix</strong> <em>FileName | HeaderRecord | Automatic</em></strong></dt>
+<dd>
+<p>Specify how to generate a prefix for sequence IDs during <em>Sequences</em> value
+of <strong>-m, --mode</strong> option: use input file name prefix; retrieve PDB ID from HEADER record;
+or automatically decide the method for generating the prefix. The chain IDs are also
+appended to the prefix. Possible values: <em>FileName | HeaderRecord | Automatic</em>.
+Default: <em>Automatic</em></p>
+</dd>
+<dt><strong><strong>--WaterResidueNames</strong> <em>Automatic | &quot;ResidueName,[ResidueName,...]&quot;</em></strong></dt>
+<dd>
+<p>Identification of water residues during <em>NonWater</em> value of <strong>-m, --mode</strong> option. Possible values:
+<em>Automatic | &quot;ResidueName,[ResidueName,...]&quot;</em>. Default: <em>Automatic</em> - corresponds
+to &quot;HOH,WAT,H20&quot;. You can also specify a different comma delimited list of residue names
+to use for water.</p>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To extract non-water records from Sample2.pdb file and generate Sample2NonWater.pdb
+file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl Sample2.pdb</div>
+<p>To extract non-water records corresponding to only ATOM records from Sample2.pdb file
+and generate Sample2NonWater.pdb file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl --RecordMode Atom Sample2.pdb</div>
+<p>To extract non-water records from Sample2.pdb file using HOH or WAT residue name for water along
+with all old non-coordinate records and generate Sample2NewNonWater.pdb file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m NonWater --WaterResidueNames &quot;HOH,WAT&quot;
+      -KeepOldRecords Yes -r Sample2New -o Sample2.pdb</div>
+<p>To extract non-hydrogens records from Sample2.pdb file and generate Sample2NonHydrogen.pdb
+file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m NonHydrogens Sample2.pdb</div>
+<p>To extract data for first chain in Sample2.pdb and generate Sample2ChainA.pdb, type
+file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m chains -o Sample2.pdb</div>
+<p>To extract data for both chains in Sample2.pdb and generate Sample2ChainA.pdb and
+Sample2ChainB.pdb, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m chains -c All -o Sample2.pdb</div>
+<p>To extract data for alpha carbons in Sample2.pdb and generate Sample2CAlphas.pdb, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m CAlphas -o Sample2.pdb</div>
+<p>To extract records for specific residue numbers in all chains from Sample2.pdb file and generate
+Sample2ResidueNums.pdb file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m ResidueNums --Residues &quot;3,6&quot;
+      Sample2.pdb</div>
+<p>To extract records for a specific range of residue number in all chains from Sample2.pdb
+file and generate Sample2ResiduesRange.pdb file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m ResiduesRange --Residues &quot;10,30&quot;
+      Sample2.pdb</div>
+<p>To extract data for all ATOM and HETATM records with in 10 angstrom of an atom specifed by
+atom serial number and name &quot;1,N&quot; in Sample2.pdb file and generate Sample2DistanceByAtom.pdb,
+type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m Distance --DistanceMode Atom
+      --DistanceOrigin &quot;1,N&quot; -k No --distance 10 -o Sample2.pdb</div>
+<p>To extract data for all ATOM and HETATM records for complete residues with any atom or hetatm
+less than 10 angstrom of an atom specifed by atom serial number and name &quot;1,N&quot; in Sample2.pdb
+file and generate Sample2DistanceByAtom.pdb, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m Distance --DistanceMode Atom
+      --DistanceOrigin &quot;1,N&quot; --DistanceSelectionMode ByResidue
+      -k No --distance 10 -o Sample2.pdb</div>
+<p>To extract data for all ATOM and HETATM records with in 25 angstrom of an arbitrary point &quot;0,0,0&quot;
+in Sample2.pdb file and generate Sample2DistanceByXYZ.pdb, type:</p>
+<div class="ExampleBox">
+    % ExtractFromPDBFiles.pl -m Distance --DistanceMode XYZ
+      --DistanceOrigin &quot;0,0,0&quot; -k No --distance 25 -o Sample2.pdb</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoPDBFiles.html">InfoPDBFiles.pl</a>,&nbsp<a href="./ModifyPDBFiles.html">ModifyPDBFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtendedConnectivityFingerprints.html" title="ExtendedConnectivityFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ExtractFromSDFiles.html" title="ExtractFromSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ExtractFromPDBFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

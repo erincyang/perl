@@ -1,0 +1,205 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Fingerprints::Fingerprints.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtendedConnectivityFingerprints.html" title="ExtendedConnectivityFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FingerprintsBitVector.html" title="FingerprintsBitVector.html">Next</a></td><td width="34%" align="middle"><strong>Fingerprints::Fingerprints.pm</strong></td><td width="33%" align="right"><a href="././code/Fingerprints.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Fingerprints.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Fingerprints.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Fingerprints.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Fingerprints.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Fingerprints - Fingerprints class</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Fingerprints::Fingerprints;</p>
+<p>use Fingerprints::Fingerprints qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Fingerprints</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#foldfingerprintsbybitdensity">FoldFingerprintsByBitDensity</a>, <a href="#foldfingerprintsbysize">FoldFingerprintsBySize</a>
+, <a href="#getfingerprintbitsasbinarystring">GetFingerprintBitsAsBinaryString</a>, <a href="#getfingerprintbitsashexadecimalstring">GetFingerprintBitsAsHexadecimalString</a>
+, <a href="#getfingerprintbitsasrawbinarystring">GetFingerprintBitsAsRawBinaryString</a>, <a href="#getfingerprintsvectorvalueids">GetFingerprintsVectorValueIDs</a>
+, <a href="#getfingerprintsvectorvalues">GetFingerprintsVectorValues</a>, <a href="#isfingerprintsgenerationsuccessful">IsFingerprintsGenerationSuccessful</a>
+, <a href="#setfingerprintsbitvector">SetFingerprintsBitVector</a>, <a href="#setfingerprintsvector">SetFingerprintsVector</a>, <a href="#setfingerprintsvectortype">SetFingerprintsVectorType</a>
+, <a href="#setmolecule">SetMolecule</a>, <a href="#setsize">SetSize</a>, <a href="#settype">SetType</a>, <a href="#setvectortype">SetVectorType</a>
+</p><p><strong>Fingerprints</strong> class is used as a base class for various specific fingerprint classes such as
+<strong>AtomNeighborhoodsFingerprints</strong>, <strong>AtomTypesFingerprints</strong>, <strong>EStateIndiciesFingerprints</strong>,
+<strong>PathLengthFingerprints</strong>, <strong>ExtendedConnectivityFingerprints</strong>, <strong>MACCSKeys</strong> and so on.
+It implements functionality common to fingerprint classes.</p>
+<p><strong>Fingerprints</strong> class is  derived from <strong>ObjectProperty</strong> base class which provides methods not
+explicitly defined in <strong>Fingerprints</strong> or <strong>ObjectProperty</strong> classes using Perl's AUTOLOAD functionality.
+These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p><strong>Fingerprints</strong> class uses <strong>FingerprintsBitVector</strong> class to provide bits manipulation functionality.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFingerprints = new Fingerprints(%NamesAndValues);</div>
+<p>Using specified <em>Fingerprints</em> property names and values hash, <strong>new</strong> method creates a new object
+and returns a reference to newly created <strong>Fingerprints</strong> object. By default, following properties are
+initialized:</p>
+<div class="OptionsBox">
+    Molecule = '';
+<br/>    Type = '';
+<br/>    VectorType = '';
+<br/>    Size = '';
+<br/>    MinSize = '';
+<br/>    MaxSize = '';
+<br/>    FingerprintsBitVector = '';
+<br/>    FingerprintsVectorType = '';
+<br/>    FingerprintsVector = '';</div>
+</dd>
+<dt><strong><a name="foldfingerprintsbybitdensity" class="item"><strong>FoldFingerprintsByBitDensity</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;FoldFingerprintsByBitDensity($BitDensity);</div>
+<p>Folds fingerprints by recursively reducing its size by half until bit density is greater than or equal to
+specified <em>BitDensity</em> and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="foldfingerprintsbysize" class="item"><strong>FoldFingerprintsBySize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;FoldFingerprintsBySize($Size, [$CheckSizeValue]);</div>
+<p>Fold fingerprints by recursively reducing its size by half until size is less than or equal to specified
+<em>Size</em> and returns <em>Fingerprints</em>. By default, value <em>Size</em> is checked to make sure it's:</p>
+<div class="OptionsBox">
+    &gt;= MinSize and &lt; Size and IsPowerOfTwo</div>
+</dd>
+<dt><strong><a name="getfingerprintbitsasbinarystring" class="item"><strong>GetFingerprintBitsAsBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BinaryASCIIString =
+       $Fingerprints-&gt;GetFingerprintBitsAsBinaryString();</div>
+<p>Returns fingerprints as a binary ASCII string containing 0s and 1s.</p>
+</dd>
+<dt><strong><a name="getfingerprintbitsashexadecimalstring" class="item"><strong>GetFingerprintBitsAsHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HexadecimalString =
+       $Fingerprints-&gt;GetFingerprintBitsAsHexadecimalString();</div>
+<p>Returns fingerprints as a hexadecimal string</p>
+</dd>
+<dt><strong><a name="getfingerprintbitsasrawbinarystring" class="item"><strong>GetFingerprintBitsAsRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RawBinaryString =
+       $Fingerprints-&gt;GetFingerprintBitsAsRawBinaryString();</div>
+<p>Returns fingerprints as a raw binary string containing packed bit values for each byte.</p>
+</dd>
+<dt><strong><a name="getfingerprintsvectorvalueids" class="item"><strong>GetFingerprintsVectorValueIDs</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ValueIDsRef = $Fingerprints-&gt;GetFingerprintsVectorValueIDs();
+<br/>    @ValueIDs = $Fingerprints-&gt;GetFingerprintsVectorValueIDs();</div>
+<p>Returns fingerprints vector value IDs as an array or reference to an array.</p>
+</dd>
+<dt><strong><a name="getfingerprintsvectorvalues" class="item"><strong>GetFingerprintsVectorValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ValuesRef = $Fingerprints-&gt;GetFingerprintsVectorValues();
+<br/>    @Values = $Fingerprints-&gt;GetFingerprintsVectorValues();</div>
+<p>Returns fingerprints vector values as an array or reference to an array.</p>
+</dd>
+<dt><strong><a name="isfingerprintsgenerationsuccessful" class="item"><strong>IsFingerprintsGenerationSuccessful</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Return = $Fingerprints-&gt;IsFingerprintsGenerationSuccessful();</div>
+<p>Returns 1 or 0 based on whether fingerprints were successfully generated.</p>
+</dd>
+<dt><strong><a name="setfingerprintsbitvector" class="item"><strong>SetFingerprintsBitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetFingerprintsBitVector($FingerprintsBitVector);</div>
+<p>Sets <em>FingerprintsBitVector</em> object for <em>Fingerprints</em> and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="setfingerprintsvector" class="item"><strong>SetFingerprintsVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetFingerprintsVector();</div>
+<p>Sets <em>FingerprintsVector</em> object for <em>Fingerprints</em> and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="setfingerprintsvectortype" class="item"><strong>SetFingerprintsVectorType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetFingerprintsVectorType($VectorType);</div>
+<p>Sets <em>FingerprintsVector</em> type for <em>Fingerprints</em> and returns <em>Fingerprints</em>. Possible
+<em>VectorType</em> values: <em>OrderedNumericalValues, NumericalValues or AlphaNumericalValues</em>.</p>
+</dd>
+<dt><strong><a name="setmolecule" class="item"><strong>SetMolecule</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetMolecule($Molecule);</div>
+<p>Sets <em>Molecule</em> object for <em>Fingerprints</em> and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="setsize" class="item"><strong>SetSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetSize($Size);</div>
+<p>Sets <em>Size</em> of fingerprints and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="settype" class="item"><strong>SetType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetType($Type);</div>
+<p>Sets <em>Type</em> of fingerprints and returns <em>Fingerprints</em>.</p>
+</dd>
+<dt><strong><a name="setvectortype" class="item"><strong>SetVectorType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Fingerprints-&gt;SetVectorType($Type);</div>
+<p>Sets <em>Type</em> of fingerprints vector and returns <em>Fingerprints</em>. Possible <em>Type</em> values:
+<em>FingerprintsBitVector or FingerprintsVector</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./FingerprintsStringUtil.html">FingerprintsStringUtil.pm</a>,&nbsp<a href="./AtomNeighborhoodsFingerprints.html">AtomNeighborhoodsFingerprints.pm</a>,&nbsp<a href="./AtomTypesFingerprints.html">AtomTypesFingerprints.pm</a>,&nbsp
+<a href="./EStateIndiciesFingerprints.html">EStateIndiciesFingerprints.pm</a>,&nbsp<a href="./ExtendedConnectivityFingerprints.html">ExtendedConnectivityFingerprints.pm</a>,&nbsp<a href="./MACCSKeys.html">MACCSKeys.pm</a>,&nbsp
+<a href="./PathLengthFingerprints.html">PathLengthFingerprints.pm</a>,&nbsp<a href="./TopologicalAtomPairsFingerprints.html">TopologicalAtomPairsFingerprints.pm</a>,&nbsp<a href="./TopologicalAtomTripletsFingerprints.html">TopologicalAtomTripletsFingerprints.pm</a>,&nbsp
+<a href="./TopologicalAtomTorsionsFingerprints.html">TopologicalAtomTorsionsFingerprints.pm</a>,&nbsp<a href="./TopologicalPharmacophoreAtomPairsFingerprints.html">TopologicalPharmacophoreAtomPairsFingerprints.pm</a>,&nbsp
+<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html">TopologicalPharmacophoreAtomTripletsFingerprints.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtendedConnectivityFingerprints.html" title="ExtendedConnectivityFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FingerprintsBitVector.html" title="FingerprintsBitVector.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Fingerprints::Fingerprints.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

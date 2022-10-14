@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MolecularDescriptors::HydrogenBondsDescriptors.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Fsp3CarbonsDescriptors.html" title="Fsp3CarbonsDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularComplexityDescriptors.html" title="MolecularComplexityDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>MolecularDescriptors::HydrogenBondsDescriptors.pm</strong></td><td width="33%" align="right"><a href="././code/HydrogenBondsDescriptors.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/HydrogenBondsDescriptors.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/HydrogenBondsDescriptors.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/HydrogenBondsDescriptors.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/HydrogenBondsDescriptors.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>HydrogenBondsDescriptors</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use MolecularDescriptors::HydrogenBondsDescriptors;</p>
+<p>use MolecularDescriptors::HydrogenBondsDescriptors qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>HydrogenBondsDescriptors</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#generatedescriptors">GenerateDescriptors</a>, <a href="#getdescriptornames">GetDescriptorNames</a>, <a href="#sethydrogenbondstype">SetHydrogenBondsType</a>
+, <a href="#stringifyhydrogenbondsdescriptors">StringifyHydrogenBondsDescriptors</a>
+</p><p><strong>HydrogenBondsDescriptors</strong> is derived from <strong>MolecularDescriptors</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>HydrogenBondsDescriptors</strong>, <strong>MolecularDescriptors</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>The current release of MayaChemTools supports identification of two types of hydrogen bond
+donor and acceptor atoms with these names:</p>
+<div class="OptionsBox">
+    HBondsType1 or HydrogenBondsType1
+<br/>    HBondsType2 or HydrogenBondsType2</div>
+<p>The names of these hydrogen bond types are rather arbitrary. However, their definitions have
+specific meaning and are as follows:</p>
+<div class="OptionsBox">
+    HydrogenBondsType1 [ Ref 60-61, Ref 65-66 ]:</div>
+<div class="OptionsBox">
+&nbsp;&nbsp;&nbsp;&nbsp;        Donor: NH, NH2, OH - Any N and O with available H
+        Acceptor: N[!H], O - Any N without available H and any O</div>
+<div class="OptionsBox">
+    HydrogenBondsType2 [ Ref 91 ]:</div>
+<div class="OptionsBox">
+&nbsp;&nbsp;&nbsp;&nbsp;        Donor: NH, NH2, OH - N and O with available H
+        Acceptor: N, O - And N and O</div>
+<p>By default, <em>HydrogenBondsType2</em> is used to calculate number hydrogen bond donor
+and acceptor atoms. This corresponds to <strong>RuleOf5</strong> definition of hydrogen bond donors
+and acceptors.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors = new MolecularDescriptors::
+                                HydrogenBondsDescriptors(%NamesAndValues);</div>
+<p>Using specified <em>HydrogenBondsDescriptors</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>HydrogenBondsDescriptors</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'HydrogenBonds'
+<br/>    HydrogenBondsType = 'HBondsType2'
+<br/>    @DescriptorNames = ('HydrogenBondDonors', 'HydrogenBondAcceptors')
+<br/>    @DescriptorValues = ('None', 'None')</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors = new MolecularDescriptors::
+                                HydrogenBondsDescriptors();</div>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors = new MolecularDescriptors::
+                                HydrogenBondsDescriptors(
+                                'HydrogenBondsType' =&gt; 'HBondsType2');</div>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors-&gt;SetMolecule($Molecule);
+<br/>    $HydrogenBondsDescriptors-&gt;GenerateDescriptors();
+<br/>    print &quot;HydrogenBondsDescriptors: $HydrogenBondsDescriptors\n&quot;;</div>
+</dd>
+<dt><strong><a name="generatedescriptors" class="item"><strong>GenerateDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors-&gt;GenerateDescriptors();</div>
+<p>Calculates number of hydrogen bond donors and acceptors a molecule and returns
+<em>HydrogenBondsDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="getdescriptornames" class="item"><strong>GetDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $HydrogenBondsDescriptors-&gt;GetDescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::HydrogenBondsDescriptors::
+                       GetDescriptorNames();</div>
+<p>Returns all available descriptor names as an array.</p>
+</dd>
+<dt><strong><a name="sethydrogenbondstype" class="item"><strong>SetHydrogenBondsType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HydrogenBondsDescriptors-&gt;SetHydrogenBondsType($HBondsType);</div>
+<p>Sets value of hydrogen bonds type to use during calculation of descriptors and returns
+<em>HydrogenBondsDescriptors</em>. Possible values: <em>HBondsType1, HydrogenBondsType1,
+HBondsType2, HydrogenBondsType2</em>.</p>
+</dd>
+<dt><strong><a name="stringifyhydrogenbondsdescriptors" class="item"><strong>StringifyHydrogenBondsDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $HydrogenBondsDescriptors-&gt;
+                              StringifyHydrogenBondsDescriptors();</div>
+<p>Returns a string containing information about <em>HydrogenBondsDescriptors</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./MolecularDescriptors.html">MolecularDescriptors.pm</a>,&nbsp<a href="./MolecularDescriptorsGenerator.html">MolecularDescriptorsGenerator.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Fsp3CarbonsDescriptors.html" title="Fsp3CarbonsDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularComplexityDescriptors.html" title="MolecularComplexityDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MolecularDescriptors::HydrogenBondsDescriptors.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

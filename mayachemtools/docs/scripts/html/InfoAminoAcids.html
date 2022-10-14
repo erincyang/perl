@@ -1,0 +1,221 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:InfoAminoAcids.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./FilterSDFiles.html" title="FilterSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoFingerprintsFiles.html" title="InfoFingerprintsFiles.html">Next</a></td><td width="34%" align="middle"><strong>InfoAminoAcids.pl</strong></td><td width="33%" align="right"><a href="././code/InfoAminoAcids.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/InfoAminoAcids.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/InfoAminoAcids.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/InfoAminoAcids.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/InfoAminoAcids.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>InfoAminoAcids.pl - List properties of amino acids</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>InfoAminoAcids.pl AminoAcidIDs...</p>
+<p>InfoAminoAcids.pl [<strong>-h, --help</strong>] [<strong>--outdelim</strong> comma | tab | semicolon]
+[<strong>--output</strong> STDOUT | File] [<strong>--outputstyle</strong> AminoAcidBlock | AminoAcidRows]
+[<strong>-o, --overwrite</strong>] [<strong>--precision</strong> number] [<strong>--propertiesmode</strong> Categories | Names | All]
+[<strong>-p, --properties</strong> CategoryName,[CategoryName,...] | PropertyName,[PropertyName,...]]
+[<strong>--propertieslinting</strong> ByGroup | Alphabetical] [<strong>-q, --quote</strong> yes | no] [<strong>-r, --root</strong> rootname]
+[<strong>-w, --workingdir</strong> dirname] AminoAcidIDs...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>List amino acid properties. Amino acids identification supports these three types of IDs: one letter
+code, three letter code or name. Amino acid properties data, in addition to basic information about
+amino acids - one and three letter codes, name, DNA and RNA codons, molecular weight - include
+variety of other properties: polarity, acidity, hydrophobicity, and so on.</p>
+<p>
+</p>
+<h2>PARAMETERS</h2>
+<dl>
+<dt><strong><strong>AminoAcidIDs</strong> <em>ThreeLetterCode [OneLetterCode AminoAcidName...]</em></strong></dt>
+<dd>
+<p><em>AminoAcidIDs</em> is a space delimited list of values to identify amino acids.</p>
+<p>Input value format is: <em>ThreeLetterCode [OneLetterCode AminoAcidName...]</em>. Default: <em>Ala</em>.
+Examples:</p>
+<div class="OptionsBox">
+    Ala
+<br/>    Glu A
+<br/>    Alanine Glu Y &quot;Aspartic acid&quot;</div>
+</dd>
+</dl>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--outdelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Output text file delimiter. Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>STDOUT | File</em></strong></dt>
+<dd>
+<p>List information at STDOUT or write it to a file. Possible values: <em>STDOUT or File</em>. Default:
+<em>STDOUT</em>. <strong>-r, --root</strong> option is used to generate output file name.</p>
+</dd>
+<dt><strong><strong>--outputstyle</strong> <em>AminoAcidBlock | AminoAcidRows</em></strong></dt>
+<dd>
+<p>Specify how to list amino acid information: add a new line for each property and present it as a block
+for each amino acid; or include all properties in one line and show it as a single line.</p>
+<p>Possible values: <em>AminoAcidBlock | AminoAcidRows</em>. Default: <em>AminoAcidBlock</em></p>
+<p>An example for <em>AminoAcidBlock</em> output style:</p>
+<div class="OptionsBox">
+    ThreeLetterCode: Ala
+<br/>    OneLetterCode: A
+<br/>    AminoAcid: Alanine
+<br/>    MolecularWeight: 89.0941
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...</div>
+<div class="OptionsBox">
+    ThreeLetterCode: Glu
+<br/>    OneLetterCode: E
+<br/>    AminoAcid: Glutamic acid
+<br/>    MolecularWeight: 147.1308
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>An example for <em>AminoAcidRows</em> output style:</p>
+<div class="OptionsBox">
+    ThreeLetterCode,OneLetterCode,AminoAcid,MolecularWeight
+<br/>    Ala,A,Alanine,89.0941..
+<br/>    Glu,E,Glutamic acid,147.1308..</div>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>--precision</strong> <em>number</em></strong></dt>
+<dd>
+<p>Precision for listing numerical values. Default: up to <em>4</em> decimal places.
+Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>--propertiesmode</strong> <em>Categories | Names | All</em></strong></dt>
+<dd>
+<p>Specify how property names are specified: use category names; explicit list of property names; or
+use all available properties. Possible values: <em>Categories, Names, or All</em>. Default: <em>Categories</em>.</p>
+<p>This option is used in conjunction with <strong>-p, --properties</strong> option to specify properties of
+interest.</p>
+</dd>
+<dt><strong><strong>-p, --properties</strong> <em>CategoryName,[CategoryName,...] | PropertyName,[PropertyName,...]</em></strong></dt>
+<dd>
+<p>This option is <strong>--propertiesmode</strong> specific. In general, it's a list of comma separated category or
+property names.</p>
+<p>Specify which amino acid properties information to list for the amino acid IDs specified using command:
+line parameters: list basic and/or hydrophobicity information; list all available information; or specify a comma
+separated list of amino acid property names.</p>
+<p>Possible values: <em>Basic | BasicPlus | BasicAndHydrophobicity | BasicAndHydrophobicityPlus | PropertyName,[PropertyName,...]</em>.
+Default: <em>Basic</em>.</p>
+<p><em>Basic</em> includes: <em>ThreeLetterCode, OneLetterCode, AminoAcid, DNACodons, RNACodons, ChemicalFormula, MolecularWeight, LinearStructure, LinearStructureAtpH7.4</em></p>
+<p><em>BasicPlus</em> includes: <em>ThreeLetterCode, OneLetterCode, AminoAcid, DNACodons, RNACodons, AcidicBasic, PolarNonpolar, Charged, Aromatic, HydrophobicHydophilic, IsoelectricPoint, pKCOOH, pKNH3+, ChemicalFormula, MolecularWeight, ExactMass, ChemicalFormulaMinusH2O, MolecularWeightMinusH2O(18.01524), ExactMassMinusH2O(18.01056), LinearStructure, LinearStructureAtpH7.4</em></p>
+<p><em>BasicAndHydrophobicity</em> includes: <em>ThreeLetterCode, OneLetterCode, AminoAcid, DNACodons, RNACodons, ChemicalFormula, MolecularWeight, LinearStructure, LinearStructureAtpH7.4, HydrophobicityEisenbergAndOthers, HydrophobicityHoppAndWoods, HydrophobicityJanin, HydrophobicityKyteAndDoolittle, HydrophobicityRoseAndOthers, HydrophobicityWolfendenAndOthers</em></p>
+<p><em>BasicAndHydrophobicityPlus</em> includes: <em>(ThreeLetterCode, OneLetterCode, AminoAcid, DNACodons, RNACodons, ChemicalFormula, MolecularWeight, LinearStructure, LinearStructureAtpH7.4, HydrophobicityAbrahamAndLeo, HydrophobicityBlack, HydrophobicityBullAndBreese, HydrophobicityChothia, HydrophobicityEisenbergAndOthers, HydrophobicityFauchereAndOthers, HydrophobicityGuy, HydrophobicityHPLCAtpH3.4Cowan, HydrophobicityHPLCAtpH7.5Cowan, HydrophobicityHPLCParkerAndOthers, HydrophobicityHPLCWilsonAndOthers, HydrophobicityHoppAndWoods, HydrophobicityJanin, HydrophobicityKyteAndDoolittle, HydrophobicityManavalanAndOthers, HydrophobicityMiyazawaAndOthers, HydrophobicityOMHSweetAndOthers, HydrophobicityRaoAndArgos, HydrophobicityRfMobility, HydrophobicityRoseAndOthers, HydrophobicityRoseman, HydrophobicityWellingAndOthers, HydrophobicityWolfendenAndOthers</em></p>
+<p>Here is a complete list of available properties: ThreeLetterCode, OneLetterCode, AminoAcid, DNACodons, RNACodons, AcidicBasic, PolarNonpolar, Charged, Aromatic, HydrophobicHydophilic, IsoelectricPoint, pKCOOH, pKNH3+, ChemicalFormula, MolecularWeight, ExactMass, ChemicalFormulaMinusH2O, MolecularWeightMinusH2O(18.01524), ExactMassMinusH2O(18.01056), vanderWaalsVolume, %AccessibleResidues, %BuriedResidues, AlphaHelixChouAndFasman, AlphaHelixDeleageAndRoux, AlphaHelixLevitt, AminoAcidsComposition, AminoAcidsCompositionInSwissProt, AntiparallelBetaStrand, AverageAreaBuried, AverageFlexibility, BetaSheetChouAndFasman, BetaSheetDeleageAndRoux, BetaSheetLevitt, BetaTurnChouAndFasman, BetaTurnDeleageAndRoux, BetaTurnLevitt, Bulkiness, CoilDeleageAndRoux, HPLCHFBARetention, HPLCRetentionAtpH2.1, HPLCRetentionAtpH7.4, HPLCTFARetention, HydrophobicityAbrahamAndLeo, HydrophobicityBlack, HydrophobicityBullAndBreese, HydrophobicityChothia, HydrophobicityEisenbergAndOthers, HydrophobicityFauchereAndOthers, HydrophobicityGuy, HydrophobicityHPLCAtpH3.4Cowan, HydrophobicityHPLCAtpH7.5Cowan, HydrophobicityHPLCParkerAndOthers, HydrophobicityHPLCWilsonAndOthers, HydrophobicityHoppAndWoods, HydrophobicityJanin, HydrophobicityKyteAndDoolittle, HydrophobicityManavalanAndOthers, HydrophobicityMiyazawaAndOthers, HydrophobicityOMHSweetAndOthers, HydrophobicityRaoAndArgos, HydrophobicityRfMobility, HydrophobicityRoseAndOthers, HydrophobicityRoseman, HydrophobicityWellingAndOthers, HydrophobicityWolfendenAndOthers, ParallelBetaStrand, PolarityGrantham, PolarityZimmerman, RatioHeteroEndToSide, RecognitionFactors, Refractivity, RelativeMutability, TotalBetaStrand, LinearStructure, LinearStructureAtpH7.4</p>
+</dd>
+<dt><strong><strong>--propertieslisting</strong> <em>ByGroup | Alphabetical</em></strong></dt>
+<dd>
+<p>Specify how to list properties for amino acids: group by category or an alphabetical by
+property names. Possible values: <em>ByGroup or Alphabetical</em>. Default: <em>ByGroup</em>.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Put quotes around column values in output text file. Possible values: <em>yes or
+no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New text file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. File name is only
+used during <em>File</em> value of <strong>-o, --output</strong> option.</p>
+<p>Default file name: AminoAcidInfo&lt;mode&gt;.&lt;Ext&gt;. The csv, and tsv
+&lt;Ext&gt; values are used for comma/semicolon, and tab delimited text files respectively.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To list basic properties information for amino acid Ala, type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl</div>
+<p>To list all available properties information for amino acid Ala, type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode all</div>
+<p>To list basic properties information for amino acids Ala, Arg, and Asp type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl Ala Arg Asp
+    <br/>% InfoAminoAcids.pl A Arg &quot;Aspartic acid&quot;</div>
+<p>To list all available properties information for amino acids Ala, Arg, and Asp type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode all Ala Arg Asp</div>
+<p>To list basic and hydrophobicty properties information for amino acids Ala, Arg, and Asp type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode Categories
+      --properties BasicAndHydrophobicity Ala Arg Asp</div>
+<p>To list OneLetterCode, ThreeLetterCode, DNACodons, and MolecularWeight for amino
+acids Ala, Arg, and Asp type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode Names
+      --properties OneLetterCode,ThreeLetterCode,DNACodons,MolecularWeight
+      Ala Arg Asp</div>
+<p>To alphabetically list basic and hydrophobicty properties information for amino acids Ala, Arg, and Asp
+in rows insetad of amino acid blocks with quotes around the values, type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode Categories
+      --properties BasicAndHydrophobicity --propertieslisting alphabetical
+      --outdelim comma --outputstyle AminoAcidRows --quote yes Ala Arg Asp</div>
+<p>To alphabetically list basic and hydrophobicty properties information for amino acids Ala, Arg, and Asp
+in rows insetad of amino acid blocks with quotes around the values and write them into a file
+AminoAcidProperties.csv, type:</p>
+<div class="ExampleBox">
+    % InfoAminoAcids.pl --propertiesmode Categories
+      --properties BasicAndHydrophobicity --propertieslisting alphabetical
+      --outdelim comma --outputstyle AminoAcidRows --quote yes
+      --output File -r AminoAcidProperties -o Ala Arg Asp</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoNucleicAcids.plInfoPeriodicTableElements.html">InfoNucleicAcids.plInfoPeriodicTableElements.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./FilterSDFiles.html" title="FilterSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoFingerprintsFiles.html" title="InfoFingerprintsFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>InfoAminoAcids.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Parsers::Lexer.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PackageInfo.html" title="PackageInfo.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SimpleCalcParser.html" title="SimpleCalcParser.html">Next</a></td><td width="34%" align="middle"><strong>Parsers::Lexer.pm</strong></td><td width="33%" align="right"><a href="././code/Lexer.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Lexer.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Lexer.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Lexer.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Lexer.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Parsers::Lexer</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Parsers::Lexer;</p>
+<p>use Parsers::Lexer qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Lexer</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#getlex">GetLex</a>, <a href="#lex">Lex</a>, <a href="#next">Next</a>, <a href="#peek">Peek</a>, <a href="#stringifylexer">StringifyLexer</a>
+</p><p>The object oriented chained <strong>Lexer</strong> is implemented based on examples available in
+Higher-order Perl [ Ref 126 ] book by Mark J. Dominus. It is designed to be used
+both in standalone mode or as a base class for <strong>YYLexer</strong>.</p>
+<p>A chained lexer is created by generating a lexer for for the first specified token
+specification using specified input and chaining it with other lexers generated for all
+subsequent token specifications. The lexer generated for the first token specification
+uses input iterator to retrieve any available input text; the subsequent chained lexeres
+for rest of the token specifications use lexers generated for previous token
+specifications to get next input, which might be unmatched input text or a reference
+to an array containing token and  matched text pair.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Lexer = new Parsers::Lexer($Input, @TokensSpec);</div>
+<p>Using specified <em>Input</em> and <em>TokensSpec</em>, <strong>new</strong> method generates a new lexer
+and returns a reference to newly created <strong>Lexer</strong> object.</p>
+<p>Example:</p>
+<div class="OptionsBox">
+    # Tokens specifications supplied by the caller. It's an array containing references
+<br/>    # to arrays with each containing TokenLabel and TokenMatchRegex pair along with
+<br/>    # an option reference to code to be executed after a matched.
+<br/>    #
+<br/>    @LexerTokensSpec = (
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        [ 'LETTER', qr/[a-zA-Z]/ ],
+        [ 'NUMBER', qr/\d+/ ],
+        [ 'SPACE', qr/[ ]*/,
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            sub { my($This, $TokenLabel, $MatchedText) = @_; return ''; }
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        ],
+        [ 'NEWLINE', qr/(?:\r\n|\r|\n)/,
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            sub { my($This, $TokenLabel, $MatchedText) = @_;  return &quot;\n&quot;; }
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        ],
+        [ 'CHAR', qr/./ ]
+<br/>    );</div>
+<div class="OptionsBox">
+    # Input string...
+<br/>    $InputText = 'y = 3 + 4';
+<br/>    $Lexer = new Parsers::Lexer($InputText, @LexerTokensSpec);</div>
+<div class="OptionsBox">
+    # Process input stream...
+<br/>    while (defined($Token = $Lexer-&gt;Lex())) {
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        print &quot;Token: &quot; . ((ref $Token) ? &quot;@{$Token}&quot; : &quot;$Token&quot;) . &quot;\n&quot;;
+<br/>    }</div>
+<div class="OptionsBox">
+    # Input file...
+<br/>    $InputFile = &quot;Input.txt&quot;;
+<br/>    open INPUTFILE, &quot;$InputFile&quot; or die &quot;Couldn't open $InputFile: $!\n&quot;;
+<br/>    $Lexer = new Parsers::Lexer(\*INPUTFILE, @LexerTokensSpec);</div>
+<div class="OptionsBox">
+    # Input file iterator...
+<br/>    $InputFile = &quot;TestSimpleCalcParser.txt&quot;;
+<br/>    open INPUTFILE, &quot;$InputFile&quot; or die &quot;Couldn't open $InputFile: $!\n&quot;;
+<br/>    $InputIterator = sub { return &lt;INPUTFILE&gt;; };
+<br/>    $Lexer = new Parsers::Lexer($InputIterator, @LexerTokensSpec);</div>
+<div class="OptionsBox">
+    @LexerTokensSpec = (
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        [ 'VAR', qr/[[:alpha:]]+/ ],
+        [ 'NUM', qr/\d+/ ],
+        [ 'OP', qr/[-+=\/]/,
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            sub { my($This, $Label, $Value) = @_;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                $Value .= &quot;; ord: &quot; . ord $Value;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                return [$Label, $Value];
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;            }
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        ],
+        [ 'NEWLINE', qr/(?:\r\n|\r|\n)/, sub { return [$_[1], 'NewLine']; } ],
+        [ 'SPACE', qr/\s*/, sub { return [$_[1], 'Space']; } ],
+<br/>    );</div>
+<div class="OptionsBox">
+    # Look ahead without removing...
+<br/>    $Token = $Lexer-&gt;Lex('Peek');
+<br/>    if (defined $Token &amp;&amp; ref $Token) {
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        print &quot;PEEK: Token: @{$Token}\n\n&quot;;
+<br/>    }</div>
+<div class="OptionsBox">
+    # Process input stream...
+<br/>    while (defined($Token = $Lexer-&gt;Lex())) {
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        print &quot;Token: &quot; . ((ref $Token) ? &quot;@{$Token}&quot; : &quot;$Token&quot;) . &quot;\n&quot;;
+<br/>    }</div>
+</dd>
+<dt><strong><a name="getlex" class="item"><strong>GetLex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $LexerRef = $Lexer-&gt;GetLex();</div>
+<p>Returns a refernece to <em>Lexer</em> method to the caller for use in a specific <strong>YYLexer</strong>.</p>
+</dd>
+<dt><strong><a name="lex" class="item"><strong>Lex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TokenRefOrText = $Lexer-&gt;Lex($Mode);
+<br/>    if (ref $TokenRefOrText) {
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        ($TokenLabel, $TokenValue) = @{$TokenRefOrText};
+<br/>    }
+<br/>    else {
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        $TokenText = $TokenRefOrText;
+<br/>    }</div>
+<p>Get next available token label and value pair as an array reference or unrecognized
+text from input stream by either removing it from the input or simply peeking ahead
+and without removing it from the input stream.</p>
+<p>Possible <em>Mode</em> values: <em>Peek, Next</em>. Default: <em>Next</em>.</p>
+</dd>
+<dt><strong><a name="next" class="item"><strong>Next</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TokenRefOrText = $Lexer-&gt;Next();</div>
+<p>Get next available token label and value pair as an array reference or unrecognized
+text from input stream by removing it from the input stream.</p>
+</dd>
+<dt><strong><a name="peek" class="item"><strong>Peek</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TokenRefOrText = $Lexer-&gt;Peek();</div>
+<p>Get next available token label and value pair as an array reference or unrecognized
+text from input stream by by simply peeking ahead and without removing it from the
+input stream.</p>
+</dd>
+<dt><strong><a name="stringifylexer" class="item"><strong>StringifyLexer</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $LexerString = $Lexer-&gt;StringifyLexer();</div>
+<p>Returns a string containing information about <em>Lexer</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./YYLexer.html">YYLexer.pm</a>,&nbsp<a href="./SimpleCalcYYLexer.html">SimpleCalcYYLexer.pm</a>,&nbsp<a href="./SimpleCalcParser.html">SimpleCalcParser.yy</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PackageInfo.html" title="PackageInfo.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SimpleCalcParser.html" title="SimpleCalcParser.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Parsers::Lexer.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

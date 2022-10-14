@@ -1,0 +1,264 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Vector.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TimeUtil.html" title="TimeUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;</td><td width="34%" align="middle"><strong>Vector.pm</strong></td><td width="33%" align="right"><a href="././code/Vector.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Vector.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Vector.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Vector.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Vector.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Vector</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Vector;</p>
+<p>use Vector qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Vector</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#addvalues">AddValues</a>, <a href="#copy">Copy</a>, <a href="#getlength">GetLength</a>, <a href="#getmagnitude">GetMagnitude</a>, <a href="#getnumofnonzerovalues">GetNumOfNonZeroValues</a>
+, <a href="#getpercentofnonzerovalues">GetPercentOfNonZeroValues</a>, <a href="#getsize">GetSize</a>, <a href="#getvalue">GetValue</a>, <a href="#getvalues">GetValues</a>, <a href="#getx">GetX</a>, <a href="#getxyz">GetXYZ</a>, <a href="#gety">GetY</a>
+, <a href="#getz">GetZ</a>, <a href="#isvector">IsVector</a>, <a href="#normalize">Normalize</a>, <a href="#setvalue">SetValue</a>, <a href="#setvalueprintformat">SetValuePrintFormat</a>
+, <a href="#setx">SetX</a>, <a href="#setxyz">SetXYZ</a>, <a href="#sety">SetY</a>, <a href="#setz">SetZ</a>, <a href="#stringifyvector">StringifyVector</a>, <a href="#isvector">IsVector</a>
+</p><p>The following functions are available:</p>
+<p>IsVector, SetValuePrintFormat UnitXVector, UnitYVector, UnitZVector, UnitVector,
+ZeroVector</p>
+<p>The following operators are overloaded:</p>
+<div class="OptionsBox">
+    &quot;&quot; 0+ bool
+<br/>    @{}
+<br/>    + - * / %
+<br/>    x .
+<br/>    == != &lt; &lt;= &gt; &gt;=
+<br/>    neg
+<br/>    abs exp log sqrt cos sin</div>
+<p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewVector = new Vector();
+<br/>    $NewVector = new Vector(@Values);
+<br/>    $NewVector = new Vector(\@Values);
+<br/>    $NewVector = new Vector($AnotherVector);</div>
+<p>Creates a new <strong>Vector</strong> object containing <em>Values</em> and returns <strong>NewVector</strong> object.
+In case no <em>Values</em> are specified, an empty <strong>Vector</strong> is created.</p>
+</dd>
+<dt><strong><a name="addvalues" class="item"><strong>AddValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;AddValues(@Values);
+<br/>    $Vector-&gt;AddValues(\@Values);
+<br/>    $Vector-&gt;AddValues($AnotherVector);</div>
+<p>Adds values to <em>Vector</em> using an array, reference to an array or another vector and returns
+<em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="copy" class="item"><strong>Copy</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewVector = $Vector-&gt;Copy();</div>
+<p>Creates a copy of <em>Vector</em> and returns <em>NewVector</em>.</p>
+</dd>
+<dt><strong><a name="getlength" class="item"><strong>GetLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Length = $Vector-&gt;GetLength();</div>
+<p>Returns <em>Lengh</em> of a 3D <em>Vector</em> corresponding to its dot product.</p>
+</dd>
+<dt><strong><a name="getmagnitude" class="item"><strong>GetMagnitude</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Length = $Vector-&gt;GetMagnitude();</div>
+<p>Returns <em>Lengh</em> of a 3D <em>Vector</em> corresponding to its dot product.</p>
+</dd>
+<dt><strong><a name="getnumofnonzerovalues" class="item"><strong>GetNumOfNonZeroValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $Vector-&gt;GetNumOfNonZeroValues();</div>
+<p>Returns number of non-zero values in <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="getpercentofnonzerovalues" class="item"><strong>GetPercentOfNonZeroValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $Vector-&gt;GetPercentOfNonZeroValues();</div>
+<p>Returns percent of non-zero values in <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="getsize" class="item"><strong>GetSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Vector-&gt;GetSize();</div>
+<p>Returns size of a <em>Vector</em> corresponding to number of its values.</p>
+</dd>
+<dt><strong><a name="getvalue" class="item"><strong>GetValue</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $Vector-&gt;GetValues($Index);</div>
+<p>Returns vector <strong>Value</strong> specified using <em>Index</em> starting at 0.</p>
+</dd>
+<dt><strong><a name="getvalues" class="item"><strong>GetValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Values = $Vector-&gt;GetValues();
+<br/>    $ValuesRef = $Vector-&gt;GetValues();</div>
+<p>Returns an array or a reference to an array containing all <em>Vector</em> values.</p>
+</dd>
+<dt><strong><a name="getx" class="item"><strong>GetX</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $X = $Vector-&gt;GetX();</div>
+<p>Returns <strong>X</strong> value of a 3D <em>Vector</em></p>
+</dd>
+<dt><strong><a name="getxyz" class="item"><strong>GetXYZ</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @XYZValues = $Vector-&gt;GetXYZ();
+<br/>    $XYZValuesRef = $Vector-&gt;GetXYZ();</div>
+<p>Returns <strong>XYZ</strong> values of a 3D <em>Vector</em> as an array or a reference to an array
+containing the values.</p>
+</dd>
+<dt><strong><a name="gety" class="item"><strong>GetY</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Y = $Vector-&gt;GetY();</div>
+<p>Returns <strong>Y</strong> value of a 3D <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="getz" class="item"><strong>GetZ</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Z = $Vector-&gt;GetZ();</div>
+<p>Returns <strong>Z</strong> value of a 3D <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="isvector" class="item"><strong>IsVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = Vector::IsVector($Object);</div>
+<p>Returns 1 or 0 based on whether <em>Object</em> is a <strong>Vector</strong> object.</p>
+</dd>
+<dt><strong><a name="normalize" class="item"><strong>Normalize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;Normalize();</div>
+<p>Normalizes a 3D <em>Vector</em> by dividing its values by the length and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="setvalue" class="item"><strong>SetValue</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetValue($Index, $Value);</div>
+<p>Sets a <em>Vector</em> value specified by <em>Index</em> to <em>Value</em> and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="setvalueprintformat" class="item"><strong>SetValuePrintFormat</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetValuePrintFormat($ValuePrintFormat);
+<br/>    Vector::SetValuePrintFormat($ValuePrintFormat);</div>
+<p>Sets format for printing vector values for a specified <em>Vector</em> or the whole class. Default
+format: <em>%g</em>.</p>
+</dd>
+<dt><strong><a name="setx" class="item"><strong>SetX</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetX($Value);</div>
+<p>Sets <strong>X</strong> value of a 3D vector to <em>Value</em> and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="setxyz" class="item"><strong>SetXYZ</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetXYZ(@Values);
+<br/>    $Vector-&gt;SetXYZ(\@Values);
+<br/>    $Vector-&gt;SetXYZ($AnotherVector);</div>
+<p>Sets <strong>XYZ</strong> values of a 3D vector and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="sety" class="item"><strong>SetY</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetY($Value);</div>
+<p>Sets <strong>Y</strong> value of a 3D vector to <em>Value</em> and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="setz" class="item"><strong>SetZ</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Vector-&gt;SetZ($Value);</div>
+<p>Sets <strong>Z</strong> value of a 3D vector to <em>Value</em> and returns <em>Vector</em>.</p>
+</dd>
+<dt><strong><a name="stringifyvector" class="item"><strong>StringifyVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Vector-&gt;StringifyVector();</div>
+<p>Returns a string containing information about <em>Vector</em> object.</p>
+</dd>
+<dt><strong><a name="unitvector" class="item"><strong>UnitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UnitVector = UnitVector([$Size]);
+<br/>    $UnitVector = Vector::UnitVector([$Size]);</div>
+<p>Returns a <strong>UnitVector</strong> of <em>Size</em>. Default size: <em>3</em>.</p>
+</dd>
+<dt><strong><a name="unitxvector" class="item"><strong>UnitXVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UnitXVector = UnitXVector();</div>
+<p>Returns a 3D <strong>UnitXVector</strong>.</p>
+</dd>
+<dt><strong><a name="unityvector" class="item"><strong>UnitYVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UnitYVector = UnitYVector();</div>
+<p>Returns a 3D <strong>UnitYVector</strong>.</p>
+</dd>
+<dt><strong><a name="unitzvector" class="item"><strong>UnitZVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UnitZVector = UnitZVector();</div>
+<p>Returns a 3D <strong>UnitZVector</strong>.</p>
+</dd>
+<dt><strong><a name="zerovector" class="item"><strong>ZeroVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $UnitVector = ZeroVector([$Size]);
+<br/>    $UnitVector = Vector::ZeroVector([$Size]);</div>
+<p>Returns a <strong>ZeroVector</strong> of <em>Size</em>. Default size: <em>3</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./BitVector.html">BitVector.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TimeUtil.html" title="TimeUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;</td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Vector.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

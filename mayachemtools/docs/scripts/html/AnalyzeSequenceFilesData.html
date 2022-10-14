@@ -1,0 +1,182 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AnalyzeSequenceFilesData.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AnalyzeSDFilesData.html" title="AnalyzeSDFilesData.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./AnalyzeTextFilesData.html" title="AnalyzeTextFilesData.html">Next</a></td><td width="34%" align="middle"><strong>AnalyzeSequenceFilesData.pl</strong></td><td width="33%" align="right"><a href="././code/AnalyzeSequenceFilesData.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/AnalyzeSequenceFilesData.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/AnalyzeSequenceFilesData.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/AnalyzeSequenceFilesData.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/AnalyzeSequenceFilesData.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>AnalyzeSequenceFilesData.pl - Analyze sequence and alignment files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>AnalyzeSequenceFilesData.pl SequenceFile(s) AlignmentFile(s)...</p>
+<p>AnalyzeSequenceFilesData.pl [<strong>-h, --help</strong>] [<strong>-i, --IgnoreGaps</strong> yes | no]
+[<strong>-m, --mode</strong> PercentIdentityMatrix | ResidueFrequencyAnalysis | All]
+[<strong>--outdelim</strong> comma | tab | semicolon] [<strong>-o, --overwrite</strong>] [<strong>-p, --precision</strong> number] [<strong>-q, --quote</strong> yes | no]
+[<strong>--ReferenceSequence</strong> SequenceID | UseFirstSequenceID]
+[<strong>--region</strong> &quot;StartResNum, EndResNum, [StartResNum, EndResNum...]&quot; | UseCompleteSequence]
+[<strong>--RegionResiduesMode</strong> AminoAcids | NucleicAcids | None]
+[<strong>-w, --WorkingDir</strong> dirname] SequenceFile(s) AlignmentFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Analyze <em>SequenceFile(s) and AlignmentFile(s)</em> data: calculate pairwise percent identity matrix or
+calculate percent occurrence of various residues in specified sequence regions. All the sequences
+in the input file must have the same sequence lengths; otherwise, the sequence file is ignored.</p>
+<p>The file names are separated by spaces. All the sequence files in a current directory can
+be specified by <em>*.aln</em>, <em>*.msf</em>, <em>*.fasta</em>, <em>*.fta</em>, <em>*.pir</em> or any other supported
+formats; additionally, <em>DirName</em> corresponds to all the sequence files in the current directory
+with any of the supported file extension: <em>.aln, .msf, .fasta, .fta, and .pir</em>.</p>
+<p>Supported sequence formats are: <em>ALN/CLustalW</em>, <em>GCG/MSF</em>, <em>PILEUP/MSF</em>, <em>Pearson/FASTA</em>,
+and <em>NBRF/PIR</em>. Instead of using file extensions, file formats are detected by parsing the contents
+of <em>SequenceFile(s) and AlignmentFile(s)</em>.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-i, --IgnoreGaps</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Ignore gaps during calculation of sequence lengths and specification of regions during residue
+frequency analysis. Possible values: <em>yes or no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>PercentIdentityMatrix | ResidueFrequencyAnalysis | All</em></strong></dt>
+<dd>
+<p>Specify how to analyze data in sequence files: calculate percent identity matrix or calculate
+frequency of occurrence of residues in specific regions. During <em>ResidueFrequencyAnalysis</em> value
+of <strong>-m, --mode</strong> option, output files are generated for both the residue count and percent residue
+count. Possible values: <em>PercentIdentityMatrix, ResidueFrequencyAnalysis, or All</em>. Default value:
+<em>PercentIdentityMatrix</em>.</p>
+</dd>
+<dt><strong><strong>--outdelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Output text file delimiter. Possible values: <em>comma, tab, or semicolon</em>.
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-p, --precision</strong> <em>number</em></strong></dt>
+<dd>
+<p>Precision of calculated values in the output file. Default: up to <em>2</em> decimal places.
+Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Put quotes around column values in output text file. Possible values: <em>yes or
+no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>--ReferenceSequence</strong> <em>SequenceID | UseFirstSequenceID</em></strong></dt>
+<dd>
+<p>Specify reference sequence ID to identify regions for performing <em>ResidueFrequencyAnalysis</em> specified
+using <strong>-m, --mode</strong> option. Default: <em>UseFirstSequenceID</em>.</p>
+</dd>
+<dt><strong><strong>--region</strong> <em>StartResNum,EndResNum,[StartResNum,EndResNum...] | UseCompleteSequence</em></strong></dt>
+<dd>
+<p>Specify how to perform frequency of occurrence analysis for residues: use specific regions
+indicated by starting and ending residue numbers in reference sequence or use the whole reference
+sequence as one region. Default: <em>UseCompleteSequence</em>.</p>
+<p>Based on the value of <strong>-i, --IgnoreGaps</strong> option, specified residue numbers <em>StartResNum,EndResNum</em>
+correspond to the positions in the reference sequence without gaps or with gaps.</p>
+<p>For residue numbers corresponding to the reference sequence including gaps, percent occurrence
+of various residues corresponding to gap position in reference sequence is also calculated.</p>
+</dd>
+<dt><strong><strong>--RegionResiduesMode</strong> <em>AminoAcids | NucleicAcids | None</em></strong></dt>
+<dd>
+<p>Specify how to process residues in the regions specified using <strong>--region</strong> option during
+<em>ResidueFrequencyAnalysis</em> calculation: categorize residues as amino acids, nucleic acids, or simply
+ignore residue category during the calculation. Possible values: <em>AminoAcids, NucleicAcids or None</em>.
+Default value: <em>None</em>.</p>
+<p>For <em>AminoAcids</em> or <em>NucleicAcids</em> values of <strong>--RegionResiduesMode</strong> option, all the standard amino
+acids or nucleic acids are listed in the output file for each region; Any gaps and other non standard residues
+are added to the list as encountered.</p>
+<p>For <em>None</em> value of <strong>--RegionResiduesMode</strong> option, no assumption is made about type of residues.
+Residue and gaps are added to the list as encountered.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New sequence file name is generated using the root: &lt;Root&gt;&lt;Mode&gt;.&lt;Ext&gt; and
+&lt;Root&gt;&lt;Mode&gt;&lt;RegionNum&gt;.&lt;Ext&gt;. Default new file
+name: &lt;SequenceFileName&gt;&lt;Mode&gt;.&lt;Ext&gt; for <em>PercentIdentityMatrix</em> value <strong>m, --mode</strong> option
+and &lt;SequenceFileName&gt;&lt;Mode&gt;&lt;RegionNum&gt;.&lt;Ext&gt;  for <em>ResidueFrequencyAnalysis</em>.
+The csv, and tsv &lt;Ext&gt; values are used for comma/semicolon, and tab delimited text
+files respectively. This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-w --WorkingDir</strong> <em>text</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To calculate percent identity matrix for all sequences in Sample1.msf file and generate
+Sample1PercentIdentityMatrix.csv, type:</p>
+<div class="ExampleBox">
+    % AnalyzeSequenceFilesData.pl Sample1.msf</div>
+<p>To perform residue frequency analysis for all sequences in Sample1.aln file corresponding to
+non-gap positions in the first sequence and generate Sample1ResidueFrequencyAnalysisRegion1.csv
+and Sample1PercentResidueFrequencyAnalysisRegion1.csv files, type:</p>
+<div class="ExampleBox">
+    % AnalyzeSequenceFilesData.pl -m ResidueFrequencyAnalysis -o
+      Sample1.aln</div>
+<p>To perform residue frequency analysis for all sequences in Sample1.aln file corresponding to
+all positions in the first sequence and generate TestResidueFrequencyAnalysisRegion1.csv
+and TestPercentResidueFrequencyAnalysisRegion1.csv files, type:</p>
+<div class="ExampleBox">
+    % AnalyzeSequenceFilesData.pl -m ResidueFrequencyAnalysis --IgnoreGaps
+      No -o -r Test Sample1.aln</div>
+<p>To perform residue frequency analysis for all sequences in Sample1.aln file corresponding to
+non-gap residue positions 5 to 10, and 30 to 40 in sequence ACHE_BOVIN and generate
+Sample1ResidueFrequencyAnalysisRegion1.csv, Sample1ResidueFrequencyAnalysisRegion2.csv,
+SamplePercentResidueFrequencyAnalysisRegion1.csv, and
+SamplePercentResidueFrequencyAnalysisRegion2.csv files, type:</p>
+<div class="ExampleBox">
+    % AnalyzeSequenceFilesData.pl -m ResidueFrequencyAnalysis
+      --ReferenceSequence ACHE_BOVIN --region &quot;5,15,30,40&quot; -o Sample1.msf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromSequenceFiles.html">ExtractFromSequenceFiles.pl</a>,&nbsp<a href="./InfoSequenceFiles.html">InfoSequenceFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AnalyzeSDFilesData.html" title="AnalyzeSDFilesData.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./AnalyzeTextFilesData.html" title="AnalyzeTextFilesData.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AnalyzeSequenceFilesData.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MergeTextFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MACCSKeysFingerprints.html" title="MACCSKeysFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MergeTextFilesWithSD.html" title="MergeTextFilesWithSD.html">Next</a></td><td width="34%" align="middle"><strong>MergeTextFiles.pl</strong></td><td width="33%" align="right"><a href="././code/MergeTextFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/MergeTextFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/MergeTextFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/MergeTextFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/MergeTextFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>MergeTextFiles.pl - Merge multiple CSV or TSV text files into a single text file</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>MergeTextFiles.pl TextFiles...</p>
+<p>MergeTextFiles.pl [<strong>-h, --help</strong>] [<strong>--indelim</strong> comma | semicolon] [<strong>-c, --columns</strong> colnum,...;... | collabel,...;...]
+[<strong>-k, --keys</strong> colnum,...;... | collabel,...;...] [<strong>-m, --mode</strong> colnum | collabel]
+[<strong>-o, --overwrite</strong>] [<strong>--outdelim</strong> comma | tab | semicolon] [<strong>-q, --quote</strong> yes | no]
+[<strong>-r, --root</strong> rootname] [<strong>-s, --startcol</strong> colnum | collabel] [<strong>--startcolmode</strong> before | after]
+[<strong>-w, --workingdir</strong> dirname] TextFiles...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Merge multiple CSV or TSV <em>TextFiles</em> into first <em>TextFile</em> to generate a single
+text file. Unless <strong>-k --keys</strong> option is used, data rows from other <em>TextFiles</em>
+are added to first <em>TextFile</em> in a sequential order, and the number of rows in first
+<em>TextFile</em> is used to determine how many rows of data are added from other
+<em>TextFiles</em>.</p>
+<p>Multiple <em>TextFiles</em> names are separated by space. The valid file extensions are <em>.csv</em> and
+<em>.tsv</em> for comma/semicolon and tab delimited text files respectively. All other file names
+are ignored. All the text files in a current directory can be specified by <em>*.csv</em>,
+<em>*.tsv</em>, or the current directory name. The <strong>--indelim</strong> option determines the
+format of <em>TextFiles</em>. Any file which doesn't correspond to the format indicated
+by <strong>--indelim</strong> option is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-c, --columns</strong> <em>colnum,...;... | collabel,...;...</em></strong></dt>
+<dd>
+<p>This value is mode specific. It is a list of columns to merge into first
+text file specified by column numbers or labels for each text file
+delimited by &quot;;&quot;. All specified text files are merged into first text file.</p>
+<p>Default value: <em>all;all;...</em>. By default, all columns from specified text files are
+merged into first text file.</p>
+<p>For <em>colnum</em> mode, input value format is: <em>colnum,...;colnum,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;1,2;1,3,4;7,8,9&quot;</div>
+<p>For <em>collabel</em> mode, input value format is: <em>collabel,...;collabel,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;MW,SumNO;SumNHOH,ClogP,PSA;MolName,Mol_Id,Extreg&quot;</div>
+</dd>
+<dt><strong><strong>-k, --keys</strong> <em>colnum,...;... | collabel,...;...</em></strong></dt>
+<dd>
+<p>This value is mode specific. It specifies column keys to use for merging
+all specified text files into first text file. The column keys are specified by
+column numbers or labels for each text file delimited by &quot;;&quot;.</p>
+<p>By default, data rows from text files are merged into first file in the order they appear.</p>
+<p>For <em>colnum</em> mode, input value format is:<em>colkeynum, colkeynum;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;1;3;7&quot;</div>
+<p>For <em>collabel</em> mode, input value format is:<em>colkeylabel, colkeylabel;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;Mol_Id;Mol_Id;Cmpd_Id&quot;</div>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>Specify how to merge text files: using column numbers or column labels.
+Possible values: <em>colnum or collabel</em>. Default value: <em>colnum</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>--outdelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Output text file delimiter. Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Put quotes around column values in output text file. Possible values: <em>yes or
+no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New text file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default file
+name: &lt;FirstTextFileName&gt;1To&lt;Count&gt;Merged.&lt;Ext&gt;. The csv, and tsv
+&lt;Ext&gt; values are used for comma/semicolon, and tab delimited text files
+respectively.</p>
+</dd>
+<dt><strong><strong>-s, --startcol</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>This value is mode specific. It specifies the column in first text file which is
+used for start merging other text files.For <em>colnum</em> mode, specify column
+number and for <em>collabel</em> mode, specify column label.</p>
+<p>Default value: <em>last</em>. Start merge after the last column.</p>
+</dd>
+<dt><strong><strong>--startcolmode</strong> <em>before | after</em></strong></dt>
+<dd>
+<p>Start the merge before or after the <strong>-s, --startcol</strong> value. Possible values: <em>before or after</em>
+Default value: <em>after</em>.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To merge Sample2.csv and Sample3.csv into Sample1.csv and generate
+NewSample.csv, type:</p>
+<div class="ExampleBox">
+    % MergeTextFiles.pl -r NewSample -o Sample1.csv Sample2.csv
+      Sample3.csv</div>
+<p>To merge all Sample*.tsv and generate NewSample.tsv file, type:</p>
+<div class="ExampleBox">
+    % MergeTextFiles.pl -r NewSample --indelim comma --outdelim tab -o
+      Sample*.csv</div>
+<p>To merge column numbers &quot;1,2&quot; and &quot;3,4,5&quot; from Sample2.csv and Sample3.csv
+into Sample1.csv starting before column number 3 in Sample1.csv and to generate
+NewSample.csv without quoting column data, type:</p>
+<div class="ExampleBox">
+    % MergeTextFiles.pl -s 3 --startcolmode before -r NewSample -q no
+      -m colnum -c &quot;all;1,2;3,4,5&quot; -o Sample1.csv Sample2.csv
+      Sample3.csv</div>
+<p>To merge column &quot;Mol_ID,Formula,MolWeight&quot; and &quot;Mol_ID,NAME,ChemBankID&quot;
+from Sample2.csv and Sample3.csv into Sample1.csv using &quot;Mol_ID&quot; as a column keys
+starting after the last column and to generate NewSample.tsv, type:</p>
+<div class="ExampleBox">
+    % MergeTextFiles.pl -r NewSample --outdelim tab -k &quot;Mol_ID;Mol_ID;
+      Mol_ID&quot; -m collabel -c &quot;all;Mol_ID,Formula,MolWeight;Mol_ID,NAME,
+      ChemBankID&quot; -o Sample1.csv Sample2.csv Sample3.csv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>,&nbsp<a href="./SplitTextFiles.html">SplitTextFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MACCSKeysFingerprints.html" title="MACCSKeysFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MergeTextFilesWithSD.html" title="MergeTextFilesWithSD.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MergeTextFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

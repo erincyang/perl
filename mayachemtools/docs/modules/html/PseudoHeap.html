@@ -1,0 +1,231 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:PseudoHeap.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PeriodicTable.html" title="PeriodicTable.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SDFileUtil.html" title="SDFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>PseudoHeap.pm</strong></td><td width="33%" align="right"><a href="././code/PseudoHeap.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/PseudoHeap.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/PseudoHeap.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/PseudoHeap.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/PseudoHeap.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>PseudoHeap</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use PseudoHeap;</p>
+<p>use PseudoHeap qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>PseudoHeap</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#addkeyvaluepair">AddKeyValuePair</a>, <a href="#addkeyvaluepairs">AddKeyValuePairs</a>, <a href="#deletekey">DeleteKey</a>, <a href="#deletekeys">DeleteKeys</a>, <a href="#deletemaxkey">DeleteMaxKey</a>
+, <a href="#deleteminkey">DeleteMinKey</a>, <a href="#getcurrentsize">GetCurrentSize</a>, <a href="#getkeytype">GetKeyType</a>, <a href="#getkeyvalues">GetKeyValues</a>, <a href="#getkeys">GetKeys</a>, <a href="#getmaxkey">GetMaxKey</a>
+, <a href="#getmaxsize">GetMaxSize</a>, <a href="#getminkey">GetMinKey</a>, <a href="#getsortedkeys">GetSortedKeys</a>, <a href="#gettype">GetType</a>, <a href="#setkeytype">SetKeyType</a>, <a href="#setmaxsize">SetMaxSize</a>, <a href="#settype">SetType</a>
+, <a href="#stringifypseudoheap">StringifyPseudoHeap</a>
+</p><p>PseudoHeap is designed to support tracking of a specific number of largest or smallest key/value
+pairs with numeric or alphanumeric keys along with corresponding scalar or reference values.</p>
+<p>Although PseudoHeap is conceptually similar to a heap, it lacks number of key properties of a traditional
+heap data structure: no concept of root, parent and child nodes; no ordering of keys in any particular
+order; no specific location greatest or smallest key.</p>
+<p>The keys are simply stored in a hash with each key pointing to an array containing specified values.
+The min/max keys are updated during addition and deletion of key/value pairs; these can be retrieved
+by accessing corresponding hash.</p>
+<p>Addition and deletion of key/value is also straightforward using hashes. However, min/max keys
+need to be identified which is done using Perl sort function on the keys.</p>
+<p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewPseudoHeap = new PseudoHeap(%NamesAndValues);</div>
+<p>Using specified parameters <em>NamesAndValues</em> names and values hash, <strong>new</strong> method creates
+a new object and returns a reference to a newly created <strong>NewPseudoHeap</strong> object. By default,
+the following property names are initialized:</p>
+<div class="OptionsBox">
+    Type = undef;
+<br/>    KeyType = undef;
+<br/>    MaxSize = 10;</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $NewPseudoHeap = new PseudoHeap(
+                               'Type' =&gt; 'KeepTopN',
+                               'KeyType' =&gt; 'Numeric');</div>
+<div class="OptionsBox">
+    $NewPseudoHeap = new PseudoHeap(
+                               'Type' =&gt; 'KeepTopN',
+                               'KeyType' =&gt; 'AlphaNumeric',
+                               'MaxSize' =&gt; '20');</div>
+<div class="OptionsBox">
+    $NewPseudoHeap = new PseudoHeap(
+                               'Type' =&gt; 'KeepBottomN',
+                               'KeyType' =&gt; 'AlphaNumeric',
+                               'MaxSize' =&gt; '20');</div>
+</dd>
+<dt><strong><a name="addkeyvaluepair" class="item"><strong>AddKeyValuePair</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;AddKeyValuePair($Key, $Value);</div>
+<p>Add specified <em>Key</em> and <em>Value</em> pair to pseudo heap using a new or an existing
+key and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="addkeyvaluepairs" class="item"><strong>AddKeyValuePairs</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;AddKeyValuePairs(@KeyValuePairs);</div>
+<p>Adds multiple key and value pairs specified in array <em>KeyValuePairs</em> to pseudo heap
+using a new or existing keys and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="deletekey" class="item"><strong>DeleteKey</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;DeleteKey($Key);</div>
+<p>Deletes a specified <em>Key</em> from pseudo heap and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="deletekeys" class="item"><strong>DeleteKeys</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;DeleteKeys(@Keys);</div>
+<p>Deletes a specified <em>Keys</em> from pseudo heap and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="deletemaxkey" class="item"><strong>DeleteMaxKey</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;DeleteMaxKey();</div>
+<p>Deletes a <em>MaxKey</em> along with its associated values from pseudo heap and returns
+<strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="deleteminkey" class="item"><strong>DeleteMinKey</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;DeleteMinKey();</div>
+<p>Deletes a <em>MinKey</em> along with its associated values from pseudo heap and returns
+<strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="getcurrentsize" class="item"><strong>GetCurrentSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $PseudoHeap-&gt;GetCurrentSize();</div>
+<p>Returns current <em>Size</em> of pseudo heap corresponding to number to keys in heap.</p>
+</dd>
+<dt><strong><a name="getkeytype" class="item"><strong>GetKeyType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $KeyType = $PseudoHeap-&gt;GetKeyType();</div>
+<p>Returns <em>KeyType</em> of pseudo heap. Possible <strong>KeyType</strong> values: <em>Numeric or Alphanumeric</em>.</p>
+</dd>
+<dt><strong><a name="getkeyvalues" class="item"><strong>GetKeyValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Values = $PseudoHeap-&gt;GetKeyValues($Key);
+<br/>    $NumOfValues = $PseudoHeap-&gt;GetKeyValues($Key);</div>
+<p>Returns an array containing <strong>Values</strong> associated with a specified <em>Key</em> in pseudo heap. In
+scalar context, it returns number of values associated with a key.</p>
+</dd>
+<dt><strong><a name="getkeys" class="item"><strong>GetKeys</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Keys = $PseudoHeap-&gt;GetKeys();
+<br/>    $NumOfKeys = $PseudoHeap-&gt;GetKeys();</div>
+<p>Returns an array containing all <strong>Keys</strong> in pseudo heap. In scalar context, it returns total
+number of keys.</p>
+</dd>
+<dt><strong><a name="getmaxkey" class="item"><strong>GetMaxKey</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MaxKey = $PseudoHeap-&gt;GetMaxKey();</div>
+<p>Returns <em>MaxKey</em> present in pseudo heap.</p>
+</dd>
+<dt><strong><a name="getmaxsize" class="item"><strong>GetMaxSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MaxSize = $PseudoHeap-&gt;GetMaxSize();</div>
+<p>Returns <em>MaxSize</em> of pseudo heap.</p>
+</dd>
+<dt><strong><a name="getminkey" class="item"><strong>GetMinKey</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MinKey = $PseudoHeap-&gt;GetMinKey();</div>
+<p>Returns <em>MinKey</em> present in pseudo heap.</p>
+</dd>
+<dt><strong><a name="getsortedkeys" class="item"><strong>GetSortedKeys</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Keys = $PseudoHeap-&gt;GetSortedKeys();
+<br/>    $NumOfKeys = $PseudoHeap-&gt;GetSortedKeys();</div>
+<p>Returns an array containing all sorted <strong>Keys</strong> in pseudo heap. In scalar context, it retruns
+total number of keys.</p>
+<p>Keys are sorted based on values of <strong>Type</strong> and <strong>KeyType</strong> for pseudo heap:</p>
+<div class="OptionsBox">
+    Type          KeyType       SortOrder   SortOperator
+<br/>    KeepTopN      Numeric       Descending  &lt;=&gt;
+<br/>    KeepTopN      Alphanumeric  Descending  cmp
+<br/>    KeepBottomN   Numeric       Ascending    &lt;=&gt;
+<br/>    KeepBottomN   Alphanumeric  Ascending   cmp</div>
+</dd>
+<dt><strong><a name="gettype" class="item"><strong>GetType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Type = $PseudoHeap-&gt;GetType();</div>
+<p>Returns <em>Type</em> of pseudo heap.</p>
+</dd>
+<dt><strong><a name="setkeytype" class="item"><strong>SetKeyType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;SetKeyType($KeyType);</div>
+<p>Sets <em>KeyType</em> of pseudo heap and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="setmaxsize" class="item"><strong>SetMaxSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;SetMaxSize($MaxSize);</div>
+<p>Sets <em>MaxSize</em> of pseudo heap and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="settype" class="item"><strong>SetType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeap-&gt;SetType($Type);</div>
+<p>Sets <em>Type</em> of pseudo heap and returns <strong>PseudoHeap</strong>.</p>
+</dd>
+<dt><strong><a name="stringifypseudoheap" class="item"><strong>StringifyPseudoHeap</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PseudoHeapString = $PseudoHeap-&gt;StringifyPseudoHeap();</div>
+<p>Returns a string containing information about <em>PseudoHeap</em> object</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PeriodicTable.html" title="PeriodicTable.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SDFileUtil.html" title="SDFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>PseudoHeap.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

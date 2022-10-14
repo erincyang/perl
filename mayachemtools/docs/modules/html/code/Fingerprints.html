@@ -1,0 +1,434 @@
+<html>
+<head>
+<title>MayaChemTools:Code:Fingerprints::Fingerprints.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-Fingerprints::Fingerprints-"></a>   1 <span class="k">package </span><span class="i">Fingerprints::Fingerprints</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: Fingerprints.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:24 $</span>
+   5 <span class="c"># $Revision: 1.35 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Scalar::Util</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">ObjectProperty</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">MathUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  36 <span class="k">use</span> <span class="w">Fingerprints::FingerprintsBitVector</span><span class="sc">;</span>
+  37 <span class="k">use</span> <span class="w">Fingerprints::FingerprintsVector</span><span class="sc">;</span>
+  38 
+  39 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  40 
+  41 <span class="i">@ISA</span> = <span class="q">qw(ObjectProperty Exporter)</span><span class="sc">;</span>
+  42 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  43 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  44 
+  45 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  46 
+  47 <span class="c"># Setup class variables...</span>
+  48 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  49 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  50 
+  51 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  52 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  53   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  54 
+  55   <span class="c"># Initialize object...</span>
+  56   <span class="k">my</span> <span class="i">$This</span> = <span class="s">{</span><span class="s">}</span><span class="sc">;</span>
+  57   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  58   <span class="i">$This</span><span class="i">-&gt;_InitializeFingerprints</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  59 
+  60   <span class="i">$This</span><span class="i">-&gt;_InitializeFingerprintsProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  61 
+  62   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  63 <span class="s">}</span>
+  64 
+  65 <span class="c"># Initialize object data...</span>
+  66 <span class="c">#</span>
+<a name="_InitializeFingerprints-"></a>  67 <span class="k">sub </span><span class="m">_InitializeFingerprints</span> <span class="s">{</span>
+  68   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  69 
+  70   <span class="c"># Molecule object...</span>
+  71   <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  72 
+  73   <span class="c"># Type of fingerprints...</span>
+  74   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  75 
+  76   <span class="c"># Type of fingerprints vector: FingerprintsBitVector or FingerprintsVector...</span>
+  77   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  78 
+  79   <span class="c"># Marks successful generation of fingerprints...</span>
+  80   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsGenerated</span>} = <span class="n">0</span><span class="sc">;</span>
+  81 
+  82   <span class="c"># Initialize values for FingerprintsBitVector...</span>
+  83   <span class="i">_InitializeClassValuesForFingerprintsBitVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  84 
+  85   <span class="c"># Initialize values for FingerprintsVector...</span>
+  86   <span class="i">_InitializeClassValuesForFingerprintsVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  87 <span class="s">}</span>
+  88 
+  89 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a>  90 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+  91   <span class="c">#Class name...</span>
+  92   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+  93 <span class="s">}</span>
+  94 
+  95 <span class="c"># Initialize class values specific to FingerprintsBitVector...</span>
+  96 <span class="c">#</span>
+<a name="_InitializeClassValuesForFingerprintsBitVector-"></a>  97 <span class="k">sub </span><span class="m">_InitializeClassValuesForFingerprintsBitVector</span> <span class="s">{</span>
+  98   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  99 
+ 100   <span class="c"># Size of FingerprintsBitVector...</span>
+ 101   <span class="i">$This</span>-&gt;{<span class="w">Size</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 102 
+ 103   <span class="c"># Min/Max sizes used for folding FingerprintsBitVector...</span>
+ 104   <span class="i">$This</span>-&gt;{<span class="w">MinSize</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 105   <span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 106 
+ 107   <span class="c"># FingerprintsBitVector...</span>
+ 108   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 109 <span class="s">}</span>
+ 110 
+ 111 <span class="c"># Initialize class values specific to FingerprintsVector...</span>
+ 112 <span class="c">#</span>
+<a name="_InitializeClassValuesForFingerprintsVector-"></a> 113 <span class="k">sub </span><span class="m">_InitializeClassValuesForFingerprintsVector</span> <span class="s">{</span>
+ 114   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 115 
+ 116   <span class="c"># Types of FingerprintsVector values: OrderedNumericalValues, NumericalValues or AlphaNumericalValues.</span>
+ 117   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 118 
+ 119   <span class="c"># Fingerprints vector...</span>
+ 120   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 121 <span class="s">}</span>
+ 122 
+ 123 <span class="c"># Initialize object properties....</span>
+<a name="_InitializeFingerprintsProperties-"></a> 124 <span class="k">sub </span><span class="m">_InitializeFingerprintsProperties</span> <span class="s">{</span>
+ 125   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 126 
+ 127   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 128   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 129     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 130     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 131   <span class="s">}</span>
+ 132 
+ 133   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 134 <span class="s">}</span>
+ 135 
+ 136 <span class="c"># Set molecule object and make sure it&#39;s not already set...</span>
+ 137 <span class="c">#</span>
+<a name="SetMolecule-"></a> 138 <span class="k">sub </span><span class="m">SetMolecule</span> <span class="s">{</span>
+ 139   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Molecule</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 140 
+ 141   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span> <span class="s">{</span>
+ 142     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMolecule: Can&#39;t change molecule object:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 143   <span class="s">}</span>
+ 144   <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>} = <span class="i">$Molecule</span><span class="sc">;</span>
+ 145 
+ 146   <span class="c"># Weaken the reference to disable increment of reference count...</span>
+ 147   <span class="i">Scalar::Util::weaken</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span><span class="sc">;</span>
+ 148 
+ 149   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 150 <span class="s">}</span>
+ 151 
+ 152 <span class="c"># Set type and make sure it&#39;s not already set...</span>
+ 153 <span class="c">#</span>
+<a name="SetType-"></a> 154 <span class="k">sub </span><span class="m">SetType</span> <span class="s">{</span>
+ 155   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Type</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 156 
+ 157   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>}<span class="s">)</span> <span class="s">{</span>
+ 158     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetType: Can&#39;t change fingerprint type:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 159   <span class="s">}</span>
+ 160   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="i">$Type</span><span class="sc">;</span>
+ 161 
+ 162   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 163 <span class="s">}</span>
+ 164 
+ 165 <span class="c"># Is fingerprints generation successful?</span>
+ 166 <span class="c">#</span>
+ 167 <span class="c"># Notes:</span>
+ 168 <span class="c">#   . The specific fingerprints generation class sets the value of FingerprinsGenerated</span>
+ 169 <span class="c">#     to 1 after the successful generation of fingerprints; otherwise, it&#39;s set to 0.</span>
+ 170 <span class="c">#</span>
+<a name="IsFingerprintsGenerationSuccessful-"></a> 171 <span class="k">sub </span><span class="m">IsFingerprintsGenerationSuccessful</span> <span class="s">{</span>
+ 172   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 173 
+ 174   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsGenerated</span>} ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 175 <span class="s">}</span>
+ 176 
+ 177 <span class="c"># Set vector type and make sure it&#39;s not already set...</span>
+ 178 <span class="c">#</span>
+<a name="SetVectorType-"></a> 179 <span class="k">sub </span><span class="m">SetVectorType</span> <span class="s">{</span>
+ 180   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$VectorType</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 181 
+ 182   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">VectorType</span>}<span class="s">)</span> <span class="s">{</span>
+ 183     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetVectorType: Can&#39;t change fingerprint vector type:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 184   <span class="s">}</span>
+ 185   <span class="k">if</span> <span class="s">(</span><span class="i">$VectorType</span> !~ <span class="q">/^(FingerprintsBitVector|FingerprintsVector)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 186     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetVectorType: Specified value, $VectorType, for Type is not vaild. Supported types in current release of MayaChemTools: FingerprintsBitVector and FingerprintsVector...&quot;</span><span class="sc">;</span>
+ 187   <span class="s">}</span>
+ 188   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="i">$VectorType</span><span class="sc">;</span>
+ 189 
+ 190   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 191 <span class="s">}</span>
+ 192 
+ 193 <span class="c">#</span>
+ 194 <span class="c"># Methods/functions for FingerprintsBitVector...</span>
+ 195 <span class="c">#</span>
+ 196 
+ 197 <span class="c"># Initialize fingerprint bit vector...</span>
+<a name="_InitializeFingerprintsBitVector-"></a> 198 <span class="k">sub </span><span class="m">_InitializeFingerprintsBitVector</span> <span class="s">{</span>
+ 199   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 200 
+ 201   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} !~ <span class="q">/^FingerprintsBitVector$/i</span><span class="s">)</span> <span class="s">{</span>
+ 202     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_InitializeFingerprintsBitVector: Can&#39;t initialize fingerprints bit vector: VectorType must be FingerprintsBitVector...&quot;</span><span class="sc">;</span>
+ 203   <span class="s">}</span>
+ 204 
+ 205   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span> <span class="s">{</span>
+ 206     <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>} = <span class="i">new</span> <span class="i">Fingerprints::FingerprintsBitVector</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 207   <span class="s">}</span>
+ 208   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 209 <span class="s">}</span>
+ 210 
+ 211 <span class="c"># Set size...</span>
+ 212 <span class="c">#</span>
+<a name="SetSize-"></a> 213 <span class="k">sub </span><span class="m">SetSize</span> <span class="s">{</span>
+ 214   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 215 
+ 216   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinSize</span>} &amp;&amp; <span class="i">$Size</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MinSize</span>}<span class="s">)</span> <span class="s">{</span>
+ 217     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetSize: Fingerprint size value, $Size, is not valid :  It must be &gt;= $This-&gt;{MinSize}...&quot;</span><span class="sc">;</span>
+ 218   <span class="s">}</span>
+ 219   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>} &amp;&amp; <span class="i">$Size</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>}<span class="s">)</span> <span class="s">{</span>
+ 220     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetSize: Fingerprint size value, $Size, is not valid:  It must be &lt;= $This-&gt;{MaxSize}...&quot;</span><span class="sc">;</span>
+ 221   <span class="s">}</span>
+ 222 
+ 223   <span class="i">$This</span>-&gt;{<span class="w">Size</span>} = <span class="i">$Size</span><span class="sc">;</span>
+ 224 
+ 225   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 226 <span class="s">}</span>
+ 227 
+ 228 <span class="c"># Set FingerprintsBitVector object and make sure it&#39;s not already set...</span>
+ 229 <span class="c">#</span>
+<a name="SetFingerprintsBitVector-"></a> 230 <span class="k">sub </span><span class="m">SetFingerprintsBitVector</span> <span class="s">{</span>
+ 231   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$FingerprintsBitVector</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 232 
+ 233   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 234     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFingerprintsBitVector: Can&#39;t change FingerprintsBitVector object:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 235   <span class="s">}</span>
+ 236   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>} = <span class="i">$FingerprintsBitVector</span><span class="sc">;</span>
+ 237 
+ 238   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 239 <span class="s">}</span>
+ 240 
+ 241 <span class="c"># Fold fingerprints by recursively reducing its size by half untill bit density is greater than or equal to</span>
+ 242 <span class="c"># specified bit density...</span>
+ 243 <span class="c">#</span>
+<a name="FoldFingerprintsByBitDensity-"></a> 244 <span class="k">sub </span><span class="m">FoldFingerprintsByBitDensity</span> <span class="s">{</span>
+ 245   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitDensity</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 246 
+ 247   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$BitDensity</span> &gt;= <span class="n">0</span> &amp;&amp; <span class="i">$BitDensity</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 248     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsByBitDensity: Specified bit density, $BitDensity, is not valid:  It must be &gt; 0 &amp;&amp; &lt;= 1 ...&quot;</span><span class="sc">;</span>
+ 249   <span class="s">}</span>
+ 250 
+ 251   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_FoldFingerprintsBitVector</span><span class="s">(</span><span class="q">&#39;ByDensity&#39;</span><span class="cm">,</span> <span class="i">$BitDensity</span><span class="s">)</span><span class="sc">;</span>
+ 252 <span class="s">}</span>
+ 253 
+ 254 <span class="c"># Fold fingerprints by recursively reducing its size by half untill size is less than or equal to</span>
+ 255 <span class="c"># specified size...</span>
+ 256 <span class="c">#</span>
+<a name="FoldFingerprintsBySize-"></a> 257 <span class="k">sub </span><span class="m">FoldFingerprintsBySize</span> <span class="s">{</span>
+ 258   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="cm">,</span> <span class="i">$CheckSizeValue</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 259 
+ 260   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$CheckSizeValue</span><span class="s">)</span> <span class="s">{</span>
+ 261     <span class="i">$CheckSizeValue</span> = <span class="n">1</span><span class="sc">;</span>
+ 262   <span class="s">}</span>
+ 263 
+ 264   <span class="k">if</span> <span class="s">(</span><span class="i">$CheckSizeValue</span><span class="s">)</span> <span class="s">{</span>
+ 265     <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsPositiveInteger</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 266       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsBySize: Specified size, $Size, is not valid:  It must be a positive integer&quot;</span><span class="sc">;</span>
+ 267     <span class="s">}</span>
+ 268     <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$Size</span> &gt;= <span class="i">$This</span>-&gt;{<span class="w">MinSize</span>} &amp;&amp; <span class="i">$Size</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 269       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsBySize: Specified size, $Size, is not valid:  It must be greater than or equal to minimum size of $This-&gt;{MinSize} and less than current size of $This-&gt;{Size}...&quot;</span><span class="sc">;</span>
+ 270     <span class="s">}</span>
+ 271     <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsNumberPowerOfNumber</span><span class="s">(</span><span class="i">$Size</span><span class="cm">,</span> <span class="n">2</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 272       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsBySize: Specified size value, $Size, must be power of 2...&quot;</span><span class="sc">;</span>
+ 273     <span class="s">}</span>
+ 274   <span class="s">}</span>
+ 275 
+ 276   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_FoldFingerprintsBitVector</span><span class="s">(</span><span class="q">&#39;BySize&#39;</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 277 <span class="s">}</span>
+ 278 
+ 279 <span class="c"># Fold fingerprints bit vector using specified size of bit density...</span>
+ 280 <span class="c">#</span>
+<a name="_FoldFingerprintsBitVector-"></a> 281 <span class="k">sub </span><span class="m">_FoldFingerprintsBitVector</span> <span class="s">{</span>
+ 282   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Mode</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 283 
+ 284   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 285     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 286   <span class="s">}</span>
+ 287   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVector</span><span class="cm">,</span> <span class="i">$FoldedFingerprintsBitVector</span><span class="s">)</span><span class="sc">;</span>
+ 288 
+ 289   <span class="i">$FoldedFingerprintsBitVector</span> = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 290   <span class="i">$FingerprintsBitVector</span> = <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="sc">;</span>
+ 291   <span class="j">MODE:</span> <span class="s">{</span>
+ 292     <span class="k">if</span> <span class="s">(</span><span class="i">$Mode</span> =~ <span class="q">/^BySize$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$FoldedFingerprintsBitVector</span> = <span class="i">$FingerprintsBitVector</span><span class="i">-&gt;FoldFingerprintsBitVectorBySize</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">MODE</span><span class="sc">;</span> <span class="s">}</span>
+ 293     <span class="k">if</span> <span class="s">(</span><span class="i">$Mode</span> =~ <span class="q">/^ByDensity$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$FoldedFingerprintsBitVector</span> = <span class="i">$FingerprintsBitVector</span><span class="i">-&gt;FoldFingerprintsBitVectorByDensity</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">MODE</span><span class="sc">;</span> <span class="s">}</span>
+ 294     <span class="i">$FoldedFingerprintsBitVector</span> = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 295   <span class="s">}</span>
+ 296   <span class="k">if</span> <span class="s">(</span><span class="i">$FoldedFingerprintsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 297     <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>} = <span class="i">$FoldedFingerprintsBitVector</span><span class="sc">;</span>
+ 298     <span class="i">$This</span>-&gt;{<span class="w">Size</span>} = <span class="i">$FoldedFingerprintsBitVector</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 299   <span class="s">}</span>
+ 300   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 301 <span class="s">}</span>
+ 302 
+ 303 <span class="c"># Get fingerprints as a binary ascii string containing 0s and 1s...</span>
+ 304 <span class="c">#</span>
+<a name="GetFingerprintBitsAsBinaryString-"></a> 305 <span class="k">sub </span><span class="m">GetFingerprintBitsAsBinaryString</span> <span class="s">{</span>
+ 306   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 307 
+ 308   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 309 <span class="s">}</span>
+ 310 
+ 311 <span class="c"># Get fingerprints as a hexadecimal string...</span>
+ 312 <span class="c">#</span>
+<a name="GetFingerprintBitsAsHexadecimalString-"></a> 313 <span class="k">sub </span><span class="m">GetFingerprintBitsAsHexadecimalString</span> <span class="s">{</span>
+ 314   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 315 
+ 316   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 317 <span class="s">}</span>
+ 318 
+ 319 <span class="c"># Get fingerprints as a raw binary string containing packed bit values for each</span>
+ 320 <span class="c"># byte...</span>
+ 321 <span class="c">#</span>
+<a name="GetFingerprintBitsAsRawBinaryString-"></a> 322 <span class="k">sub </span><span class="m">GetFingerprintBitsAsRawBinaryString</span> <span class="s">{</span>
+ 323   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 324 
+ 325   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 326 <span class="s">}</span>
+ 327 
+ 328 <span class="c"># Get fingerprint bits as a string...</span>
+ 329 <span class="c">#</span>
+<a name="_GetFingerprintBitsAsString-"></a> 330 <span class="k">sub </span><span class="m">_GetFingerprintBitsAsString</span> <span class="s">{</span>
+ 331   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 332 
+ 333   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 334     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 335   <span class="s">}</span>
+ 336   <span class="j">FORMAT :</span> <span class="s">{</span>
+ 337     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Binary|Bin|BinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="i">-&gt;GetBitsAsBinaryString</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 338     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Hexadecimal|Hex|HexadecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="i">-&gt;GetBitsAsHexadecimalString</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 339     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsBitVector</span>}<span class="i">-&gt;GetBitsAsRawBinaryString</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 340     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_GetFingerprintBitsAsString: Specified bit vector string format, $Format, is not supported. Value values: Binary, Bin, BinaryString, Hexdecimal, Hex, HexadecimalString, RawBinary, RawBin, RawBinaryString...&quot;</span><span class="sc">;</span>
+ 341   <span class="s">}</span>
+ 342   <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 343 <span class="s">}</span>
+ 344 
+ 345 <span class="c">#</span>
+ 346 <span class="c"># Methods/functions for FingerprintsVector...</span>
+ 347 <span class="c">#</span>
+ 348 
+ 349 <span class="c"># Initialize fingerprint vector...</span>
+<a name="_InitializeFingerprintsVector-"></a> 350 <span class="k">sub </span><span class="m">_InitializeFingerprintsVector</span> <span class="s">{</span>
+ 351   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 352 
+ 353   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} !~ <span class="q">/^FingerprintsVector$/i</span><span class="s">)</span> <span class="s">{</span>
+ 354     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_InitializeFingerprintsVector: Can&#39;t initialize fingerprints vector: VectorType must be FingerprintsVector...&quot;</span><span class="sc">;</span>
+ 355   <span class="s">}</span>
+ 356 
+ 357   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>}<span class="s">)</span> <span class="s">{</span>
+ 358     <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>} = <span class="i">new</span> <span class="i">Fingerprints::FingerprintsVector</span><span class="s">(</span><span class="q">&#39;Type&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>}<span class="s">)</span><span class="sc">;</span>
+ 359   <span class="s">}</span>
+ 360   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 361 <span class="s">}</span>
+ 362 
+ 363 <span class="c"># Set FingerprintsVector object and make sure it&#39;s not already set...</span>
+ 364 <span class="c">#</span>
+<a name="SetFingerprintsVector-"></a> 365 <span class="k">sub </span><span class="m">SetFingerprintsVector</span> <span class="s">{</span>
+ 366   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$FingerprintsVector</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 367 
+ 368   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 369     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFingerprintsVector: Can&#39;t change FingerprintsVector object:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 370   <span class="s">}</span>
+ 371   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>} = <span class="i">$FingerprintsVector</span><span class="sc">;</span>
+ 372 
+ 373   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 374 <span class="s">}</span>
+ 375 
+ 376 <span class="c"># Types of FingerprintsVector values: OrderedNumericalValues, NumericalValues or AlphaNumericalValues.</span>
+ 377 <span class="c">#</span>
+<a name="SetFingerprintsVectorType-"></a> 378 <span class="k">sub </span><span class="m">SetFingerprintsVectorType</span> <span class="s">{</span>
+ 379   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$FingerprintsVectorType</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 380 
+ 381   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>}<span class="s">)</span> <span class="s">{</span>
+ 382     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFingerprintsVector: Can&#39;t change FingerprintsVectorType:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 383   <span class="s">}</span>
+ 384   <span class="k">if</span> <span class="s">(</span><span class="i">$FingerprintsVectorType</span> !~ <span class="q">/^(OrderedNumericalValues|NumericalValues|AlphaNumericalValues)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 385     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFingerprintsVectorType: Specified value, $FingerprintsVectorType, for Type is not vaild. Supported types in current release of MayaChemTools: OrderedNumericalValues, NumericalValues or AlphaNumericalValues&quot;</span><span class="sc">;</span>
+ 386   <span class="s">}</span>
+ 387   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="i">$FingerprintsVectorType</span><span class="sc">;</span>
+ 388 
+ 389   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 390 <span class="s">}</span>
+ 391 
+ 392 <span class="c"># Get fingerprints vector values as an array or reference to an array...</span>
+ 393 <span class="c">#</span>
+<a name="GetFingerprintsVectorValues-"></a> 394 <span class="k">sub </span><span class="m">GetFingerprintsVectorValues</span> <span class="s">{</span>
+ 395   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 396 
+ 397   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 398     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 399   <span class="s">}</span>
+ 400   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;GetValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 401 <span class="s">}</span>
+ 402 
+ 403 <span class="c"># Get fingerprints vector value IDs as an array or reference to an array...</span>
+ 404 <span class="c">#</span>
+<a name="GetFingerprintsVectorValueIDs-"></a> 405 <span class="k">sub </span><span class="m">GetFingerprintsVectorValueIDs</span> <span class="s">{</span>
+ 406   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 407 
+ 408   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="s">)</span> <span class="s">{</span>
+ 409     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 410   <span class="s">}</span>
+ 411   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;GetValueIDs</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 412 <span class="s">}</span>
+ 413 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<html>
+<head>
+<title>MayaChemTools:Code:PseudoHeap.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-PseudoHeap-"></a>   1 <span class="k">package </span><span class="i">PseudoHeap</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: PseudoHeap.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:58:00 $</span>
+   5 <span class="c"># $Revision: 1.12 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 
+  34 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  35 
+  36 <span class="i">@ISA</span> = <span class="q">qw(Exporter)</span><span class="sc">;</span>
+  37 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  38 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  39 
+  40 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span>
+  41                 <span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span>
+  42                <span class="s">)</span><span class="sc">;</span>
+  43 
+  44 <span class="c"># Setup class variables...</span>
+  45 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  46 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  47 
+  48 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyPseudoHeap&#39;</span><span class="sc">;</span>
+  49 
+  50 <span class="c"># PseudoHeap is designed to support tracking of a specific number of largest or smallest key/value</span>
+  51 <span class="c"># pairs with numeric or alphanumeric keys along with corresponding scalar or reference values.</span>
+  52 <span class="c">#</span>
+  53 <span class="c"># Although PseudoHeap is similar to a heap, it lacks number of key properties of a traditional heap data</span>
+  54 <span class="c"># structure: no concept of root, parent and child nodes; no ordering of keys in any particular order; no</span>
+  55 <span class="c"># specific localtion greatest or smallest key.</span>
+  56 <span class="c">#</span>
+  57 <span class="c"># The keys are simply stored in a hash with each key poining to an array containing specified values.</span>
+  58 <span class="c"># The min/max keys are updated during addition and deletion of key/value pairs; these can be retrieved</span>
+  59 <span class="c"># by accessing corresponding hash.</span>
+  60 <span class="c">#</span>
+  61 <span class="c"># Addition and deletion of key/value is also straightforward using hashes. However, min/max keys</span>
+  62 <span class="c"># need to be identified which is done using Perl sort on the keys.</span>
+  63 <span class="c">#</span>
+  64 <span class="c">#</span>
+  65 <span class="c"># Class constructor...</span>
+  66 <span class="c">#</span>
+<a name="new-"></a>  67 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  68   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  69 
+  70   <span class="c"># Initialize object...</span>
+  71   <span class="k">my</span> <span class="i">$This</span> = <span class="s">{</span><span class="s">}</span><span class="sc">;</span>
+  72   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  73   <span class="i">$This</span><span class="i">-&gt;_InitializePseudoHeap</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  74 
+  75   <span class="i">$This</span><span class="i">-&gt;_InitializePseudoHeapProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  76 
+  77   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  78 <span class="s">}</span>
+  79 
+  80 <span class="c"># Initialize object data...</span>
+  81 <span class="c">#</span>
+<a name="_InitializePseudoHeap-"></a>  82 <span class="k">sub </span><span class="m">_InitializePseudoHeap</span> <span class="s">{</span>
+  83   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  84 
+  85   <span class="c"># Type of pseudo heap:</span>
+  86   <span class="c">#</span>
+  87   <span class="c"># KeepTopN - Keep track of a specified number largest of key/value pairs</span>
+  88   <span class="c"># KeepBottomN - Keep track of a specified number smallest of key/value pairs</span>
+  89   <span class="c">#</span>
+  90   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="k">undef</span><span class="sc">;</span>
+  91 
+  92   <span class="c"># Type of keys: Numeric or Alphanumeric</span>
+  93   <span class="c">#</span>
+  94   <span class="c"># The value of KeyType determines comparison function used to sort and</span>
+  95   <span class="c"># and compare keys for a specific heap type as shown below:</span>
+  96   <span class="c">#</span>
+  97   <span class="c"># Type             KeyType       Comp  Sorting</span>
+  98   <span class="c">#</span>
+  99   <span class="c"># KeepTopN      Numeric       &lt;     Descending</span>
+ 100   <span class="c"># KeepTopN      AlphaNumeric  lt    Descending</span>
+ 101   <span class="c"># KeepBottomN  Numeric        &gt;     Ascending</span>
+ 102   <span class="c"># KeepBottomN  AlphaNumeric   gt    Ascending</span>
+ 103   <span class="c">#</span>
+ 104   <span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 105 
+ 106   <span class="c"># Maximum number of largest or smallest key/value pairs to keep...</span>
+ 107   <span class="c">#</span>
+ 108   <span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>} = <span class="n">10</span><span class="sc">;</span>
+ 109 
+ 110   <span class="c"># Keys and values associated with each key as an array...</span>
+ 111   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 112 
+ 113   <span class="c"># Min and max keys...</span>
+ 114   <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 115   <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 116 
+ 117   <span class="c"># Number of key/valur pairs currently present...</span>
+ 118   <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} = <span class="n">0</span><span class="sc">;</span>
+ 119 
+ 120   <span class="c"># Number of keys currently present where each key correspond to multiple values...</span>
+ 121   <span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} = <span class="n">0</span><span class="sc">;</span>
+ 122 <span class="s">}</span>
+ 123 
+ 124 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a> 125 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+ 126   <span class="c">#Class name...</span>
+ 127   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+ 128 
+ 129 <span class="s">}</span>
+ 130 
+ 131 <span class="c"># Initialize object properties....</span>
+ 132 <span class="c">#</span>
+<a name="_InitializePseudoHeapProperties-"></a> 133 <span class="k">sub </span><span class="m">_InitializePseudoHeapProperties</span> <span class="s">{</span>
+ 134   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 135   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 136 
+ 137   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 138     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 139     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 140   <span class="s">}</span>
+ 141 
+ 142   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">Type</span>}<span class="s">)</span> <span class="s">{</span>
+ 143     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated without specifying Type...&quot;</span><span class="sc">;</span>
+ 144   <span class="s">}</span>
+ 145 
+ 146   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">KeyType</span>}<span class="s">)</span> <span class="s">{</span>
+ 147     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated without specifying KeyType...&quot;</span><span class="sc">;</span>
+ 148   <span class="s">}</span>
+ 149 <span class="s">}</span>
+ 150 
+ 151 <span class="c"># Set heap type...</span>
+ 152 <span class="c">#</span>
+<a name="SetType-"></a> 153 <span class="k">sub </span><span class="m">SetType</span> <span class="s">{</span>
+ 154   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Type</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 155 
+ 156   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">Type</span>}<span class="s">)</span> <span class="s">{</span>
+ 157     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetType: Can&#39;t change Type...&quot;</span><span class="sc">;</span>
+ 158   <span class="s">}</span>
+ 159 
+ 160   <span class="k">if</span> <span class="s">(</span><span class="i">$Type</span> !~ <span class="q">/^(KeepTopN|KeepBottomN)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 161     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetType: Unknown PseudoHeap type: $Type; Supported types: KeepTopN or KeepBottomN...&quot;</span><span class="sc">;</span>
+ 162   <span class="s">}</span>
+ 163   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="i">$Type</span><span class="sc">;</span>
+ 164 
+ 165   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 166 <span class="s">}</span>
+ 167 
+ 168 <span class="c"># Get heap type..</span>
+ 169 <span class="c">#</span>
+<a name="GetType-"></a> 170 <span class="k">sub </span><span class="m">GetType</span> <span class="s">{</span>
+ 171   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 172 
+ 173   <span class="k">return</span> <span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">Type</span>} ? <span class="i">$This</span>-&gt;{<span class="w">Type</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 174 <span class="s">}</span>
+ 175 
+ 176 <span class="c"># Set key type...</span>
+ 177 <span class="c">#</span>
+<a name="SetKeyType-"></a> 178 <span class="k">sub </span><span class="m">SetKeyType</span> <span class="s">{</span>
+ 179   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$KeyType</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 180 
+ 181   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">KeyType</span>}<span class="s">)</span> <span class="s">{</span>
+ 182     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetType: Can&#39;t change KeyType...&quot;</span><span class="sc">;</span>
+ 183   <span class="s">}</span>
+ 184 
+ 185   <span class="k">if</span> <span class="s">(</span><span class="i">$KeyType</span> !~ <span class="q">/^(Numeric|Alphanumeric)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 186     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetType: Unknown PseudoHeap key type: $KeyType; Supported key types: Numeric or Alphanumeric...&quot;</span><span class="sc">;</span>
+ 187   <span class="s">}</span>
+ 188   <span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} = <span class="i">$KeyType</span><span class="sc">;</span>
+ 189 
+ 190   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 191 <span class="s">}</span>
+ 192 
+ 193 <span class="c"># Get key type..</span>
+ 194 <span class="c">#</span>
+<a name="GetKeyType-"></a> 195 <span class="k">sub </span><span class="m">GetKeyType</span> <span class="s">{</span>
+ 196   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 197 
+ 198   <span class="k">return</span> <span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} ? <span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 199 <span class="s">}</span>
+ 200 
+ 201 <span class="c"># Add a key/value pair...</span>
+ 202 <span class="c">#</span>
+<a name="AddKeyValuePair-"></a> 203 <span class="k">sub </span><span class="m">AddKeyValuePair</span> <span class="s">{</span>
+ 204   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 205 
+ 206   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span> &amp;&amp; <span class="k">defined</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 207     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;AddKeyValuePair: No key added: Both key and value must be defined...&quot;</span><span class="sc">;</span>
+ 208     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 209   <span class="s">}</span>
+ 210 
+ 211   <span class="i">$This</span><span class="i">-&gt;_AddKeyValuePair</span><span class="s">(</span><span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 212 
+ 213   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 214 <span class="s">}</span>
+ 215 
+ 216 <span class="c"># Add multiple key/value pairs...</span>
+ 217 <span class="c">#</span>
+<a name="AddKeyValuePairs-"></a> 218 <span class="k">sub </span><span class="m">AddKeyValuePairs</span> <span class="s">{</span>
+ 219   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@KeyValuePairs</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 220 
+ 221   <span class="k">if</span> <span class="s">(</span>!<span class="i">@KeyValuePairs</span><span class="s">)</span> <span class="s">{</span>
+ 222     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;AddKeyValuePairs: No keys added: Key/Value pairs list is empty...&quot;</span><span class="sc">;</span>
+ 223     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 224   <span class="s">}</span>
+ 225   <span class="k">if</span> <span class="s">(</span><span class="i">@KeyValuePairs</span> % <span class="n">2</span><span class="s">)</span> <span class="s">{</span>
+ 226     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;AddKeyValuePairs: No keys pairs added: Invalid key/value pairs data: Input list must contain even number of values...&quot;</span><span class="sc">;</span>
+ 227     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 228   <span class="s">}</span>
+ 229 
+ 230   <span class="k">my</span><span class="s">(</span><span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$Index</span><span class="s">)</span><span class="sc">;</span>
+ 231   <span class="k">for</span> <span class="s">(</span><span class="i">$Index</span> = <span class="n">0</span><span class="sc">;</span> <span class="i">$Index</span> &lt; <span class="i">$#KeyValuePairs</span><span class="sc">;</span> <span class="i">$Index</span> += <span class="n">2</span><span class="s">)</span> <span class="s">{</span>
+ 232     <span class="i">$Key</span> = <span class="i">$KeyValuePairs</span>[<span class="i">$Index</span>]<span class="sc">;</span> <span class="i">$Value</span> = <span class="i">$KeyValuePairs</span>[<span class="i">$Index</span> + <span class="n">1</span>]<span class="sc">;</span>
+ 233     <span class="i">$This</span><span class="i">-&gt;AddKeyValuePair</span><span class="s">(</span><span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 234   <span class="s">}</span>
+ 235 
+ 236   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 237 <span class="s">}</span>
+ 238 
+ 239 <span class="c"># Delete specified keys along with all associated values for each key...</span>
+ 240 <span class="c">#</span>
+<a name="DeleteKeys-"></a> 241 <span class="k">sub </span><span class="m">DeleteKeys</span> <span class="s">{</span>
+ 242   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@Keys</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 243 
+ 244   <span class="k">if</span> <span class="s">(</span>!<span class="i">@Keys</span><span class="s">)</span> <span class="s">{</span>
+ 245     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;DeleteKeys: No keys deleted: Keys list is empty...&quot;</span><span class="sc">;</span>
+ 246     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 247   <span class="s">}</span>
+ 248   <span class="k">my</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="sc">;</span>
+ 249   <span class="k">for</span> <span class="i">$Key</span> <span class="s">(</span><span class="i">@Keys</span><span class="s">)</span> <span class="s">{</span>
+ 250     <span class="i">$This</span><span class="i">-&gt;DeleteKey</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="sc">;</span>
+ 251   <span class="s">}</span>
+ 252 
+ 253   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 254 <span class="s">}</span>
+ 255 
+ 256 <span class="c"># Delete a sepcified key along with all of its associated values...</span>
+ 257 <span class="c">#</span>
+<a name="DeleteKey-"></a> 258 <span class="k">sub </span><span class="m">DeleteKey</span> <span class="s">{</span>
+ 259   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 260 
+ 261   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$Key</span> <span class="s">)</span> <span class="s">{</span>
+ 262     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;DeleteKey: No key deleted: Key must be specified...&quot;</span><span class="sc">;</span>
+ 263     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 264   <span class="s">}</span>
+ 265 
+ 266   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_DeleteKey</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="sc">;</span>
+ 267 <span class="s">}</span>
+ 268 
+ 269 <span class="c"># Delete min key along with all of its associated values...</span>
+ 270 <span class="c">#</span>
+<a name="DeleteMinKey-"></a> 271 <span class="k">sub </span><span class="m">DeleteMinKey</span> <span class="s">{</span>
+ 272   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 273 
+ 274   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;DeleteKey</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span><span class="sc">;</span>
+ 275 <span class="s">}</span>
+ 276 
+ 277 <span class="c"># Delete max key along with all of its associated values...</span>
+ 278 <span class="c">#</span>
+<a name="DeleteMaxKey-"></a> 279 <span class="k">sub </span><span class="m">DeleteMaxKey</span> <span class="s">{</span>
+ 280   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 281 
+ 282   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;DeleteKey</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span><span class="sc">;</span>
+ 283 <span class="s">}</span>
+ 284 
+ 285 <span class="c"># Set max size...</span>
+ 286 <span class="c">#</span>
+<a name="SetMaxSize-"></a> 287 <span class="k">sub </span><span class="m">SetMaxSize</span> <span class="s">{</span>
+ 288   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 289 
+ 290   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsPositiveInteger</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 291     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMaxSize: Max size value, $Size, is not valid: It must be a positive  integer...&quot;</span><span class="sc">;</span>
+ 292   <span class="s">}</span>
+ 293 
+ 294   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> || <span class="k">defined</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 295     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMaxSize: Can&#39;t change max size: Keys are already present...&quot;</span><span class="sc">;</span>
+ 296   <span class="s">}</span>
+ 297 
+ 298   <span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>} = <span class="i">$Size</span><span class="sc">;</span>
+ 299 
+ 300   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 301 <span class="s">}</span>
+ 302 
+ 303 <span class="c"># Get max size...</span>
+ 304 <span class="c">#</span>
+<a name="GetMaxSize-"></a> 305 <span class="k">sub </span><span class="m">GetMaxSize</span> <span class="s">{</span>
+ 306   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 307 
+ 308   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">MaxMaxSize</span>}<span class="sc">;</span>
+ 309 <span class="s">}</span>
+ 310 
+ 311 <span class="c"># Get current size...</span>
+ 312 <span class="c">#</span>
+<a name="GetCurrentSize-"></a> 313 <span class="k">sub </span><span class="m">GetCurrentSize</span> <span class="s">{</span>
+ 314   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 315 
+ 316   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>}<span class="sc">;</span>
+ 317 <span class="s">}</span>
+ 318 
+ 319 <span class="c"># Get min key...</span>
+ 320 <span class="c">#</span>
+<a name="GetMinKey-"></a> 321 <span class="k">sub </span><span class="m">GetMinKey</span> <span class="s">{</span>
+ 322   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 323 
+ 324   <span class="k">return</span> <span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} ? <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 325 <span class="s">}</span>
+ 326 
+ 327 <span class="c"># Get max key...</span>
+ 328 <span class="c">#</span>
+<a name="GetMaxKey-"></a> 329 <span class="k">sub </span><span class="m">GetMaxKey</span> <span class="s">{</span>
+ 330   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 331 
+ 332   <span class="k">return</span> <span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} ? <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 333 <span class="s">}</span>
+ 334 
+ 335 <span class="c"># Get keys...</span>
+ 336 <span class="c">#</span>
+<a name="GetKeys-"></a> 337 <span class="k">sub </span><span class="m">GetKeys</span> <span class="s">{</span>
+ 338   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 339 
+ 340   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}} <span class="co">:</span> <span class="k">scalar</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="sc">;</span>
+ 341 <span class="s">}</span>
+ 342 
+ 343 <span class="c"># Get sorted keys...</span>
+ 344 <span class="c">#</span>
+<a name="GetSortedKeys-"></a> 345 <span class="k">sub </span><span class="m">GetSortedKeys</span> <span class="s">{</span>
+ 346   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 347   <span class="k">my</span><span class="s">(</span><span class="i">@SortedKeys</span><span class="s">)</span><span class="sc">;</span>
+ 348 
+ 349   <span class="i">@SortedKeys</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 350   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>} =~ <span class="q">/^KeepTopN$/i</span><span class="s">)</span> <span class="s">{</span>
+ 351     <span class="i">@SortedKeys</span> = <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> ? <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$b</span> &lt;=&gt; <span class="i">$a</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span> <span class="co">:</span> <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$b</span> <span class="k">cmp</span> <span class="i">$a</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span><span class="sc">;</span>
+ 352   <span class="s">}</span>
+ 353   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>} =~ <span class="q">/^KeepBottomN$/i</span><span class="s">)</span> <span class="s">{</span>
+ 354     <span class="i">@SortedKeys</span> = <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> ? <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$a</span> &lt;=&gt; <span class="i">$b</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span> <span class="co">:</span> <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$a</span> <span class="k">cmp</span> <span class="i">$b</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span><span class="sc">;</span>
+ 355   <span class="s">}</span>
+ 356 
+ 357   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@SortedKeys</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@SortedKeys</span><span class="sc">;</span>
+ 358 <span class="s">}</span>
+ 359 
+ 360 <span class="c"># Get values associated with a specified key...</span>
+<a name="GetKeyValues-"></a> 361 <span class="k">sub </span><span class="m">GetKeyValues</span> <span class="s">{</span>
+ 362   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 363   <span class="k">my</span><span class="s">(</span><span class="i">@KeyValues</span><span class="s">)</span><span class="sc">;</span>
+ 364 
+ 365   <span class="i">@KeyValues</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 366   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span> &amp;&amp; <span class="k">exists</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 367     <span class="i">@KeyValues</span> = <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="sc">;</span>
+ 368   <span class="s">}</span>
+ 369   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@KeyValues</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@KeyValues</span><span class="sc">;</span>
+ 370 <span class="s">}</span>
+ 371 
+ 372 <span class="c">#  Add key/value pair...</span>
+ 373 <span class="c">#</span>
+<a name="_AddKeyValuePair-"></a> 374 <span class="k">sub </span><span class="m">_AddKeyValuePair</span><span class="s">{</span>
+ 375   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 376 
+ 377   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} &lt; <span class="i">$This</span>-&gt;{<span class="w">MaxSize</span>}<span class="s">)</span> <span class="s">{</span>
+ 378     <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_AppendKeyValuePair</span><span class="s">(</span><span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 379   <span class="s">}</span>
+ 380   <span class="k">else</span> <span class="s">{</span>
+ 381     <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_InsertKeyValuePair</span><span class="s">(</span><span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 382   <span class="s">}</span>
+ 383 <span class="s">}</span>
+ 384 
+ 385 <span class="c"># Append key/value pair...</span>
+ 386 <span class="c">#</span>
+<a name="_AppendKeyValuePair-"></a> 387 <span class="k">sub </span><span class="m">_AppendKeyValuePair</span> <span class="s">{</span>
+ 388   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 389 
+ 390   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="s">)</span> <span class="s">{</span>
+ 391     <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 392     <span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} += <span class="n">1</span><span class="sc">;</span>
+ 393 
+ 394     <span class="i">$This</span><span class="i">-&gt;_CompareAndSetMinKey</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="sc">;</span>
+ 395     <span class="i">$This</span><span class="i">-&gt;_CompareAndSetMaxKey</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="sc">;</span>
+ 396   <span class="s">}</span>
+ 397 
+ 398   <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="cm">,</span> <span class="i">$Value</span><span class="sc">;</span>
+ 399   <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} += <span class="n">1</span><span class="sc">;</span>
+ 400 
+ 401   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 402 <span class="s">}</span>
+ 403 
+ 404 <span class="c"># Insert key/value pair...</span>
+ 405 <span class="c">#</span>
+<a name="_InsertKeyValuePair-"></a> 406 <span class="k">sub </span><span class="m">_InsertKeyValuePair</span> <span class="s">{</span>
+ 407   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 408 
+ 409   <span class="c"># Is this key need to be inserted?</span>
+ 410   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span><span class="i">-&gt;_IsKeyNeedToBeInserted</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 411     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 412   <span class="s">}</span>
+ 413 
+ 414   <span class="c"># Insert key/value pair...</span>
+ 415   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="s">)</span> <span class="s">{</span>
+ 416     <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 417     <span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} += <span class="n">1</span><span class="sc">;</span>
+ 418   <span class="s">}</span>
+ 419   <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="cm">,</span> <span class="i">$Value</span><span class="sc">;</span>
+ 420   <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} += <span class="n">1</span><span class="sc">;</span>
+ 421 
+ 422   <span class="c"># Remove min or max key/value pair along with its update...</span>
+ 423   <span class="k">my</span><span class="s">(</span><span class="i">$KeyToDetele</span><span class="s">)</span><span class="sc">;</span>
+ 424 
+ 425   <span class="i">$KeyToDetele</span> = <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>} =~ <span class="q">/^KeepTopN$/i</span><span class="s">)</span> ? <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} <span class="co">:</span> <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="sc">;</span>
+ 426   <span class="i">$This</span><span class="i">-&gt;_DeleteKeyValuePair</span><span class="s">(</span><span class="i">$KeyToDetele</span><span class="s">)</span><span class="sc">;</span>
+ 427 
+ 428   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 429 <span class="s">}</span>
+ 430 
+ 431 <span class="c"># Check whether it makes sense to insert specified key...</span>
+ 432 <span class="c">#</span>
+<a name="_IsKeyNeedToBeInserted-"></a> 433 <span class="k">sub </span><span class="m">_IsKeyNeedToBeInserted</span> <span class="s">{</span>
+ 434   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 435 
+ 436   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>} =~ <span class="q">/^KeepTopN$/i</span><span class="s">)</span> <span class="s">{</span>
+ 437     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> <span class="s">{</span>
+ 438       <span class="k">return</span> <span class="s">(</span><span class="i">$Key</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} == <span class="i">$Key</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 439     <span class="s">}</span>
+ 440     <span class="k">else</span> <span class="s">{</span>
+ 441       <span class="k">return</span> <span class="s">(</span><span class="i">$Key</span> <span class="k">lt</span> <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} <span class="k">eq</span> <span class="i">$Key</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 442     <span class="s">}</span>
+ 443   <span class="s">}</span>
+ 444   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Type</span>} =~ <span class="q">/^KeepBottomN$/i</span><span class="s">)</span> <span class="s">{</span>
+ 445     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> <span class="s">{</span>
+ 446       <span class="k">return</span> <span class="s">(</span><span class="i">$Key</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} == <span class="i">$Key</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 447     <span class="s">}</span>
+ 448     <span class="k">else</span> <span class="s">{</span>
+ 449       <span class="k">return</span> <span class="s">(</span><span class="i">$Key</span> <span class="k">gt</span> <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="s">(</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} == <span class="n">1</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} <span class="k">eq</span> <span class="i">$Key</span><span class="s">)</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 450     <span class="s">}</span>
+ 451   <span class="s">}</span>
+ 452 
+ 453   <span class="k">return</span> <span class="n">1</span><span class="sc">;</span>
+ 454 <span class="s">}</span>
+ 455 
+ 456 <span class="c"># Set min key...</span>
+ 457 <span class="c">#</span>
+<a name="_CompareAndSetMinKey-"></a> 458 <span class="k">sub </span><span class="m">_CompareAndSetMinKey</span> <span class="s">{</span>
+ 459   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 460 
+ 461   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 462     <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 463     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 464   <span class="s">}</span>
+ 465 
+ 466   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> <span class="s">{</span>
+ 467     <span class="k">if</span> <span class="s">(</span><span class="i">$Key</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 468       <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 469     <span class="s">}</span>
+ 470   <span class="s">}</span>
+ 471   <span class="k">else</span> <span class="s">{</span>
+ 472     <span class="k">if</span> <span class="s">(</span><span class="i">$Key</span> <span class="k">lt</span> <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 473       <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 474     <span class="s">}</span>
+ 475   <span class="s">}</span>
+ 476 
+ 477   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 478 <span class="s">}</span>
+ 479 
+ 480 <span class="c"># Set max key...</span>
+ 481 <span class="c">#</span>
+<a name="_CompareAndSetMaxKey-"></a> 482 <span class="k">sub </span><span class="m">_CompareAndSetMaxKey</span> <span class="s">{</span>
+ 483   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 484 
+ 485   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 486     <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 487     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 488   <span class="s">}</span>
+ 489 
+ 490   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> <span class="s">{</span>
+ 491     <span class="k">if</span> <span class="s">(</span><span class="i">$Key</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 492       <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 493     <span class="s">}</span>
+ 494   <span class="s">}</span>
+ 495   <span class="k">else</span> <span class="s">{</span>
+ 496     <span class="k">if</span> <span class="s">(</span><span class="i">$Key</span> <span class="k">gt</span> <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>}<span class="s">)</span> <span class="s">{</span>
+ 497       <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="i">$Key</span><span class="sc">;</span>
+ 498     <span class="s">}</span>
+ 499   <span class="s">}</span>
+ 500 
+ 501   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 502 <span class="s">}</span>
+ 503 
+ 504 <span class="c"># Delete a sepcified key along with all of its values added to the list...</span>
+ 505 <span class="c">#</span>
+<a name="_DeleteKey-"></a> 506 <span class="k">sub </span><span class="m">_DeleteKey</span> <span class="s">{</span>
+ 507   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 508   <span class="k">my</span><span class="s">(</span><span class="i">$NumOfValues</span><span class="s">)</span><span class="sc">;</span>
+ 509 
+ 510   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="s">)</span> <span class="s">{</span>
+ 511     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 512   <span class="s">}</span>
+ 513 
+ 514   <span class="c"># Delete all key values...</span>
+ 515   <span class="i">$NumOfValues</span> = <span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="sc">;</span>
+ 516   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 517   <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} -= <span class="i">$NumOfValues</span><span class="sc">;</span>
+ 518 
+ 519   <span class="c"># Delete key...</span>
+ 520   <span class="k">delete</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="sc">;</span>
+ 521   <span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} -= <span class="n">1</span><span class="sc">;</span>
+ 522 
+ 523   <span class="c"># Set min and max keys...</span>
+ 524   <span class="i">$This</span><span class="i">-&gt;_FindAndSetMinAndMaxKeys</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 525 
+ 526   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 527 <span class="s">}</span>
+ 528 
+ 529 <span class="c"># Delete a sepcified key along with its most recent value added to the list...</span>
+ 530 <span class="c">#</span>
+<a name="_DeleteKeyValuePair-"></a> 531 <span class="k">sub </span><span class="m">_DeleteKeyValuePair</span> <span class="s">{</span>
+ 532   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Key</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 533 
+ 534   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="s">)</span> <span class="s">{</span>
+ 535     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 536   <span class="s">}</span>
+ 537 
+ 538   <span class="c"># Delete value...</span>
+ 539   <span class="k">pop</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="sc">;</span>
+ 540   <span class="i">$This</span>-&gt;{<span class="w">CurrentSize</span>} -= <span class="n">1</span><span class="sc">;</span>
+ 541 
+ 542   <span class="c"># Delete key...</span>
+ 543   <span class="k">if</span> <span class="s">(</span>!<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}}<span class="s">)</span> <span class="s">{</span>
+ 544     <span class="k">delete</span> <span class="i">$This</span>-&gt;{<span class="w">Keys</span>}{<span class="i">$Key</span>}<span class="sc">;</span>
+ 545     <span class="i">$This</span>-&gt;{<span class="w">KeysCount</span>} -= <span class="n">1</span><span class="sc">;</span>
+ 546   <span class="s">}</span>
+ 547 
+ 548   <span class="c"># Set min and max keys...</span>
+ 549   <span class="i">$This</span><span class="i">-&gt;_FindAndSetMinAndMaxKeys</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 550 
+ 551   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 552 <span class="s">}</span>
+ 553 
+ 554 <span class="c"># Set min and max key...</span>
+ 555 <span class="c">#</span>
+<a name="_FindAndSetMinAndMaxKeys-"></a> 556 <span class="k">sub </span><span class="m">_FindAndSetMinAndMaxKeys</span> <span class="s">{</span>
+ 557   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 558   <span class="k">my</span><span class="s">(</span><span class="i">@SortedKeys</span><span class="s">)</span><span class="sc">;</span>
+ 559 
+ 560   <span class="i">@SortedKeys</span> = <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">KeyType</span>} =~ <span class="q">/^Numeric$/i</span><span class="s">)</span> ? <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$a</span> &lt;=&gt; <span class="i">$b</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span> <span class="co">:</span> <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$a</span> <span class="k">cmp</span> <span class="i">$b</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">Keys</span>}}<span class="s">)</span><span class="sc">;</span>
+ 561 
+ 562   <span class="k">if</span> <span class="s">(</span><span class="i">@SortedKeys</span><span class="s">)</span> <span class="s">{</span>
+ 563     <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="i">$SortedKeys</span>[<span class="n">0</span>]<span class="sc">;</span>
+ 564     <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="i">$SortedKeys</span>[<span class="i">$#SortedKeys</span>]<span class="sc">;</span>
+ 565   <span class="s">}</span>
+ 566   <span class="k">else</span> <span class="s">{</span>
+ 567     <span class="i">$This</span>-&gt;{<span class="w">MinKey</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 568     <span class="i">$This</span>-&gt;{<span class="w">MaxKey</span>} = <span class="k">undef</span><span class="sc">;</span>
+ 569   <span class="s">}</span>
+ 570 
+ 571   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 572 <span class="s">}</span>
+ 573 
+ 574 <span class="c"># Return a string containing vector values...</span>
+<a name="StringifyPseudoHeap-"></a> 575 <span class="k">sub </span><span class="m">StringifyPseudoHeap</span> <span class="s">{</span>
+ 576   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 577   <span class="k">my</span><span class="s">(</span><span class="i">$PseudoHeapString</span><span class="cm">,</span> <span class="i">$Key</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$KeyValuesString</span><span class="cm">,</span> <span class="i">@KeysAndValues</span><span class="s">)</span><span class="sc">;</span>
+ 578 
+ 579   <span class="i">$PseudoHeapString</span> = <span class="q">&quot;PseudoHeap: Type: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetType</span><span class="s">(</span><span class="s">)</span> . <span class="q">&quot;; KeyType: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetKeyType</span><span class="s">(</span><span class="s">)</span> . <span class="q">&quot;; MaxSize: $This-&gt;{MaxSize}; CurrentSize: $This-&gt;{CurrentSize}; MinKey: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetMinKey</span><span class="s">(</span><span class="s">)</span> .  <span class="q">&quot;; MaxKey: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetMaxKey</span><span class="s">(</span><span class="s">)</span> . <span class="q">&quot;; NumOfUniqueKeys: $This-&gt;{KeysCount}&quot;</span><span class="sc">;</span>
+ 580 
+ 581   <span class="i">@KeysAndValues</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 582   <span class="k">for</span> <span class="i">$Key</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSortedKeys</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 583     <span class="k">for</span> <span class="i">$Value</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetKeyValues</span><span class="s">(</span><span class="i">$Key</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 584       <span class="k">push</span> <span class="i">@KeysAndValues</span><span class="cm">,</span> <span class="q">&quot;$Key - $Value&quot;</span><span class="sc">;</span>
+ 585     <span class="s">}</span>
+ 586   <span class="s">}</span>
+ 587   <span class="k">if</span> <span class="s">(</span><span class="i">@KeysAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 588     <span class="i">$KeyValuesString</span> = <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@KeysAndValues</span><span class="cm">,</span> <span class="q">&quot;; &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 589   <span class="s">}</span>
+ 590   <span class="k">else</span> <span class="s">{</span>
+ 591     <span class="i">$KeyValuesString</span> = <span class="q">&quot;None&quot;</span><span class="sc">;</span>
+ 592   <span class="s">}</span>
+ 593 
+ 594   <span class="i">$PseudoHeapString</span> .= <span class="q">&quot;; Sorted Key - Value pairs: [$KeyValuesString]&quot;</span><span class="sc">;</span>
+ 595 
+ 596   <span class="k">return</span> <span class="i">$PseudoHeapString</span><span class="sc">;</span>
+ 597 <span class="s">}</span>
+ 598 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

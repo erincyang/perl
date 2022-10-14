@@ -1,0 +1,1342 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Graph.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PathsTraversal.html" title="PathsTraversal.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./HTMLUtil.html" title="HTMLUtil.html">Next</a></td><td width="34%" align="middle"><strong>Graph.pm</strong></td><td width="33%" align="right"><a href="././code/Graph.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Graph.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Graph.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Graph.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Graph.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Graph</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Graph;</p>
+<p>use Graph qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Graph</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#addcycle">AddCycle</a>, <a href="#addedge">AddEdge</a>, <a href="#addedges">AddEdges</a>, <a href="#addpath">AddPath</a>, <a href="#addvertex">AddVertex</a>, <a href="#addvertices">AddVertices</a>, <a href="#clearcycles">ClearCycles</a>
+, <a href="#copy">Copy</a>, <a href="#copyedgesproperties">CopyEdgesProperties</a>, <a href="#copyverticesandedges">CopyVerticesAndEdges</a>, <a href="#copyverticesproperties">CopyVerticesProperties</a>
+, <a href="#deletecycle">DeleteCycle</a>, <a href="#deleteedge">DeleteEdge</a>, <a href="#deleteedgeproperties">DeleteEdgeProperties</a>, <a href="#deleteedgeproperty">DeleteEdgeProperty</a>, <a href="#deleteedges">DeleteEdges</a>
+, <a href="#deleteedgesproperties">DeleteEdgesProperties</a>, <a href="#deleteedgesproperty">DeleteEdgesProperty</a>, <a href="#deletegraphproperties">DeleteGraphProperties</a>
+, <a href="#deletegraphproperty">DeleteGraphProperty</a>, <a href="#deletepath">DeletePath</a>, <a href="#deletevertex">DeleteVertex</a>, <a href="#deletevertexproperties">DeleteVertexProperties</a>
+, <a href="#deletevertexproperty">DeleteVertexProperty</a>, <a href="#deletevertices">DeleteVertices</a>, <a href="#deleteverticesproperty">DeleteVerticesProperty</a>, <a href="#detectcycles">DetectCycles</a>
+, <a href="#getadjacencymatrix">GetAdjacencyMatrix</a>, <a href="#getadmittancematrix">GetAdmittanceMatrix</a>, <a href="#getallpaths">GetAllPaths</a>, <a href="#getallpathsstartingat">GetAllPathsStartingAt</a>
+, <a href="#getallpathsstartingatwithlength">GetAllPathsStartingAtWithLength</a>, <a href="#getallpathsstartingatwithlengthupto">GetAllPathsStartingAtWithLengthUpto</a>
+, <a href="#getallpathswithlength">GetAllPathsWithLength</a>, <a href="#getallpathswithlengthupto">GetAllPathsWithLengthUpto</a>, <a href="#getcircumference">GetCircumference</a>
+, <a href="#getconnectedcomponentsvertices">GetConnectedComponentsVertices</a>, <a href="#getcycles">GetCycles</a>, <a href="#getcycleswithevensize">GetCyclesWithEvenSize</a>
+, <a href="#getcycleswithoddsize">GetCyclesWithOddSize</a>, <a href="#getcycleswithsize">GetCyclesWithSize</a>, <a href="#getcycleswithsizegreaterthan">GetCyclesWithSizeGreaterThan</a>
+, <a href="#getcycleswithsizelessthan">GetCyclesWithSizeLessThan</a>, <a href="#getdegree">GetDegree</a>, <a href="#getdegreematrix">GetDegreeMatrix</a>, <a href="#getdistancematrix">GetDistanceMatrix</a>
+, <a href="#getedgecycles">GetEdgeCycles</a>, <a href="#getedgecycleswithevensize">GetEdgeCyclesWithEvenSize</a>, <a href="#getedgecycleswithoddsize">GetEdgeCyclesWithOddSize</a>
+, <a href="#getedgecycleswithsize">GetEdgeCyclesWithSize</a>, <a href="#getedgecycleswithsizegreaterthan">GetEdgeCyclesWithSizeGreaterThan</a>
+, <a href="#getedgecycleswithsizelessthan">GetEdgeCyclesWithSizeLessThan</a>, <a href="#getedgeproperties">GetEdgeProperties</a>, <a href="#getedgeproperty">GetEdgeProperty</a>, <a href="#getedges">GetEdges</a>
+, <a href="#getedgesproperty">GetEdgesProperty</a>, <a href="#getfusedandnonfusedcycles">GetFusedAndNonFusedCycles</a>, <a href="#getgirth">GetGirth</a>, <a href="#getgraphproperties">GetGraphProperties</a>
+, <a href="#getgraphproperty">GetGraphProperty</a>, <a href="#getincidencematrix">GetIncidenceMatrix</a>, <a href="#getisolatedvertices">GetIsolatedVertices</a>, <a href="#getkirchhoffmatrix">GetKirchhoffMatrix</a>
+, <a href="#getlaplacianmatrix">GetLaplacianMatrix</a>, <a href="#getlargestcycle">GetLargestCycle</a>, <a href="#getlargestedgecycle">GetLargestEdgeCycle</a>, <a href="#getlargestvertexcycle">GetLargestVertexCycle</a>
+, <a href="#getleafvertices">GetLeafVertices</a>, <a href="#getmaximumdegree">GetMaximumDegree</a>, <a href="#getmininumdegree">GetMininumDegree</a>, <a href="#getneighborhoodvertices">GetNeighborhoodVertices</a>
+, <a href="#getneighborhoodverticeswithradiusupto">GetNeighborhoodVerticesWithRadiusUpto</a>, <a href="#getneighborhoodverticeswithsuccessors">GetNeighborhoodVerticesWithSuccessors</a>
+, <a href="#getneighborhoodverticeswithsuccessorsandradiusupto">GetNeighborhoodVerticesWithSuccessorsAndRadiusUpto</a>, <a href="#getneighbors">GetNeighbors</a>
+, <a href="#getnormalizedlaplacianmatrix">GetNormalizedLaplacianMatrix</a>, <a href="#getnumofcycles">GetNumOfCycles</a>, <a href="#getnumofcycleswithevensize">GetNumOfCyclesWithEvenSize</a>
+, <a href="#getnumofcycleswithoddsize">GetNumOfCyclesWithOddSize</a>, <a href="#getnumofcycleswithsize">GetNumOfCyclesWithSize</a>
+, <a href="#getnumofcycleswithsizegreaterthan">GetNumOfCyclesWithSizeGreaterThan</a>, <a href="#getnumofcycleswithsizelessthan">GetNumOfCyclesWithSizeLessThan</a>
+, <a href="#getnumofedgecycles">GetNumOfEdgeCycles</a>, <a href="#getnumofedgecycleswithevensize">GetNumOfEdgeCyclesWithEvenSize</a>, <a href="#getnumofedgecycleswithoddsize">GetNumOfEdgeCyclesWithOddSize</a>
+, <a href="#getnumofedgecycleswithsize">GetNumOfEdgeCyclesWithSize</a>, <a href="#getnumofedgecycleswithsizegreaterthan">GetNumOfEdgeCyclesWithSizeGreaterThan</a>
+, <a href="#getnumofedgecycleswithsizelessthan">GetNumOfEdgeCyclesWithSizeLessThan</a>, <a href="#getnumofvertexcycles">GetNumOfVertexCycles</a>
+, <a href="#getnumofvertexcycleswithevensize">GetNumOfVertexCyclesWithEvenSize</a>, <a href="#getnumofvertexcycleswithoddsize">GetNumOfVertexCyclesWithOddSize</a>
+, <a href="#getnumofvertexcycleswithsize">GetNumOfVertexCyclesWithSize</a>, <a href="#getnumofvertexcycleswithsizegreaterthan">GetNumOfVertexCyclesWithSizeGreaterThan</a>
+, <a href="#getnumofvertexcycleswithsizelessthan">GetNumOfVertexCyclesWithSizeLessThan</a>, <a href="#getpaths">GetPaths</a>, <a href="#getpathsbetween">GetPathsBetween</a>
+, <a href="#getpathsstartingat">GetPathsStartingAt</a>, <a href="#getpathsstartingatwithlength">GetPathsStartingAtWithLength</a>
+, <a href="#getpathsstartingatwithlengthupto">GetPathsStartingAtWithLengthUpto</a>, <a href="#getpathswithlength">GetPathsWithLength</a>, <a href="#getpathswithlengthupto">GetPathsWithLengthUpto</a>
+, <a href="#getsiedeladjacencymatrix">GetSiedelAdjacencyMatrix</a>, <a href="#getsizeoflargestcycle">GetSizeOfLargestCycle</a>, <a href="#getsizeoflargestedgecycle">GetSizeOfLargestEdgeCycle</a>
+, <a href="#getsizeoflargestvertexcycle">GetSizeOfLargestVertexCycle</a>, <a href="#getsizeofsmallestcycle">GetSizeOfSmallestCycle</a>, <a href="#getsizeofsmallestedgecycle">GetSizeOfSmallestEdgeCycle</a>
+, <a href="#getsizeofsmallestvertexcycle">GetSizeOfSmallestVertexCycle</a>, <a href="#getsmallestcycle">GetSmallestCycle</a>, <a href="#getsmallestedgecycle">GetSmallestEdgeCycle</a>
+, <a href="#getsmallestvertexcycle">GetSmallestVertexCycle</a>, <a href="#gettopologicallysortedvertices">GetTopologicallySortedVertices</a>, <a href="#getvertex">GetVertex</a>
+, <a href="#getvertexcycles">GetVertexCycles</a>, <a href="#getvertexcycleswithevensize">GetVertexCyclesWithEvenSize</a>, <a href="#getvertexcycleswithoddsize">GetVertexCyclesWithOddSize</a>
+, <a href="#getvertexcycleswithsize">GetVertexCyclesWithSize</a>, <a href="#getvertexcycleswithsizegreaterthan">GetVertexCyclesWithSizeGreaterThan</a>
+, <a href="#getvertexcycleswithsizelessthan">GetVertexCyclesWithSizeLessThan</a>, <a href="#getvertexproperties">GetVertexProperties</a>, <a href="#getvertexproperty">GetVertexProperty</a>
+, <a href="#getvertexwithlargestdegree">GetVertexWithLargestDegree</a>, <a href="#getvertexwithsmallestdegree">GetVertexWithSmallestDegree</a>, <a href="#getvertices">GetVertices</a>
+, <a href="#getverticesproperty">GetVerticesProperty</a>, <a href="#getverticeswithdegreelessthan">GetVerticesWithDegreeLessThan</a>, <a href="#hascycle">HasCycle</a>, <a href="#hasedge">HasEdge</a>
+, <a href="#hasedgeproperty">HasEdgeProperty</a>, <a href="#hasedges">HasEdges</a>, <a href="#hasfusedcycles">HasFusedCycles</a>, <a href="#hasgraphproperty">HasGraphProperty</a>, <a href="#haspath">HasPath</a>, <a href="#hasvertex">HasVertex</a>
+, <a href="#hasvertexproperty">HasVertexProperty</a>, <a href="#hasvertices">HasVertices</a>, <a href="#isacyclic">IsAcyclic</a>, <a href="#isacyclicedge">IsAcyclicEdge</a>, <a href="#isacyclicvertex">IsAcyclicVertex</a>
+, <a href="#iscyclic">IsCyclic</a>, <a href="#iscyclicedge">IsCyclicEdge</a>, <a href="#iscyclicvertex">IsCyclicVertex</a>, <a href="#isgraph">IsGraph</a>, <a href="#isisolatedvertex">IsIsolatedVertex</a>, <a href="#isleafvertex">IsLeafVertex</a>
+, <a href="#isunicyclic">IsUnicyclic</a>, <a href="#isunicyclicedge">IsUnicyclicEdge</a>, <a href="#isunicyclicvertex">IsUnicyclicVertex</a>, <a href="#setactivecyclicpaths">SetActiveCyclicPaths</a>
+, <a href="#setedgeproperties">SetEdgeProperties</a>, <a href="#setedgeproperty">SetEdgeProperty</a>, <a href="#setedgesproperty">SetEdgesProperty</a>, <a href="#setgraphproperties">SetGraphProperties</a>
+, <a href="#setgraphproperty">SetGraphProperty</a>, <a href="#setvertexproperties">SetVertexProperties</a>, <a href="#setvertexproperty">SetVertexProperty</a>, <a href="#setverticesproperty">SetVerticesProperty</a>
+, <a href="#stringifyedgesproperties">StringifyEdgesProperties</a>, <a href="#stringifygraph">StringifyGraph</a>, <a href="#stringifygraphproperties">StringifyGraphProperties</a>
+, <a href="#stringifyproperties">StringifyProperties</a>, <a href="#stringifyverticesandedges">StringifyVerticesAndEdges</a>, <a href="#stringifyverticesproperties">StringifyVerticesProperties</a>
+, <a href="#updateedgeproperty">UpdateEdgeProperty</a>, <a href="#updatevertexproperty">UpdateVertexProperty</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewGraph = new Graph([@VertexIDs]);</div>
+<p>Using specified <em>Graph</em> <em>VertexIDs</em>, <strong>new</strong> method creates a new <strong>Graph</strong> object and returns
+newly created <strong>Graph</strong> object.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $Graph = new Graph();
+<br/>    $Graph = new Graph(@VertexIDs);</div>
+</dd>
+<dt><strong><a name="addcycle" class="item"><strong>AddCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddCycle(@VertexIDs);</div>
+<p>Adds edges between successive pair of <em>VertexIDs</em> including an additional edge from the last
+to first vertex ID to complete the cycle to <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="addedge" class="item"><strong>AddEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddEdge($VertexID1, $VertexID2);</div>
+<p>Adds an edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="addedges" class="item"><strong>AddEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddEdges(@VertexIDs);</div>
+<p>Adds edges between successive pair of <em>VertexIDs</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="addpath" class="item"><strong>AddPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddPath(@VertexIDs);</div>
+<p>Adds edges between successive pair of <em>VertexIDs</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="addvertex" class="item"><strong>AddVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddVertex($VertexID);</div>
+<p>Adds <em>VertexID</em> to <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="addvertices" class="item"><strong>AddVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;AddVertices(@VertexIDs);</div>
+<p>Adds vertices using <em>VertexIDs</em> to <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="clearcycles" class="item"><strong>ClearCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;ClearCycles();</div>
+<p>Delete all cycle properties assigned to graph, vertices, and edges by <em>DetectCycles</em> method.</p>
+</dd>
+<dt><strong><a name="copy" class="item"><strong>Copy</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewGraph = $Graph-&gt;Copy();</div>
+<p>Copies <em>Graph</em> and its associated data using <strong>Storable::dclone</strong> and returns a new
+<strong>Graph</strong> object.</p>
+</dd>
+<dt><strong><a name="copyedgesproperties" class="item"><strong>CopyEdgesProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $OtherGraph = $Graph-&gt;CopyEdgesProperties($OtherGraph);</div>
+<p>Copies all properties associated with edges from <em>Graph</em> to <em>$OtherGraph</em> and
+returns <em>OtherGraph</em>.</p>
+</dd>
+<dt><strong><a name="copyverticesandedges" class="item"><strong>CopyVerticesAndEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $OtherGraph = $Graph-&gt;CopyVerticesAndEdges($OtherGraph);</div>
+<p>Copies all vertices and edges from <em>Graph</em> to <em>$OtherGraph</em> and returns <em>OtherGraph</em>.</p>
+</dd>
+<dt><strong><a name="copyverticesproperties" class="item"><strong>CopyVerticesProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $OtherGraph = $Graph-&gt;CopyVerticesProperties($OtherGraph);</div>
+<p>Copies all properties associated with vertices from <em>Graph</em> to <em>$OtherGraph</em> and
+returns <em>OtherGraph</em>.</p>
+</dd>
+<dt><strong><a name="deletecycle" class="item"><strong>DeleteCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteCycle(@VertexIDs);</div>
+<p>Deletes edges between successive pair of <em>VertexIDs</em> including an additional edge from the last
+to first vertex ID to complete the cycle to <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedge" class="item"><strong>DeleteEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdge($VertexID1, $VertexID2);</div>
+<p>Deletes an edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedgeproperties" class="item"><strong>DeleteEdgeProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdgeProperties($VertexID1, $VertexID2);</div>
+<p>Deletes all properties associated with edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>
+and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedgeproperty" class="item"><strong>DeleteEdgeProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdgeProperty($PropertyName, $VertexID1, $VertexID2);</div>
+<p>Deletes <em>PropertyName</em> associated with edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>
+and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedges" class="item"><strong>DeleteEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdges(@VertexIDs);</div>
+<p>Deletes edges between successive pair of <em>VertexIDs</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedgesproperties" class="item"><strong>DeleteEdgesProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdgesProperties(@VertexIDs);</div>
+<p>Deletes all properties associated with edges between successive pair of <em>VertexIDs</em> and
+returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteedgesproperty" class="item"><strong>DeleteEdgesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteEdgesProperty($PropertyName, @VertexIDs);</div>
+<p>Deletes <em>PropertyName</em> associated with edges between successive pair of <em>VertexIDs</em>
+and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletegraphproperties" class="item"><strong>DeleteGraphProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteGraphProperties();</div>
+<p>Deletes all properties associated as graph not including properties associated to vertices
+or edges and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletegraphproperty" class="item"><strong>DeleteGraphProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteGraphProperty($PropertyName);</div>
+<p>Deletes a <em>PropertyName</em> associated as graph property and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletepath" class="item"><strong>DeletePath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeletePath(@VertexIDs);</div>
+<p>Deletes edges between successive pair of <em>VertexIDs</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletevertex" class="item"><strong>DeleteVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteVertex($VertexID);</div>
+<p>Deletes <em>VertexID</em> to <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletevertexproperties" class="item"><strong>DeleteVertexProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteVertexProperties($VertexID);</div>
+<p>Deletes all properties associated with <em>VertexID</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletevertexproperty" class="item"><strong>DeleteVertexProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteVertexProperty($PropertyName, $VertexID);</div>
+<p>Deletes a <em>PropertyName</em> associated with <em>VertexID</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deletevertices" class="item"><strong>DeleteVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteVertices(@VertexIDs);</div>
+<p>Deletes vertices specified in <em>VertexIDs</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="deleteverticesproperty" class="item"><strong>DeleteVerticesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DeleteVerticesProperty($PropertyName, @VertexIDs);</div>
+<p>Deletes a <em>PropertyName</em> associated with <em>VertexIDs</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="detectcycles" class="item"><strong>DetectCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;DetectCycles();</div>
+<p>Detect cycles using <strong>CyclesDetection</strong> class and associate found cycles to <em>Graph</em>
+object as graph properties: <em>ActiveCyclicPaths, AllCyclicPaths, IndependentCyclicPaths</em>.</p>
+<p>Notes:</p>
+<div class="OptionsBox">
+    . CyclesDetection class detects all cycles in the graph and filters
+      them to find independent cycles.
+<br/>    . All cycles related methods in the graph operate on
+      ActiveCyclicPaths. By default, active cyclic paths correspond
+      to IndependentCyclicPaths. This behavior can be changed
+      using SetActiveCyclicPaths method.</div>
+</dd>
+<dt><strong><a name="getadjacencymatrix" class="item"><strong>GetAdjacencyMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetAdjacencyMatrix();</div>
+<p>Returns adjacency matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the adjacency matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . 1    if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 0    if i != j and vertex Vi is not adjacent to vertex Vj</div>
+</dd>
+<dt><strong><a name="getadmittancematrix" class="item"><strong>GetAdmittanceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetAdmittanceMatrix();</div>
+<p>Returns admittance matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the adjacency matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . 1    if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 0    if i != j and vertex Vi is not adjacent to vertex Vj</div>
+</dd>
+<dt><strong><a name="getallpaths" class="item"><strong>GetAllPaths</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PathsRef = $Graph-&gt;GetAllPaths([$AllowCycles]);</div>
+<p>Returns a reference to an array containing <strong>Path</strong> objects corresponding to all possible
+lengths starting from each vertex in graph with sharing of edges in paths traversed.
+By default, cycles are included in paths. A path containing a cycle is terminated at a vertex
+completing the cycle. Duplicate paths are not removed.</p>
+</dd>
+<dt><strong><a name="getallpathsstartingat" class="item"><strong>GetAllPathsStartingAt</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetAllPathsStartingAt($StartVertexID,
+             [$AllowCycles]);</div>
+<p>Returns an array of <em>Path</em> objects starting from a <em>StartVertexID</em> of any length
+with sharing of edges in paths traversed. By default, cycles are included in paths.
+A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getallpathsstartingatwithlength" class="item"><strong>GetAllPathsStartingAtWithLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetAllPathsStartingAtWithLength($StartVertexID,
+             $Length, [$AllowCycles]);</div>
+<p>Returns an array of <em>Path</em> objects starting from a <em>StartVertexID</em> of specified <em>Length</em>
+with sharing of edges in paths traversed. By default, cycles are included in paths.
+A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getallpathsstartingatwithlengthupto" class="item"><strong>GetAllPathsStartingAtWithLengthUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetAllPathsStartingAtWithLengthUpto($StartVertexID,
+             $Length, [$AllowCycles]);</div>
+<p>Returns an array of <em>Path</em> objects starting from a <em>StartVertexID</em> with length upto a
+<em>Length</em> with sharing of edges in paths traversed. By default, cycles are included in paths.
+A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getallpathswithlength" class="item"><strong>GetAllPathsWithLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PathsRef = $Graph-&gt;GetAllPathsWithLength($Length,
+                [$AllowCycles]);</div>
+<p>Returns a reference to an array containing <strong>Path</strong> objects corresponding to paths with
+<em>Length</em> starting from each vertex in graph with sharing of edges in paths traversed.
+By default, cycles are included in paths. A path containing a cycle is terminated at a vertex
+completing the cycle. Duplicate paths are not removed.</p>
+</dd>
+<dt><strong><a name="getallpathswithlengthupto" class="item"><strong>GetAllPathsWithLengthUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PathsRef = $Graph-&gt;GetAllPathsWithLengthUpto($Length,
+                [$AllowCycles]);</div>
+<p>Returns a reference to an array containing <strong>Path</strong> objects corresponding to paths up to
+specified <em>Length</em> starting from each vertex in graph with sharing of edges in paths traversed.
+By default, cycles are included in paths. A path containing a cycle is terminated at a vertex
+completing the cycle. Duplicate paths are not removed.</p>
+</dd>
+<dt><strong><a name="getcircumference" class="item"><strong>GetCircumference</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Circumference = $Graph-&gt;GetCircumference();</div>
+<p>Returns size of largest cycle in a <em>Graph</em></p>
+</dd>
+<dt><strong><a name="getconnectedcomponentsvertices" class="item"><strong>GetConnectedComponentsVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ConnectedComponents = $Graph-&gt;GetConnectedComponentsVertices();</div>
+<p>Returns an array <em>ConnectedComponents</em> containing referecens to arrays with vertex
+IDs for each component sorted in order of their decreasing size.</p>
+</dd>
+<dt><strong><a name="getcycles" class="item"><strong>GetCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graphs-&gt;GetCycles();</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getcycleswithevensize" class="item"><strong>GetCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetCyclesWithEvenSize();</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+even size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getcycleswithoddsize" class="item"><strong>GetCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetCyclesWithOddSize();</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+odd size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getcycleswithsize" class="item"><strong>GetCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetCyclesWithSize($CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+<em>CycleSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getcycleswithsizegreaterthan" class="item"><strong>GetCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetCyclesWithSizeGreaterThan($CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size greater than <em>CycleSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getcycleswithsizelessthan" class="item"><strong>GetCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetCyclesWithSizeGreaterThan($CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size less than <em>CycleSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getdegree" class="item"><strong>GetDegree</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Degree = $Graph-&gt;GetDegree($VertexID);</div>
+<p>Returns <strong>Degree</strong> for <em>VertexID</em> in a <em>Graph</em> corresponding to sum of in and out vertex
+degree values.</p>
+</dd>
+<dt><strong><a name="getdegreematrix" class="item"><strong>GetDegreeMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetDegreeMatrix();</div>
+<p>Returns degree matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the degree matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi
+<br/>    . 0         otherwise</div>
+</dd>
+<dt><strong><a name="getdistancematrix" class="item"><strong>GetDistanceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetDistanceMatrix();</div>
+<p>Returns distance matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the distance matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . d    if i != j and d is the shortest distance between vertex Vi and vertex Vj</div>
+<p>In the final matrix, value of constant <strong>BigNumber</strong> defined in <strong>Constants.pm</strong> module
+corresponds to vertices with no edges.</p>
+</dd>
+<dt><strong><a name="getedgecycles" class="item"><strong>GetEdgeCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCycles($VertexID1, $VertexID2);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to all cycles containing
+edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgecycleswithevensize" class="item"><strong>GetEdgeCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCyclesWithEvenSize($VertexID1,
+                   $VertexID2);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+even size containing edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgecycleswithoddsize" class="item"><strong>GetEdgeCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCyclesWithOddSize($VertexID1,
+                   $VertexID2);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+odd size containing edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgecycleswithsize" class="item"><strong>GetEdgeCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCyclesWithSize($VertexID1, $VertexID2,
+                   $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size <em>CycleSize</em> containing edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgecycleswithsizegreaterthan" class="item"><strong>GetEdgeCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCyclesWithSizeGreaterThan($VertexID1,
+                   $VertexID2, $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size greater than <em>CycleSize</em> containing edge between <em>VertexID1</em> and <em>VertexID2</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgecycleswithsizelessthan" class="item"><strong>GetEdgeCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetEdgeCyclesWithSizeLessThan($VertexID1,
+                   $VertexID2, $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size less than <em>CycleSize</em> containing edge between <em>VertexID1</em> and <em>VertexID2</em>.</p>
+</dd>
+<dt><strong><a name="getedgeproperties" class="item"><strong>GetEdgeProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %EdgeProperties = $Graph-&gt;GetEdgeProperties($VertexID1, $VertexID2);</div>
+<p>Returns a hash <strong>EdgeProperties</strong> containing all <strong>PropertyName</strong> and <strong>PropertyValue</strong>
+pairs associated with an edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgeproperty" class="item"><strong>GetEdgeProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $Graph-&gt;GetEdgeProperty($PropertyName, $VertexID1, $VertexID2);</div>
+<p>Returns value of <em>PropertyName</em> associated with an edge between <em>VertexID1</em>
+and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedges" class="item"><strong>GetEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @EdgeVertexIDs = $Graph-&gt;GetEdges($VertexID);
+<br/>    $NumOfEdges = $Graph-&gt;GetEdges($VertexID);</div>
+<p>Returns an array <em>EdgeVertexIDs</em> with successive pair of IDs corresponding to edges involving
+<em>VertexID</em> or number of edges for <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getedgesproperty" class="item"><strong>GetEdgesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @PropertyValues = $Graph-&gt;GetEdgesProperty($PropertyName, @VertexIDs);</div>
+<p>Returns an array <em>PropertyValues</em> containing property values corresponding to
+<em>PropertyName</em> associated with edges between successive pair of <em>VertexIDs</em>.</p>
+</dd>
+<dt><strong><a name="getfusedandnonfusedcycles" class="item"><strong>GetFusedAndNonFusedCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($FusedCycleSetsRef, $NonFusedCyclesRef) =
+       $Graph-&gt;GetFusedAndNonFusedCycles();</div>
+<p>Returns references to arrays <em>FusedCycleSetsRef</em> and <em>NonFusedCyclesRef</em>
+containing references to arrays of cyclic <em>Path</em> objects corresponding to fuses and
+non-fused cyclic paths.</p>
+</dd>
+<dt><strong><a name="getgirth" class="item"><strong>GetGirth</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Girth = $Graph-&gt;GetGirth();</div>
+<p>Returns size of smallest cycle in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getgraphproperties" class="item"><strong>GetGraphProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %GraphProperties = $Graph-&gt;GetGraphProperties();</div>
+<p>Returns a hash <strong>EdgeProperties</strong> containing all <strong>PropertyName</strong> and <strong>PropertyValue</strong>
+pairs associated with graph in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getgraphproperty" class="item"><strong>GetGraphProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PropertyValue = $Graph-&gt;GetGraphProperty($PropertyName);</div>
+<p>Returns value of <em>PropertyName</em> associated with graph in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getincidencematrix" class="item"><strong>GetIncidenceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetIncidenceMatrix();</div>
+<p>Returns incidence matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices and e edges, the incidence matrix for G is a n x e matrix
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 1    if vertex Vi and the edge Ej are incident; in other words, Vi and Ej are related
+<br/>    . 0    otherwise</div>
+</dd>
+<dt><strong><a name="getisolatedvertices" class="item"><strong>GetIsolatedVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs = $Graph-&gt;GetIsolatedVertices();</div>
+<p>Returns an array <em>VertexIDs</em> containing vertices without any edges in <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getkirchhoffmatrix" class="item"><strong>GetKirchhoffMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetGetKirchhoffMatrix();</div>
+<p>Returns Kirchhoff matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p><strong>KirchhoffMatrix</strong> is another name for <strong>LaplacianMatrix</strong>.</p>
+</dd>
+<dt><strong><a name="getlaplacianmatrix" class="item"><strong>GetLaplacianMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetLaplacianMatrix();</div>
+<p>Returns Laplacian matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the Laplacian matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi
+<br/>    . -1        if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 0         otherwise</div>
+</dd>
+<dt><strong><a name="getlargestcycle" class="item"><strong>GetLargestCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetLargestCycle();</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to largest cycle in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getlargestedgecycle" class="item"><strong>GetLargestEdgeCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetLargestEdgeCycle($VertexID1, $VertexID2);</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to largest cycle containing edge between
+<em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getlargestvertexcycle" class="item"><strong>GetLargestVertexCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetLargestVertexCycle($VertexID);</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to largest cycle containing <em>VertexID</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getleafvertices" class="item"><strong>GetLeafVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs = $Graph-&gt;GetLeafVertices();</div>
+<p>Returns an array <em>VertexIDs</em> containing vertices with degree of 1 in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getmaximumdegree" class="item"><strong>GetMaximumDegree</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Degree = $Graph-&gt;GetMaximumDegree();</div>
+<p>Returns value of maximum vertex degree in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getmininumdegree" class="item"><strong>GetMininumDegree</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Degree = $Graph-&gt;GetMininumDegree();</div>
+<p>Returns value of minimum vertex degree in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getneighborhoodvertices" class="item"><strong>GetNeighborhoodVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexNeighborhoods = GetNeighborhoodVertices($StartVertexID);</div>
+<p>Returns an array <em>VertexNeighborhoods</em> containing references to arrays corresponding to
+neighborhood vertices around a specified <em>StartVertexID</em> at all possible radii levels.</p>
+</dd>
+<dt><strong><a name="getneighborhoodverticeswithradiusupto" class="item"><strong>GetNeighborhoodVerticesWithRadiusUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexNeighborhoods = GetNeighborhoodVerticesWithRadiusUpto(
+                           $StartVertexID, $Radius);</div>
+<p>Returns an array <em>VertexNeighborhoods</em> containing references to arrays corresponding to
+neighborhood vertices around a specified <em>StartVertexID</em> upto specified <em>Radius</em> levels.</p>
+</dd>
+<dt><strong><a name="getneighborhoodverticeswithsuccessors" class="item"><strong>GetNeighborhoodVerticesWithSuccessors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexNeighborhoods = GetNeighborhoodVerticesWithSuccessors(
+                           $StartVertexID);</div>
+<p>Returns vertex neighborhoods around a specified <em>StartVertexID</em>, along with their successor
+connected vertices, collected at all neighborhood radii as an array <em>VertexNeighborhoods</em>
+containing references to arrays with first value corresponding to vertex ID and second
+value as reference to an array  containing its successor connected vertices.</p>
+<p>For a neighborhood vertex at each radius level, the successor connected vertices correspond to the
+neighborhood vertices at the next radius level. Consequently, the neighborhood vertices at the last
+radius level don't contain any successor vertices which fall outside the range of specified radius.</p>
+</dd>
+<dt><strong><a name="getneighborhoodverticeswithsuccessorsandradiusupto" class="item"><strong>GetNeighborhoodVerticesWithSuccessorsAndRadiusUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexNeighborhoods = GetNeighborhoodVerticesWithSuccessors(
+                           $StartVertexID, $Radius);</div>
+<p>Returns vertex neighborhoods around a specified <em>StartVertexID</em>, along with their successor
+connected vertices, collected with in a specified <em>Radius</em> as an array <em>VertexNeighborhoods</em>
+containing references to arrays with first value corresponding to vertex ID and second value
+as reference to a list containing its successor connected vertices.</p>
+<p>For a neighborhood vertex at each radius level, the successor connected vertices correspond to the
+neighborhood vertices at the next radius level. Consequently, the neighborhood vertices at the last
+radius level don't contain any successor vertices which fall outside the range of specified radius.</p>
+</dd>
+<dt><strong><a name="getneighbors" class="item"><strong>GetNeighbors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs = $Graph-&gt;GetNeighbors($VertexID);
+<br/>    $NumOfNeighbors = $Graph-&gt;GetNeighbors($VertexID);</div>
+<p>Returns an array <em>VertexIDs</em> containing vertices connected to <em>VertexID</em> of number of
+neighbors of a <em>VertextID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnormalizedlaplacianmatrix" class="item"><strong>GetNormalizedLaplacianMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetNormalizedLaplacianMatrix();</div>
+<p>Returns normalized Laplacian matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the normalized Laplacian matrix L for G is a n x n square
+matrix and its elements Lij are:</p>
+<div class="OptionsBox">
+    .  1                           if i == j and deg(Vi) != 0
+<br/>    .  -1/SQRT(deg(Vi) * deg(Vj))  if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    .  0                           otherwise</div>
+</dd>
+<dt><strong><a name="getnumofcycles" class="item"><strong>GetNumOfCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCycles();</div>
+<p>Returns number of cycles in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofcycleswithevensize" class="item"><strong>GetNumOfCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCyclesWithEvenSize();</div>
+<p>Returns number of cycles with even size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofcycleswithoddsize" class="item"><strong>GetNumOfCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCyclesWithOddSize();</div>
+<p>Returns number of cycles with odd size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofcycleswithsize" class="item"><strong>GetNumOfCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCyclesWithSize($CycleSize);</div>
+<p>Returns number of cycles with <em>CyclesSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofcycleswithsizegreaterthan" class="item"><strong>GetNumOfCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCyclesWithSizeGreaterThan(
+                   $CycleSize);</div>
+<p>Returns number of cycles with size greater than <em>CyclesSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofcycleswithsizelessthan" class="item"><strong>GetNumOfCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfCyclesWithSizeLessThan($CycleSize);</div>
+<p>Returns number of cycles with size less than <em>CyclesSize</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycles" class="item"><strong>GetNumOfEdgeCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCycles($VertexID1, $VertexID2);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycleswithevensize" class="item"><strong>GetNumOfEdgeCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCyclesWithEvenSize($VertexID1,
+                   $VertexID2);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em> with even
+size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycleswithoddsize" class="item"><strong>GetNumOfEdgeCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCyclesWithOddSize($VertexID1,
+                   $VertexID2);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em> with odd
+size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycleswithsize" class="item"><strong>GetNumOfEdgeCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCyclesWithSize($VertexID1,
+                   $VertexID2, $CycleSize);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em> with
+<em>CycleSize</em> size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycleswithsizegreaterthan" class="item"><strong>GetNumOfEdgeCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCyclesWithSizeGreaterThan(
+                   $VertexID1, $VertexID2, $CycleSize);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em> with
+size greater than <em>CycleSize</em> size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofedgecycleswithsizelessthan" class="item"><strong>GetNumOfEdgeCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfEdgeCyclesWithSizeLessThan(
+                   $VertexID1, $VertexID2, $CycleSize);</div>
+<p>Returns number of cycles containing edge between <em>VertexID1</em> and <em>VertexID2</em> with
+size less than <em>CycleSize</em> size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycles" class="item"><strong>GetNumOfVertexCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCycles($VertexID);</div>
+<p>Returns number of cycles containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycleswithevensize" class="item"><strong>GetNumOfVertexCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCyclesWithEvenSize($VertexID);</div>
+<p>Returns number of cycles containing <em>VertexID</em> with even size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycleswithoddsize" class="item"><strong>GetNumOfVertexCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCyclesWithOddSize($VertexID);</div>
+<p>Returns number of cycles containing <em>VertexID</em> with odd size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycleswithsize" class="item"><strong>GetNumOfVertexCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCyclesWithSize($VertexID);</div>
+<p>Returns number of cycles containing <em>VertexID</em> with even size in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycleswithsizegreaterthan" class="item"><strong>GetNumOfVertexCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCyclesWithSizeGreaterThan(
+                   $VertexID, $CycleSize);</div>
+<p>Returns number of cycles containing <em>VertexID</em> with size greater than <em>CycleSize</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getnumofvertexcycleswithsizelessthan" class="item"><strong>GetNumOfVertexCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfCycles = $Graph-&gt;GetNumOfVertexCyclesWithSizeLessThan(
+                   $VertexID, $CycleSize);</div>
+<p>Returns number of cycles containing <em>VertexID</em> with size less than <em>CycleSize</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getpaths" class="item"><strong>GetPaths</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PathsRefs = $Graph-&gt;GetPaths([$AllowCycles]);</div>
+<p>Returns a reference to an array of <em>Path</em> objects corresponding to paths of all possible
+lengths starting from each vertex with no sharing of edges in paths traversed. By default,
+cycles are included in paths. A path containing a cycle is terminated at a vertex completing
+the cycle.</p>
+</dd>
+<dt><strong><a name="getpathsbetween" class="item"><strong>GetPathsBetween</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetPathsBetween($StartVertexID, $EndVertexID);</div>
+<p>Returns an arrays of <em>Path</em> objects list of paths between <em>StartVertexID</em> and <em>EndVertexID</em>.
+For cyclic graphs, the list contains may contain more than one <em>Path</em> object.</p>
+</dd>
+<dt><strong><a name="getpathsstartingat" class="item"><strong>GetPathsStartingAt</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetPathsStartingAt($StartVertexID, [$AllowCycles]);</div>
+<p>Returns an array of <em>Path</em> objects corresponding to all possible lengths starting from a
+specified <em>StartVertexID</em> with no sharing of edges in paths traversed. By default, cycles
+are included in paths. A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getpathsstartingatwithlength" class="item"><strong>GetPathsStartingAtWithLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;StartingAtWithLength($StartVertexID, $Length,
+             $AllowCycles);</div>
+<p>Returns an array of <em>Path</em> objects corresponding to all paths starting from a specified <em>StartVertexID</em>
+with length <em>Length</em> and no sharing of edges in paths traversed. By default, cycles are included in paths.
+A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getpathsstartingatwithlengthupto" class="item"><strong>GetPathsStartingAtWithLengthUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;StartingAtWithLengthUpto($StartVertexID, $Length,
+             $AllowCycles);</div>
+<p>Returns an array of <em>Path</em> objects corresponding to all paths starting from a specified <em>StartVertexID</em>
+with length upto <em>Length</em> and no sharing of edges in paths traversed. By default, cycles are included in paths.
+A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getpathswithlength" class="item"><strong>GetPathsWithLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetPathsWithLength($Length, $AllowCycles);</div>
+<p>Returns an array of <em>Path</em> objects corresponding to to paths starting from each vertex in graph
+with specified &lt;Length&gt; and no sharing of edges in paths traversed. By default, cycles are included
+in paths. A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getpathswithlengthupto" class="item"><strong>GetPathsWithLengthUpto</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Paths = $Graph-&gt;GetPathsWithLengthUpto($Length, $AllowCycles);</div>
+<p>Returns an array of <em>Path</em> objects corresponding to to paths starting from each vertex in graph
+with length upto specified <em>Length</em> and no sharing of edges in paths traversed. By default,
+cycles are included in paths. A path containing a cycle is terminated at a vertex completing the cycle.</p>
+</dd>
+<dt><strong><a name="getsiedeladjacencymatrix" class="item"><strong>GetSiedelAdjacencyMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GraphMatrix = $Graph-&gt;GetSiedelAdjacencyMatrix();</div>
+<p>Returns Siedel admittance matrix for <em>Graph</em> as a <em>GraphMatrix</em> object with row and column indices
+corresponding to graph vertices returned by GetVertices method.</p>
+<p>For a simple graph G with n vertices, the Siedal adjacency matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . -1   if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 1    if i != j and vertex Vi is not adjacent to vertex Vj</div>
+</dd>
+<dt><strong><a name="getsizeoflargestcycle" class="item"><strong>GetSizeOfLargestCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfLargestCycle();</div>
+<p>Returns size of the largest cycle in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsizeoflargestedgecycle" class="item"><strong>GetSizeOfLargestEdgeCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfLargestEdgeCycle($VertexID1, $VertexID2);</div>
+<p>Returns size of the largest cycle containing egde between <em>VertextID1</em> and  <em>VertexID2</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsizeoflargestvertexcycle" class="item"><strong>GetSizeOfLargestVertexCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfLargestVertexCycle($VertexID);</div>
+<p>Returns size of the largest cycle containing  <em>VertextID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsizeofsmallestcycle" class="item"><strong>GetSizeOfSmallestCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfSmallestCycle();</div>
+<p>Returns size of the smallest cycle in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsizeofsmallestedgecycle" class="item"><strong>GetSizeOfSmallestEdgeCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfSmallestEdgeCycle($VertexID1, $VertexID2);</div>
+<p>Returns size of the smallest cycle containing egde between <em>VertextID1</em> and  <em>VertexID2</em>
+in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsizeofsmallestvertexcycle" class="item"><strong>GetSizeOfSmallestVertexCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Graph-&gt;GetSizeOfSmallestVertexCycle($VertexID);</div>
+<p>Returns size of the smallest cycle containing  <em>VertextID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsmallestcycle" class="item"><strong>GetSmallestCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetSmallestCycle();</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to smallest cycle in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsmallestedgecycle" class="item"><strong>GetSmallestEdgeCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetSmallestEdgeCycle($VertexID1, $VertexID2);</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to smallest cycle containing edge between
+<em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getsmallestvertexcycle" class="item"><strong>GetSmallestVertexCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CyclicPath = $Graph-&gt;GetSmallestVertexCycle($VertexID);</div>
+<p>Returns a cyclic <em>Path</em> object corresponding to smallest cycle containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="gettopologicallysortedvertices" class="item"><strong>GetTopologicallySortedVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs = $Graph-&gt;GetTopologicallySortedVertices(
+                 [$RootVertexID]);</div>
+<p>Returns an array of <em>VertexIDs</em> sorted topologically starting from a specified <em>RootVertexID</em> or
+from an arbitrary vertex ID.</p>
+</dd>
+<dt><strong><a name="getvertex" class="item"><strong>GetVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexValue = $Graph-&gt;GetVertex($VertexID);</div>
+<p>Returns vartex value for <em>VertexID</em> in a <em>Graph</em>. Vartex IDs and values are equivalent
+in the current implementation of <strong>Graph</strong>.</p>
+</dd>
+<dt><strong><a name="getvertexcycles" class="item"><strong>GetVertexCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCycles($VertexID);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to all cycles containing
+<em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexcycleswithevensize" class="item"><strong>GetVertexCyclesWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCyclesWithEvenSize($VertexID);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+even size containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexcycleswithoddsize" class="item"><strong>GetVertexCyclesWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCyclesWithOddSize($VertexID);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+odd size containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexcycleswithsize" class="item"><strong>GetVertexCyclesWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCyclesWithSize($VertexID,
+                   $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size <em>CycleSize</em> containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexcycleswithsizegreaterthan" class="item"><strong>GetVertexCyclesWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCyclesWithSizeGreaterThan($VertexID,
+                   $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size greater than <em>CycleSize</em> containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexcycleswithsizelessthan" class="item"><strong>GetVertexCyclesWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CyclicPaths = $Graph-&gt;GetVertexCyclesWithSizeLessThan($VertexID,
+                   $CycleSize);</div>
+<p>Returns an array <em>CyclicPaths</em> containing <em>Path</em> objects corresponding to cycles with
+size less than <em>CycleSize</em> containing <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexproperties" class="item"><strong>GetVertexProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %VertexProperties = $Graph-&gt;GetVertexProperties($VertexID);</div>
+<p>Returns a hash <strong>VertexProperties</strong> containing all <strong>PropertyName</strong> and <strong>PropertyValue</strong>
+pairs associated with a <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexproperty" class="item"><strong>GetVertexProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $Graph-&gt;GetVertexProperty($PropertyName, $VertexID);</div>
+<p>Returns value of <em>PropertyName</em> associated with a <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexwithlargestdegree" class="item"><strong>GetVertexWithLargestDegree</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexID = $Graph-&gt;GetVertexWithLargestDegree();</div>
+<p>Returns <strong>VertexID</strong> with largest degree in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertexwithsmallestdegree" class="item"><strong>GetVertexWithSmallestDegree</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexID = $Graph-&gt;GetVertexWithSmallestDegree();</div>
+<p>Returns <strong>VertexID</strong> with smallest degree in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getvertices" class="item"><strong>GetVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs = $Graph-&gt;GetVertices();
+<br/>    $VertexCount = $Graph-&gt;GetVertices();</div>
+<p>Returns an array of <em>VertexIDs</em> corresponding to all vertices in a <em>Graph</em>; in a scalar context,
+number of vertices is returned.</p>
+</dd>
+<dt><strong><a name="getverticesproperty" class="item"><strong>GetVerticesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @PropertyValues = $Graph-&gt;GetVerticesProperty($PropertyName, @VertexIDs);</div>
+<p>Returns an array <em>PropertyValues</em> containing property values corresponding to
+<em>PropertyName</em> associated with with <em>VertexIDs</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="getverticeswithdegreelessthan" class="item"><strong>GetVerticesWithDegreeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VertexIDs  = $Graph-&gt;GetVerticesWithDegreeLessThan($Degree);</div>
+<p>Returns an array of <em>VertexIDs</em> containing vertices with degree less than <em>Degree</em> in
+a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hascycle" class="item"><strong>HasCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasCycle(@VertexIDs);</div>
+<p>Returns 1 or 0 based on whether edges between successive pair of <em>VertexIDs</em> including
+an additional edge from the last to first vertex ID exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasedge" class="item"><strong>HasEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasEdge($VertexID1, $VertexID2);</div>
+<p>Returns 1 or 0 based on whether an edge between <em>VertexID1</em> and <em>VertexID2</em> exist in
+a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasedgeproperty" class="item"><strong>HasEdgeProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasEdgeProperty($PropertyName, $VertexID1,
+              $VertexID2);</div>
+<p>Returns 1 or 0 based on whether <em>PropertyName</em> has already been associated with an edge
+between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasedges" class="item"><strong>HasEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @EdgesStatus = $Graph-&gt;HasEdges(@VertexIDs);
+<br/>    $FoundEdgesCount = $Graph-&gt;HasEdges(@VertexIDs);</div>
+<p>Returns an array <em>EdgesStatus</em> containing 1s and 0s corresponding to whether edges between
+successive pairs of <em>VertexIDs</em> exist in a <em>Graph</em>. In a scalar context, number of edges found
+is returned.</p>
+</dd>
+<dt><strong><a name="hasfusedcycles" class="item"><strong>HasFusedCycles</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasFusedCycles();</div>
+<p>Returns 1 or 0 based on whether any fused cycles exist in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasgraphproperty" class="item"><strong>HasGraphProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasGraphProperty($PropertyName);</div>
+<p>Returns 1 or 0 based on whether <em>PropertyName</em> has already been associated as a
+graph property as opposed to vertex or edge property in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="haspath" class="item"><strong>HasPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasPath(@VertexIDs));</div>
+<p>Returns 1 or 0 based on whether edges between all successive pairs of <em>VertexIDs</em> exist in
+a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasvertex" class="item"><strong>HasVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasVertex($VertexID);</div>
+<p>Returns 1 or 0 based on whether <em>VertexID</em> exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasvertexproperty" class="item"><strong>HasVertexProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;HasGraphProperty($HasVertexProperty, $VertexID);</div>
+<p>Returns 1 or 0 based on whether <em>PropertyName</em> has already been associated with
+<em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="hasvertices" class="item"><strong>HasVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @VerticesStatus = $Graph-&gt;HasVertices(@VertexIDs);
+<br/>    $VerticesFoundCount = $Graph-&gt;HasVertices(@VertexIDs);</div>
+<p>Returns an array <em></em> containing 1s and 0s corresponding to whether <em>VertexIDs</em> exist in a 
+<em>Graph</em>. In a scalar context, number of vertices found is returned.</p>
+</dd>
+<dt><strong><a name="isacyclic" class="item"><strong>IsAcyclic</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsAcyclic();</div>
+<p>Returns 0 or 1 based on whether a cycle exist in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="isacyclicedge" class="item"><strong>IsAcyclicEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsAcyclicEdge($VertexID1, $VertexID2);</div>
+<p>Returns 0 or 1 based on whether a cycle containing an edge between <em>VertexID1</em> and
+<em>VertexID2</em> exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="isacyclicvertex" class="item"><strong>IsAcyclicVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsAcyclicVertex($VertexID1);</div>
+<p>Returns 0 or 1 based on whether a cycle containing a <em>VertexID</em> exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="iscyclic" class="item"><strong>IsCyclic</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsCyclic();</div>
+<p>Returns 1 or 0 based on whether a cycle exist in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="iscyclicedge" class="item"><strong>IsCyclicEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsCyclicEdge($VertexID1, $VertexID2);</div>
+<p>Returns 1 or 0 based on whether a cycle containing an edge between <em>VertexID1</em> and
+<em>VertexID2</em> exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="iscyclicvertex" class="item"><strong>IsCyclicVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsCyclicVertex($VertexID1);</div>
+<p>Returns 1 or 0 based on whether a cycle containing a <em>VertexID</em> exists in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="isgraph" class="item"><strong>IsGraph</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = Graph::IsGraph($Object);</div>
+<p>Returns 1 or 0 based on whether <em>Object</em> is a <strong>Graph</strong> object.</p>
+</dd>
+<dt><strong><a name="isisolatedvertex" class="item"><strong>IsIsolatedVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsIsolatedVertex($VertexID);</div>
+<p>Returns 1 or 0 based on whether <em>VertexID</em> is an isolated vertex in a <em>Graph</em>. A vertex
+with zero as its degree value is considered an isolated vertex.</p>
+</dd>
+<dt><strong><a name="isleafvertex" class="item"><strong>IsLeafVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsLeafVertex($VertexID);</div>
+<p>Returns 1 or 0 based on whether <em>VertexID</em> is an isolated vertex in a <em>Graph</em>. A vertex
+with one as its degree value is considered an isolated vertex.</p>
+</dd>
+<dt><strong><a name="isunicyclic" class="item"><strong>IsUnicyclic</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsUnicyclic();</div>
+<p>Returns 1 or 0 based on whether only one cycle is present in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="isunicyclicedge" class="item"><strong>IsUnicyclicEdge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsUnicyclicEdge($VertexID1, $VertexID2);</div>
+<p>Returns 1 or 0 based on whether only one cycle contains the edge between <em>VertexID1</em> and
+<em>VertexID2</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="isunicyclicvertex" class="item"><strong>IsUnicyclicVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Graph-&gt;IsUnicyclicVertex($VertexID);</div>
+<p>Returns 1 or 0 based on whether only one cycle contains <em>VertexID</em> in a <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setactivecyclicpaths" class="item"><strong>SetActiveCyclicPaths</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetActiveCyclicPaths($CyclicPathsType);</div>
+<p>Sets the type of cyclic paths to use during all methods related to cycles and returns <em>Graph</em>.
+Possible values for cyclic paths: <em>Independent or All</em>.</p>
+</dd>
+<dt><strong><a name="setedgeproperties" class="item"><strong>SetEdgeProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetEdgeProperties($VertexID1, $VertexID2, @NamesAndValues);</div>
+<p>Associates property names and values corresponding to successive pairs of values in
+<em>NamesAndValues</em> to an edge between <em>VertexID1</em> and <em>VertexID2</em> in a <em>Graph</em>
+and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setedgeproperty" class="item"><strong>SetEdgeProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetEdgeProperty($Name, $Value, $VertexID1, $VertexID2);</div>
+<p>Associates property <em>Name</em> and <em>Value</em> to an edge between <em>VertexID1</em> and <em>VertexID2</em>
+in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setedgesproperty" class="item"><strong>SetEdgesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetEdgesProperty($Name, @ValuesAndVertexIDs);</div>
+<p>Associates a same property <em>Name</em> but different <em>Values</em> for different edges specified using
+triplets of <em>PropertyValue, $VertexID1, $VertexID2</em> via <em>ValuesAndVertexIDs</em> in a <em>graph</em>.</p>
+</dd>
+<dt><strong><a name="setgraphproperties" class="item"><strong>SetGraphProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetGraphProperties(%NamesAndValues);</div>
+<p>Associates property names and values <em>NamesAndValues</em> hash to graph as opposed to vertex
+or edge and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setgraphproperty" class="item"><strong>SetGraphProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetGraphProperty($Name, $Value);</div>
+<p>Associates property <em>Name</em> and <em>Value</em> to graph as opposed to vertex
+or edge and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setvertexproperties" class="item"><strong>SetVertexProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetVertexProperties($VertexID, @NamesAndValues);</div>
+<p>Associates property names and values corresponding to successive pairs of values in
+<em>NamesAndValues</em> to <em>VertexID</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setvertexproperty" class="item"><strong>SetVertexProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetVertexProperty($Name, $Value, $VertexID);</div>
+<p>Associates property <em>Name</em> and <em>Value</em> to <em>VertexID</em> in a <em>Graph</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="setverticesproperty" class="item"><strong>SetVerticesProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;SetVerticesProperty($Name, @ValuesAndVertexIDs));</div>
+<p>Associates a same property <em>Name</em> but different <em>Values</em> for different vertices specified using
+doublets of <em>PropertyValue, $VertexID</em> via <em>ValuesAndVertexIDs</em> in a <em>graph</em>.</p>
+</dd>
+<dt><strong><a name="stringifyedgesproperties" class="item"><strong>StringifyEdgesProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyEdgesProperties();</div>
+<p>Returns a string containing information about properties associated with all edges in a <em>Graph</em> object.</p>
+</dd>
+<dt><strong><a name="stringifygraph" class="item"><strong>StringifyGraph</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyGraph();</div>
+<p>Returns a string containing information about <em>Graph</em> object.</p>
+</dd>
+<dt><strong><a name="stringifygraphproperties" class="item"><strong>StringifyGraphProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyGraphProperties();</div>
+<p>Returns a string containing information about properties associated with graph as opposed to vertex.
+or an edge in a <em>Graph</em> object</p>
+</dd>
+<dt><strong><a name="stringifyproperties" class="item"><strong>StringifyProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyProperties();</div>
+<p>Returns a string containing information about properties associated with graph, vertices, and edges in
+a <em>Graph</em> object.</p>
+</dd>
+<dt><strong><a name="stringifyverticesandedges" class="item"><strong>StringifyVerticesAndEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyVerticesAndEdges();</div>
+<p>Returns a string containing information about vertices and edges in a <em>Graph</em> object.</p>
+</dd>
+<dt><strong><a name="stringifyverticesproperties" class="item"><strong>StringifyVerticesProperties</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Graph-&gt;StringifyVerticesProperties();</div>
+<p>Returns a string containing information about properties associated with vertices a <em>Graph</em> object.</p>
+</dd>
+<dt><strong><a name="updateedgeproperty" class="item"><strong>UpdateEdgeProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;UpdateEdgeProperty($Name, $Value, $VertexID1, $VertexID2);</div>
+<p>Updates property <em>Value</em> for <em>Name</em> associated with an edge between <em>VertexID1</em> and
+<em>VertexID1</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="updatevertexproperty" class="item"><strong>UpdateVertexProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Graph-&gt;UpdateVertexProperty($Name, $Value, $VertexID);</div>
+<p>Updates property <em>Value</em> for <em>Name</em> associated with <em>VertexID</em> and returns <em>Graph</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./CyclesDetection.html">CyclesDetection.pm</a>,&nbsp<a href="./Path.html">Path.pm</a>,&nbsp<a href="./PathGraph.html">PathGraph.pm</a>,&nbsp<a href="./PathsTraversal.html">PathsTraversal.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PathsTraversal.html" title="PathsTraversal.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./HTMLUtil.html" title="HTMLUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Graph.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

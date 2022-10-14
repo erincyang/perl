@@ -1,0 +1,301 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:StatisticsUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SequenceFileUtil.html" title="SequenceFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextUtil.html" title="TextUtil.html">Next</a></td><td width="34%" align="middle"><strong>StatisticsUtil.pm</strong></td><td width="33%" align="right"><a href="././code/StatisticsUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/StatisticsUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/StatisticsUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/StatisticsUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/StatisticsUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>StatisticsUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use StatisticsUtil;</p>
+<p>use Statistics qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>StatisticsUtil</strong> module provides the following functions:</p>
+<p> <a href="#average">Average</a>, <a href="#averagedeviation">AverageDeviation</a>, <a href="#correlation">Correlation</a>, <a href="#covariance">Covariance</a>, <a href="#euclidean">Euclidean</a>, <a href="#factorial">Factorial</a>
+, <a href="#factorialdivison">FactorialDivison</a>, <a href="#frequency">Frequency</a>, <a href="#geometricmean">GeometricMean</a>, <a href="#harmonicmean">HarmonicMean</a>, <a href="#klargest">KLargest</a>, <a href="#ksmallest">KSmallest</a>
+, <a href="#kurtosis">Kurtosis</a>, <a href="#maximum">Maximum</a>, <a href="#mean">Mean</a>, <a href="#median">Median</a>, <a href="#minimum">Minimum</a>, <a href="#mode">Mode</a>, <a href="#pearsoncorrelation">PearsonCorrelation</a>, <a href="#permutations">Permutations</a>
+, <a href="#product">Product</a>, <a href="#rsquare">RSquare</a>, <a href="#range">Range</a>, <a href="#skewness">Skewness</a>, <a href="#standarddeviation">StandardDeviation</a>, <a href="#standarddeviationn">StandardDeviationN</a>
+, <a href="#standarderror">StandardError</a>, <a href="#standardscores">StandardScores</a>, <a href="#standardscoresn">StandardScoresN</a>, <a href="#standardize">Standardize</a>, <a href="#sum">Sum</a>, <a href="#sumofsquares">SumOfSquares</a>
+, <a href="#trimmean">TrimMean</a>, <a href="#variance">Variance</a>, <a href="#variancen">VarianceN</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="average" class="item"><strong>Average</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Average(\@DataArray);</div>
+<p>Computes the mean of an array of numbers: SUM( x[i] ) / n</p>
+</dd>
+<dt><strong><a name="averagedeviation" class="item"><strong>AverageDeviation</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = AverageDeviation(\@DataArray);</div>
+<p>Computes the average of the absolute deviation of an array of numbers: SUM( ABS(x[i] - Xmean) ) / n</p>
+</dd>
+<dt><strong><a name="correlation" class="item"><strong>Correlation</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Correlation(\@XDataArray, \@YDataArray);</div>
+<p>Computes the Pearson correlation coefficient between two arrays of numbers:
+SUM( (x[i] - Xmean)(y[i] - Ymean) ) / SQRT( SUM( (x[i] - Xmean)^2 )(SUM( (y[i] - Ymean)^2 ))   )</p>
+</dd>
+<dt><strong><a name="euclidean" class="item"><strong>Euclidean</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Return = Euclidean(\@DataArray);</div>
+<p>Computes the euclidean distance of an array of numbers: SQRT( SUM( x[i] ** 2) )</p>
+</dd>
+<dt><strong><a name="covariance" class="item"><strong>Covariance</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Covariance(\@XDataArray, \@YDataArray);</div>
+<p>Computes the covariance between two arrays of numbers: SUM( (x[i] - Xmean) (y[i] - Ymean) ) / n</p>
+</dd>
+<dt><strong><a name="factorial" class="item"><strong>Factorial</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Factorial($Num);</div>
+<p>Computes the factorial of a positive integer.</p>
+</dd>
+<dt><strong><a name="factorialdivison" class="item"><strong>FactorialDivison</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = FactorialDivision($Numerator, $Denominator);</div>
+<p>Compute the factorial divison of two positive integers.</p>
+</dd>
+<dt><strong><a name="frequency" class="item"><strong>Frequency</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %FrequencyValues = Frequency(\@DataArray, [$NumOfBins]);
+<br/>    %FrequencyValues = Frequency(\@DataArray, [\@BinRange]);</div>
+<p>A hash array is returned with keys and values representing range and frequency values, respectively.
+The frequency value for a specific key corresponds to all the values which are greater than
+the previous key and less than or equal to the current key. A key value representing maximum value is
+added for generating frequency distribution for specific number of bins, and whenever the maximum
+array value is greater than the maximum specified in bin range, it is also added to bin range.</p>
+</dd>
+<dt><strong><a name="geometricmean" class="item"><strong>GeometricMean</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = GeometricMean(\@DataArray);</div>
+<p>Computes the geometric mean of an array of numbers: NthROOT( PRODUCT(x[i]) )</p>
+</dd>
+<dt><strong><a name="harmonicmean" class="item"><strong>HarmonicMean</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = HarmonicMean(\@DataArray);</div>
+<p>Computes the harmonic mean of an array of numbers: 1 / ( SUM(1/x[i]) / n )</p>
+</dd>
+<dt><strong><a name="klargest" class="item"><strong>KLargest</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = KLargest(\@DataArray, $KthNumber);</div>
+<p>Returns the k-largest value from an array of numbers.</p>
+</dd>
+<dt><strong><a name="ksmallest" class="item"><strong>KSmallest</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = KSmallest(\@DataArray, $KthNumber);</div>
+<p>Returns the k-smallest value from an array of numbers.</p>
+</dd>
+<dt><strong><a name="kurtosis" class="item"><strong>Kurtosis</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Kurtosis(\@DataArray);</div>
+<p>Computes the kurtosis of an array of numbers:
+[ {n(n + 1)/(n - 1)(n - 2)(n - 3)}  SUM{ ((x[i] - Xmean)/STDDEV)^4 } ] - {3((n - 1)^2)}/{(n - 2)(n-3)}</p>
+</dd>
+<dt><strong><a name="maximum" class="item"><strong>Maximum</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Maximum(\@DataArray);</div>
+<p>Returns the largest value from an array of numbers.</p>
+</dd>
+<dt><strong><a name="minimum" class="item"><strong>Minimum</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Minimum(\@DataArray);</div>
+<p>Returns the smallest value from an array of numbers.</p>
+</dd>
+<dt><strong><a name="mean" class="item"><strong>Mean</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Mean(\@DataArray);</div>
+<p>Computes the mean of an array of numbers: SUM( x[i] ) / n</p>
+</dd>
+<dt><strong><a name="median" class="item"><strong>Median</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Median(\@DataArray);</div>
+<p>Computes the median value of an array of numbers. For an even number array, it's
+the average of two middle values.</p>
+<p>For even values of n: Xsorted[(n - 1)/2 + 1]
+For odd values of n: (Xsorted[n/2] + Xsorted[n/2 + 1])/2</p>
+</dd>
+<dt><strong><a name="mode" class="item"><strong>Mode</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Mode(\@DataArray);</div>
+<p>Returns the most frequently occuring value in an array of numbers.</p>
+</dd>
+<dt><strong><a name="pearsoncorrelation" class="item"><strong>PearsonCorrelation</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Correlation(\@XDataArray, \@YDataArray);</div>
+<p>Computes the Pearson correlation coefficient between two arrays of numbers:
+SUM( (x[i] - Xmean)(y[i] - Ymean) ) / SQRT( SUM( (x[i] - Xmean)^2 )(SUM( (y[i] - Ymean)^2 ))   )</p>
+</dd>
+<dt><strong><a name="permutations" class="item"><strong>Permutations</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PermutationsRef = Permutations(@DataToPermute);</div>
+<p>Generate all possible permuations or a specific permutations of items in an array
+and return a reference to an array containing array references to generated permuations.</p>
+<p>This alogrithm is based on the example provided by Mark Jason-Dominus, and is available
+at CPAN as mjd_permute standalone script.</p>
+</dd>
+<dt><strong><a name="product" class="item"><strong>Product</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Product(\@DataArray);</div>
+<p>Compute the product of an array of numbers.</p>
+</dd>
+<dt><strong><a name="range" class="item"><strong>Range</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($Smallest, $Largest) = Range(\@DataArray);</div>
+<p>Return the smallest and largest values from an array of numbers.</p>
+</dd>
+<dt><strong><a name="rsquare" class="item"><strong>RSquare</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = RSquare(\@XDataArray, \@YDataArray);</div>
+<p>Computes square of the Pearson correlation coefficient between two arrays of numbers.</p>
+</dd>
+<dt><strong><a name="skewness" class="item"><strong>Skewness</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Skewness(\@DataArray);</div>
+<p>Computes the skewness of an array of numbers:
+{n/(n - 1)(n - 2)} SUM{ ((x[i] - Xmean)/STDDEV)^3 }</p>
+</dd>
+<dt><strong><a name="standarddeviation" class="item"><strong>StandardDeviation</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = StandardDeviation(\@DataArray);</div>
+<p>Computes the standard deviation of an array of numbers.
+SQRT ( SUM( (x[i] - mean)^2 ) / (n - 1) )</p>
+</dd>
+<dt><strong><a name="standarddeviationn" class="item"><strong>StandardDeviationN</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = StandardDeviationN(\@DataArray);</div>
+<p>Computes the standard deviation of an array of numbers representing entire population:
+SQRT ( SUM( (x[i] - mean)^2 ) / n )</p>
+</dd>
+<dt><strong><a name="standarderror" class="item"><strong>StandardError</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = StandardError($StandardDeviation, $Count);</div>
+<p>Computes the standard error using standard deviation and sample size.</p>
+</dd>
+<dt><strong><a name="standardize" class="item"><strong>Standardize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Standardize($Value, $Mean, $StandardDeviation);</div>
+<p>Standardizes the value using mean and standard deviation.</p>
+</dd>
+<dt><strong><a name="standardscores" class="item"><strong>StandardScores</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Values = StandardScores(\@DataArray);</div>
+<p>Computes the standard deviation above the mean for an array of numbers:
+(x[i] - mean) / (n - 1)</p>
+</dd>
+<dt><strong><a name="standardscoresn" class="item"><strong>StandardScoresN</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Values = StandardScoresN(\@DataArray);</div>
+<p>Computes the standard deviation above the mean for an array of numbers representing entire population:
+(x[i] - mean) / n</p>
+</dd>
+<dt><strong><a name="sum" class="item"><strong>Sum</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Sum(\@DataArray);</div>
+<p>Compute the sum of an array of numbers.</p>
+</dd>
+<dt><strong><a name="sumofsquares" class="item"><strong>SumOfSquares</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = SumOfSquares(\@DataArray);</div>
+<p>Computes the sum of an array of numbers.</p>
+</dd>
+<dt><strong><a name="trimmean" class="item"><strong>TrimMean</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = TrimMean(\@DataArray, $FractionToExclude));</div>
+<p>Computes the mean of an array of numbers by excluding a fraction of
+numbers from the top and bottom of the data set.</p>
+</dd>
+<dt><strong><a name="variance" class="item"><strong>Variance</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Variance(\@DataArray);</div>
+<p>Computes the variance of an array of numbers: SUM( (x[i] - Xmean)^2  / (n - 1) )</p>
+</dd>
+<dt><strong><a name="variancen" class="item"><strong>VarianceN</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = Variance(\@DataArray);</div>
+<p>Compute the variance of an array of numbers representing entire population:
+SUM( (x[i] - Xmean)^2  / n )</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./Constants.html">Constants.pm</a>,&nbsp<a href="./ConversionsUtil.html">ConversionsUtil.pm</a>,&nbsp<a href="./MathUtil.html">MathUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SequenceFileUtil.html" title="SequenceFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextUtil.html" title="TextUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>StatisticsUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

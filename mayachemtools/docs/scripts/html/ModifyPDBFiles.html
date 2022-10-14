@@ -1,0 +1,233 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ModifyPDBFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ModifyNewLineChar.html" title="ModifyNewLineChar.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ModifySDFilesDataFields.html" title="ModifySDFilesDataFields.html">Next</a></td><td width="34%" align="middle"><strong>ModifyPDBFiles.pl</strong></td><td width="33%" align="right"><a href="././code/ModifyPDBFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ModifyPDBFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ModifyPDBFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ModifyPDBFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ModifyPDBFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ModifyPDBFiles.pl - Modify data in PDBFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>ModifyPDBFiles.pl PDBFile(s)...</p>
+<p>ModifyPDBFiles.pl [<strong>-a, --AtomNumberStart</strong> number] [<strong>-c, --ChainIDStart</strong> character]
+[<strong>--ChainIDRenameEmpty</strong> yes | no] [<strong>-h, --help</strong>] [<strong>-k, --KeepOldRecords</strong> yes | no]
+[<strong>-m, --mode </strong> RenumberAtoms | RenumberResidues | RenumberWaters | RenameChainIDs]
+[<strong>--ModifyHeader</strong> yes | no] [<strong>-o, --overwrite</strong>] [<strong>--ResidueNumberMode</strong> Sequential | PerChain]
+[<strong>--ResidueNumberStart</strong> number] [<strong>--ResidueNumberHetatmMode</strong> automatic | specify]
+[<strong>--ResidueNumberStarHetatm</strong> number] [<strong>-r, --root</strong> rootname]
+[<strong>--WaterResidueNames</strong> Automatic | &quot;ResidueName, [ResidueName,...]&quot;] [<strong>--WaterResidueStart</strong> number]
+[<strong>-w, --WorkingDir</strong> dirname] PDBFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Modify data in <em>PDBFile(s)</em>: renumber atoms, residues, and water residues or assign new
+chain IDs. Multiple PDBFile names are separated by spaces. The valid file extension is <em>.pdb</em>.
+All other file name extensions are ignored during the wild card expansion. All the PDB files
+in a current directory can be specified either by <em>*.pdb</em> or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --AtomNumberStart</strong> <em>number</em></strong></dt>
+<dd>
+<p>Starting atom number to use during <em>RenumberAtoms</em> value of <strong>-m, --mode</strong> option. Default: <em>1</em>.
+Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-c, --ChainIDStart</strong> <em>character</em></strong></dt>
+<dd>
+<p>A single character to use for starting IDs for chains during <em>RenameChainIDs</em> value of <strong>-m, --mode</strong> option.
+Default: <em>A</em>. Valid values: <em>A to Z</em>.</p>
+</dd>
+<dt><strong><strong>--ChainIDRenameEmpty</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to rename empty chain IDs during <em>RenameChainIDs</em> <strong>-m, --mode</strong> value. By
+default, ATOM and HETATM records with no chain IDs are left unchanged. Possible values:
+<em>yes | no</em>. Default: <em>No</em>.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-k, --KeepOldRecords</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to transfer old non ATOM and HETATM records from input PDBFile(s) to new
+PDBFile(s). By default, except for the HEADER record, all records other than ATOM/HETATM
+are dropped during the generation of new PDB files. Possible values: <em>yes | no</em>.
+Default: <em>no</em>.</p>
+</dd>
+<dt><strong><strong>-m, --mode </strong> <em>RenumberAtoms | RenumberResidues | RenumberWaters | RenameChainIDs</em></strong></dt>
+<dd>
+<p>Specify how to modify <em>PDBFile(s)</em>. Possible values: <em>RenumberAtoms | RenumberResidues
+| RenumberWaters | RenameChainIDs</em>. Default: <em>RenumberResidues</em>.</p>
+<p>For <em>RenumberAtoms</em> mode, residue number in ATOM and HETATM records are reassigned
+sequentially starting using value of <strong>-a, --AtomNumberStart</strong> option.</p>
+<p>For <em>RenumberResidues</em> mode, serial number in ATOM and HETATM records are reassigned
+either sequentially or statring from specified values for ATOM and HETATM records in each
+chain.</p>
+<p>For <em>RenumberWaters</em> mode, residue number for waters are reassigned starting from a specific
+value.</p>
+<p>For <em>RenameChainIDs</em> mode, all the chain IDs are reassigned starting from a specific chain ID.</p>
+<p>During the generation of new PDB files, unnecessary CONECT records are dropped.</p>
+</dd>
+<dt><strong><strong>--ModifyHeader</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Specify whether to modify HEADER record during the generation of new PDB files
+Possible values: <em>yes | no</em>.  Default: <em>yes</em>. By defailt, Classification data is replaced
+by <em>Data modified using MayaChemTools</em> before writing out HEADER record.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files</p>
+</dd>
+<dt><strong><strong>--ResidueNumberMode</strong> <em>Sequential | PerChain</em></strong></dt>
+<dd>
+<p>Specify how to renumber residues: renumber residues sequentially across all the chains
+or start from the begining for each chain. Possible values: <em>Sequential | PerChain</em>. Default:
+<em>PerChain</em>.</p>
+</dd>
+<dt><strong><strong>--ResidueNumberStart</strong> <em>number</em></strong></dt>
+<dd>
+<p>Starting residue number to use for ATOM records in chains. Default: <em>1</em>. Valid values
+positive integers.</p>
+<p>For <em>Sequential</em> value of <strong>--ResidueNumberMode</strong> option, residue numbers are
+assigned sequentially across all the chains starting from the specified value.</p>
+<p>For <em>PerChain</em> value of <strong>--ResidueNumberMode</strong> option, residue numbers are
+starting again from the specified value for each chain.</p>
+<p>HETATM residues with in the chains are numbered using this value as well</p>
+</dd>
+<dt><strong><strong>--ResidueNumberHetatmMode</strong> <em>automatic | specify</em></strong></dt>
+<dd>
+<p>Specify how to start residue number for HETATM records: use the next sequential
+residue number after the last residue number from ATOM records or start from a
+specific residue number. Possible values: <em>automatic | specify</em>. Default:
+<em>automatic</em></p>
+<p>For <em>automatic</em> , residue number after highest residue number of ATOM
+records is used as the starting residue number for HETATM records.</p>
+<p>For <em>specify</em>,  value of option <strong>--ResidueNumberStarHetatm</strong> is used as the
+starting residue number for HETATM records.</p>
+<p>This option along with <strong>--ResidueNumberStartHetatm</strong> only applies to HETATM records
+outside the chains.</p>
+</dd>
+<dt><strong><strong>--ResidueNumberStartHetatm</strong> <em>number</em></strong></dt>
+<dd>
+<p>Starting residue number to use for HETATM records. Default: <em>6000</em>. Valid values
+positive integers.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New PDB and sequence file name is generated using the root: &lt;Root&gt;&lt;Mode&gt;.&lt;Ext&gt;.
+Default new file name: &lt;PDBFileName&gt;&lt;Mode&gt;.pdb. This option is ignored for multiple
+input files.</p>
+</dd>
+<dt><strong><strong>--WaterResidueNames</strong> <em>Automatic | &quot;ResidueName,[ResidueName,...]&quot;</em></strong></dt>
+<dd>
+<p>Identification of water residues during <em>RenumberWaters</em> value of <strong>-m, --mode</strong> option. Possible
+values: <em>Automatic | &quot;ResidueName,[ResidueName,...]&quot;</em>. Default: <em>Automatic</em> which corresponds
+to &quot;HOH,WAT,H20&quot;. You can also specify a different comma delimited list of residue names
+to use for water.</p>
+</dd>
+<dt><strong><strong>--WaterResidueStart</strong> <em>number</em></strong></dt>
+<dd>
+<p>Starting water residue number to use during <em>RenumberWaters</em> <strong>-m, --mode</strong> value.
+Default: <em>8000</em>. Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To renumber ATOM and HETATM residues starting from 1 for each chain with continuation to
+HETATM residues outside TER records in Sample2.pdb and generate
+Sample2RenumberResidues.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl Sample1.pdb</div>
+<p>To renumber ATOM and HETATM residues sequentially across all chains starting from 1 with
+continuation to HETATM residues outside TER records in Sample2.pdb and generate
+Sample2RenumberResidues.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl --ResidueNumberMode Sequential -o Sample1.pdb</div>
+<p>To renumber ATOM and HETATM residues sequentially across all chains starting from 1 and
+HETATM residues outside TER records starting from 6000 in Sample2.pdb and generate
+Sample2RenumberResidues.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl --ResidueNumberMode Sequential
+      --ResidueNumberHetatmMode Specify  -o Sample1.pdb</div>
+<p>To renumber ATOM and HETATM residues sequentially across all chains starting from 100 for
+ATOM/HETATM  residues with in TER records and starting from 999 for HETATM residues
+outside TER records in Sample2.pdb and generate Sample2RenumberResidues.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl --ResidueNumberMode Sequential
+      --ResidueNumberHetatmMode Specify --ResidueNumberStart 100
+      --ResidueNumberStartHetatm 999 -o Sample2.pdb</div>
+<p>To renumber ATOM and HETATM residues from 100 for each chain and starting from 999 for
+HETATM  residues outside TER records in Sample2.pdb and generate Sample2RenumberResidues.pdb
+file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl --ResidueNumberMode PerChain
+      --ResidueNumberHetatmMode Specify --ResidueNumberStart 100
+      --ResidueNumberStartHetatm 999 -o Sample2.pdb</div>
+<p>To renumber ATOM serial numbers sequentially starting from 100 in Sample1.pdb file and generate
+Sample1RenumberAtoms.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl -m RenumberAtoms --AtomNumberStart 100
+      -o Sample1.pdb</div>
+<p>To renumber water residues identified by &quot;HOH,WAT&quot; starting from residue number 1000
+in Sample2.pdb file and generate Sample2RenumberWaters.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl -m RenumberWaters --WaterResidueNames &quot;HOH,WAT&quot;
+      -o --WaterResidueStart 950 Sample2.pdb</div>
+<p>To rename all chain IDs starting from A in Sample1.pdb file and generate
+Sample1RenameChainIDs.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl -m RenameChainIDs -o Sample1.pdb</div>
+<p>To rename all chain IDs starting from B without assigning any chain IDs to ATOM/HETATOM
+with no chain IDs in Sample2.pdb file and generate Sample2RenameChainIDs.pdb file, type:</p>
+<div class="ExampleBox">
+    % ModifyPDBFiles.pl l -m RenameChainIDs -c B --ChainIDRenameEmpty No
+      -o Sample2.pdb</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromPDBFiles.html">ExtractFromPDBFiles.pl</a>,&nbsp<a href="./InfoPDBFiles.html">InfoPDBFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ModifyNewLineChar.html" title="ModifyNewLineChar.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ModifySDFilesDataFields.html" title="ModifySDFilesDataFields.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ModifyPDBFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

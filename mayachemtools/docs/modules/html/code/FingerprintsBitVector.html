@@ -1,0 +1,1110 @@
+<html>
+<head>
+<title>MayaChemTools:Code:Fingerprints::FingerprintsBitVector.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-Fingerprints::FingerprintsBitVector-"></a>   1 <span class="k">package </span><span class="i">Fingerprints::FingerprintsBitVector</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: FingerprintsBitVector.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:24 $</span>
+   5 <span class="c"># $Revision: 1.29 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Scalar::Util</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">BitVector</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">MathUtil</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  36 
+  37 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  38 
+  39 <span class="i">@ISA</span> = <span class="q">qw(BitVector Exporter)</span><span class="sc">;</span>
+  40 
+  41 <span class="c"># Similiarity coefficients...</span>
+  42 <span class="k">my</span><span class="s">(</span><span class="i">@SimilarityCoefficients</span><span class="s">)</span> = <span class="q">qw(BaroniUrbaniSimilarityCoefficient BuserSimilarityCoefficient CosineSimilarityCoefficient DiceSimilarityCoefficient DennisSimilarityCoefficient ForbesSimilarityCoefficient FossumSimilarityCoefficient HamannSimilarityCoefficient JacardSimilarityCoefficient Kulczynski1SimilarityCoefficient Kulczynski2SimilarityCoefficient MatchingSimilarityCoefficient McConnaugheySimilarityCoefficient OchiaiSimilarityCoefficient PearsonSimilarityCoefficient RogersTanimotoSimilarityCoefficient RussellRaoSimilarityCoefficient SimpsonSimilarityCoefficient SkoalSneath1SimilarityCoefficient SkoalSneath2SimilarityCoefficient SkoalSneath3SimilarityCoefficient TanimotoSimilarityCoefficient TverskySimilarityCoefficient YuleSimilarityCoefficient WeightedTanimotoSimilarityCoefficient WeightedTverskySimilarityCoefficient)</span><span class="sc">;</span>
+  43 
+  44 <span class="c"># New from string...</span>
+  45 <span class="k">my</span><span class="s">(</span><span class="i">@NewFromString</span><span class="s">)</span> = <span class="q">qw(NewFromBinaryString NewFromHexadecimalString NewFromRawBinaryString)</span><span class="sc">;</span>
+  46 
+  47 <span class="i">@EXPORT</span> = <span class="q">qw(IsFingerprintsBitVector)</span><span class="sc">;</span>
+  48 <span class="i">@EXPORT_OK</span> = <span class="q">qw(GetSupportedSimilarityCoefficients @NewFromString @SimilarityCoefficients)</span><span class="sc">;</span>
+  49 
+  50 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span>
+  51                 <span class="w">new</span> <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@NewFromString</span><span class="s">]</span><span class="cm">,</span>
+  52                 <span class="w">coefficients</span> <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@SimilarityCoefficients</span><span class="s">]</span><span class="cm">,</span>
+  53                 <span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span>
+  54                <span class="s">)</span><span class="sc">;</span>
+  55 
+  56 <span class="c"># Setup class variables...</span>
+  57 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  58 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  59 
+  60 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyFingerprintsBitVector&#39;</span><span class="sc">;</span>
+  61 
+  62 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  63 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  64   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  65 
+  66   <span class="c"># Initialize object...</span>
+  67   <span class="k">my</span> <span class="i">$This</span> = <span class="i">$Class</span><span class="i">-&gt;SUPER::new</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+  68   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  69   <span class="i">$This</span><span class="i">-&gt;_InitializeFingerprintsBitVector</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+  70 
+  71   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  72 <span class="s">}</span>
+  73 
+  74 <span class="c"># Initialize object data...</span>
+  75 <span class="c">#</span>
+  76 <span class="c"># Note:</span>
+  77 <span class="c">#  . The class, BitVector, used to derive this class provides all the functionality to</span>
+  78 <span class="c">#    manipulate bits.</span>
+  79 <span class="c">#  . Irrespective of specified size, Perl functions used to handle bit data in</span>
+  80 <span class="c">#    BitVector class automatically sets the size to the next nearest power of 2.</span>
+  81 <span class="c">#    SpecifiedSize is used by this class to process any aribitray size during similarity</span>
+  82 <span class="c">#    coefficient calculations.</span>
+  83 <span class="c">#</span>
+<a name="_InitializeFingerprintsBitVector-"></a>  84 <span class="k">sub </span><span class="m">_InitializeFingerprintsBitVector</span> <span class="s">{</span>
+  85   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  86 
+  87   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$Size</span><span class="s">)</span> <span class="s">{</span>
+  88     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;new: FingerprintsBitVector object instantiated without specifying its size ...&quot;</span><span class="sc">;</span>
+  89   <span class="s">}</span>
+  90   <span class="k">if</span> <span class="s">(</span><span class="i">$Size</span> &lt;=<span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+  91     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;new: Fingerprints bit vector size, $Size, must be a positive integer...&quot;</span><span class="sc">;</span>
+  92   <span class="s">}</span>
+  93 
+  94   <span class="c"># Specified size of fingerprints...</span>
+  95   <span class="i">$This</span>-&gt;{<span class="w">SpecifiedSize</span>} = <span class="i">$Size</span><span class="sc">;</span>
+  96 
+  97 <span class="s">}</span>
+  98 
+  99 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a> 100 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+ 101   <span class="c">#Class name...</span>
+ 102   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+ 103 <span class="s">}</span>
+ 104 
+ 105 <span class="c"># Set specified size...</span>
+ 106 <span class="c">#</span>
+ 107 <span class="c"># Notes:</span>
+ 108 <span class="c">#   Irrespective of specified size, Perl functions used to handle bit data in</span>
+ 109 <span class="c">#   BitVector class automatically sets the size to the next nearest power of 2.</span>
+ 110 <span class="c">#   SpecifiedSize is used by this class to process any aribitray size during similarity</span>
+ 111 <span class="c">#   coefficient calculations.</span>
+ 112 <span class="c">#</span>
+<a name="SetSpecifiedSize-"></a> 113 <span class="k">sub </span><span class="m">SetSpecifiedSize</span> <span class="s">{</span>
+ 114   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$SpecifiedSize</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 115 
+ 116   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$SpecifiedSize</span> &gt; <span class="n">0</span> &amp;&amp; <span class="i">$SpecifiedSize</span> &lt;= <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 117     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetSpecifiedSize: Specified size, $SpecifiedSize, is not valid:  It must be &gt; 0 &amp;&amp; &lt;= &quot;</span><span class="cm">,</span> <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="cm">,</span><span class="q">&quot; ...&quot;</span><span class="sc">;</span>
+ 118   <span class="s">}</span>
+ 119   <span class="i">$This</span>-&gt;{<span class="w">SpecifiedSize</span>} = <span class="i">$SpecifiedSize</span><span class="sc">;</span>
+ 120 <span class="s">}</span>
+ 121 
+ 122 <span class="c"># Get specified size...</span>
+<a name="GetSpecifiedSize-"></a> 123 <span class="k">sub </span><span class="m">GetSpecifiedSize</span> <span class="s">{</span>
+ 124   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 125 
+ 126   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">SpecifiedSize</span>}<span class="sc">;</span>
+ 127 <span class="s">}</span>
+ 128 
+ 129 <span class="c"># Set ID...</span>
+<a name="SetID-"></a> 130 <span class="k">sub </span><span class="m">SetID</span> <span class="s">{</span>
+ 131   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 132 
+ 133   <span class="i">$This</span>-&gt;{<span class="w">ID</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 134 
+ 135   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 136 <span class="s">}</span>
+ 137 
+ 138 <span class="c"># Get ID...</span>
+<a name="GetID-"></a> 139 <span class="k">sub </span><span class="m">GetID</span> <span class="s">{</span>
+ 140   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 141 
+ 142   <span class="k">return</span> <span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">ID</span>} ? <span class="i">$This</span>-&gt;{<span class="w">ID</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 143 <span class="s">}</span>
+ 144 
+ 145 <span class="c"># Set description...</span>
+<a name="SetDescription-"></a> 146 <span class="k">sub </span><span class="m">SetDescription</span> <span class="s">{</span>
+ 147   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 148 
+ 149   <span class="i">$This</span>-&gt;{<span class="w">Description</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 150 
+ 151   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 152 <span class="s">}</span>
+ 153 
+ 154 <span class="c"># Get description...</span>
+<a name="GetDescription-"></a> 155 <span class="k">sub </span><span class="m">GetDescription</span> <span class="s">{</span>
+ 156   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 157 
+ 158   <span class="k">return</span> <span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Description</span>} ? <span class="i">$This</span>-&gt;{<span class="w">Description</span>} <span class="co">:</span> <span class="q">&#39;No description available&#39;</span><span class="sc">;</span>
+ 159 <span class="s">}</span>
+ 160 
+ 161 <span class="c"># Set vector type...</span>
+<a name="SetVectorType-"></a> 162 <span class="k">sub </span><span class="m">SetVectorType</span> <span class="s">{</span>
+ 163   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 164 
+ 165   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 166 
+ 167   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 168 <span class="s">}</span>
+ 169 
+ 170 <span class="c"># Get vector type...</span>
+<a name="GetVectorType-"></a> 171 <span class="k">sub </span><span class="m">GetVectorType</span> <span class="s">{</span>
+ 172   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 173 
+ 174   <span class="k">return</span> <span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} ? <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} <span class="co">:</span> <span class="q">&#39;FingerprintsBitVector&#39;</span><span class="sc">;</span>
+ 175 <span class="s">}</span>
+ 176 
+ 177 <span class="c"># Create a new fingerprints bit vector using binary string. This functionality can be</span>
+ 178 <span class="c"># either invoked as a class function or an object method.</span>
+ 179 <span class="c">#</span>
+<a name="NewFromBinaryString-"></a> 180 <span class="k">sub </span><span class="m">NewFromBinaryString ($;$)</span> <span class="s">{</span>
+ 181   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 182 
+ 183   <span class="k">if</span> <span class="s">(</span><span class="i">_IsFingerprintsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 184     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 185   <span class="s">}</span>
+ 186   <span class="k">else</span> <span class="s">{</span>
+ 187     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 188   <span class="s">}</span>
+ 189 <span class="s">}</span>
+ 190 
+ 191 <span class="c"># Create a new fingerprints bit vector using hexadecimal string. This functionality can be</span>
+ 192 <span class="c"># either invoked as a class function or an object method.</span>
+ 193 <span class="c">#</span>
+<a name="NewFromHexadecimalString-"></a> 194 <span class="k">sub </span><span class="m">NewFromHexadecimalString ($;$)</span> <span class="s">{</span>
+ 195   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 196 
+ 197   <span class="k">if</span> <span class="s">(</span><span class="i">_IsFingerprintsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 198     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 199   <span class="s">}</span>
+ 200   <span class="k">else</span> <span class="s">{</span>
+ 201     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 202   <span class="s">}</span>
+ 203 <span class="s">}</span>
+ 204 
+ 205 <span class="c"># Create a new fingerprints bit vector using octal string. This functionality can be</span>
+ 206 <span class="c"># either invoked as a class function or an object method.</span>
+ 207 <span class="c">#</span>
+ 208 <span class="c">#</span>
+<a name="NewFromOctalString-"></a> 209 <span class="k">sub </span><span class="m">NewFromOctalString ($)</span> <span class="s">{</span>
+ 210   <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;NewFromOctalString: Creation of fingerprits bit vector from an octal string is not supported ...&quot;</span><span class="sc">;</span>
+ 211 <span class="s">}</span>
+ 212 
+ 213 <span class="c"># Create a new fingerprints bit vector using decimal string. This functionality can be</span>
+ 214 <span class="c"># either invoked as a class function or an object method.</span>
+ 215 <span class="c">#</span>
+<a name="NewFromDecimalString-"></a> 216 <span class="k">sub </span><span class="m">NewFromDecimalString ($;$)</span> <span class="s">{</span>
+ 217   <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;NewFromDecimalString: Creation of fingerprits bit vector from a decimal string is not supported ...&quot;</span><span class="sc">;</span>
+ 218 <span class="s">}</span>
+ 219 
+ 220 <span class="c"># Create a new fingerprints bit vector using raw binary string. This functionality can be</span>
+ 221 <span class="c"># either invoked as a class function or an object method.</span>
+ 222 <span class="c">#</span>
+<a name="NewFromRawBinaryString-"></a> 223 <span class="k">sub </span><span class="m">NewFromRawBinaryString ($;$)</span> <span class="s">{</span>
+ 224   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 225 
+ 226   <span class="k">if</span> <span class="s">(</span><span class="i">_IsFingerprintsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 227     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 228   <span class="s">}</span>
+ 229   <span class="k">else</span> <span class="s">{</span>
+ 230     <span class="k">return</span> <span class="i">_NewFingerptinsBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 231   <span class="s">}</span>
+ 232 <span class="s">}</span>
+ 233 
+ 234 <span class="c"># Create a new fingerprints bit vector from a string...</span>
+ 235 <span class="c">#</span>
+ 236 <span class="c">#</span>
+<a name="_NewFingerptinsBitVectorFromString-"></a> 237 <span class="k">sub </span><span class="m">_NewFingerptinsBitVectorFromString ($$;$)</span> <span class="s">{</span>
+ 238   <span class="k">my</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 239   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVector</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 240 
+ 241   <span class="i">$Size</span> = <span class="i">BitVector::_CalculateStringSizeInBits</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="sc">;</span>
+ 242 
+ 243   <span class="i">$FingerprintsBitVector</span> = <span class="i">new</span> <span class="i">Fingerprints::FingerprintsBitVector</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 244   <span class="i">$FingerprintsBitVector</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span><span class="sc">;</span>
+ 245 
+ 246   <span class="k">return</span> <span class="i">$FingerprintsBitVector</span><span class="sc">;</span>
+ 247 <span class="s">}</span>
+ 248 
+ 249 <span class="c"># Get fingerprint bits as a hexadecimal string...</span>
+ 250 <span class="c">#</span>
+<a name="GetBitsAsHexadecimalString-"></a> 251 <span class="k">sub </span><span class="m">GetBitsAsHexadecimalString</span> <span class="s">{</span>
+ 252   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 253 
+ 254   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span><span class="sc">;</span>
+ 255 <span class="s">}</span>
+ 256 
+ 257 <span class="c"># Get fingerprint bits as an octal string...</span>
+ 258 <span class="c">#</span>
+<a name="GetBitsAsOctalString-"></a> 259 <span class="k">sub </span><span class="m">GetBitsAsOctalString</span> <span class="s">{</span>
+ 260   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 261 
+ 262   <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;GetBitsAsOctalString: Retrieval of fingerprits bits as an octal string is not supported ...&quot;</span><span class="sc">;</span>
+ 263 <span class="s">}</span>
+ 264 
+ 265 <span class="c"># Get fingerprint bits as an decimal string...</span>
+ 266 <span class="c">#</span>
+<a name="GetBitsAsDecimalString-"></a> 267 <span class="k">sub </span><span class="m">GetBitsAsDecimalString</span> <span class="s">{</span>
+ 268   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 269 
+ 270   <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;GetBitsAsOctalString: Retrieval of fingerprits bits as a decimal string is not supported ...&quot;</span><span class="sc">;</span>
+ 271 <span class="s">}</span>
+ 272 
+ 273 <span class="c"># Get fingerprint bits as a binary string conatning 1s and 0s...</span>
+ 274 <span class="c">#</span>
+<a name="GetBitsAsBinaryString-"></a> 275 <span class="k">sub </span><span class="m">GetBitsAsBinaryString</span> <span class="s">{</span>
+ 276   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 277 
+ 278   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span><span class="sc">;</span>
+ 279 <span class="s">}</span>
+ 280 
+ 281 <span class="c"># Get fingerprint bits as a binary string conatning 1s and 0s...</span>
+ 282 <span class="c">#</span>
+<a name="GetBitsAsRawBinaryString-"></a> 283 <span class="k">sub </span><span class="m">GetBitsAsRawBinaryString</span> <span class="s">{</span>
+ 284   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 285 
+ 286   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetFingerprintBitsAsString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="s">)</span><span class="sc">;</span>
+ 287 <span class="s">}</span>
+ 288 
+ 289 <span class="c"># Return fingerprint bits as a string...</span>
+ 290 <span class="c">#</span>
+<a name="_GetFingerprintBitsAsString-"></a> 291 <span class="k">sub </span><span class="m">_GetFingerprintBitsAsString</span> <span class="s">{</span>
+ 292   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 293 
+ 294   <span class="i">$BitsOrder</span> = <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$BitsOrder</span><span class="s">)</span> &amp;&amp; <span class="i">$BitsOrder</span><span class="s">)</span> ? <span class="i">$BitsOrder</span> <span class="co">:</span> <span class="q">&#39;Ascending&#39;</span><span class="sc">;</span>
+ 295 
+ 296   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$BitsOrder</span><span class="s">)</span><span class="sc">;</span>
+ 297 <span class="s">}</span>
+ 298 
+ 299 <span class="c"># Is it a fingerprints bit vector object?</span>
+<a name="IsFingerprintsBitVector-"></a> 300 <span class="k">sub </span><span class="m">IsFingerprintsBitVector ($)</span> <span class="s">{</span>
+ 301   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 302 
+ 303   <span class="k">return</span> <span class="i">_IsFingerprintsBitVector</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span><span class="sc">;</span>
+ 304 <span class="s">}</span>
+ 305 
+ 306 <span class="c"># Is it a fingerprints bit vector object?</span>
+<a name="_IsFingerprintsBitVector-"></a> 307 <span class="k">sub </span><span class="m">_IsFingerprintsBitVector</span> <span class="s">{</span>
+ 308   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 309 
+ 310   <span class="k">return</span> <span class="s">(</span><span class="i">Scalar::Util::blessed</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> &amp;&amp; <span class="i">$Object</span><span class="i">-&gt;isa</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 311 <span class="s">}</span>
+ 312 
+ 313 <span class="c"># Return a list of supported similarity coefficients...</span>
+<a name="GetSupportedSimilarityCoefficients-"></a> 314 <span class="k">sub </span><span class="m">GetSupportedSimilarityCoefficients ()</span> <span class="s">{</span>
+ 315 
+ 316   <span class="k">return</span> <span class="i">@SimilarityCoefficients</span><span class="sc">;</span>
+ 317 <span class="s">}</span>
+ 318 
+ 319 <span class="c"># Get bit density for fingerprints bit vector corresponding to on bits...</span>
+ 320 <span class="c">#</span>
+<a name="GetFingerprintsBitDensity-"></a> 321 <span class="k">sub </span><span class="m">GetFingerprintsBitDensity</span> <span class="s">{</span>
+ 322   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 323   <span class="k">my</span><span class="s">(</span><span class="i">$BitDensity</span><span class="s">)</span><span class="sc">;</span>
+ 324 
+ 325   <span class="i">$BitDensity</span> = <span class="i">$This</span><span class="i">-&gt;GetDensityOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 326 
+ 327   <span class="k">return</span> <span class="i">round</span><span class="s">(</span><span class="i">$BitDensity</span><span class="cm">,</span> <span class="n">2</span><span class="s">)</span><span class="sc">;</span>
+ 328 <span class="s">}</span>
+ 329 
+ 330 <span class="c"># Fold fingerprints bit vector by recursively reducing its size by half untill size is less than or equal to</span>
+ 331 <span class="c"># specified size...</span>
+ 332 <span class="c">#</span>
+<a name="FoldFingerprintsBitVectorBySize-"></a> 333 <span class="k">sub </span><span class="m">FoldFingerprintsBitVectorBySize</span> <span class="s">{</span>
+ 334   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 335 
+ 336   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$Size</span> &gt; <span class="n">0</span> &amp;&amp; <span class="i">$Size</span> &lt;= <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 337     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsBitVectorBySize: Specified size, $Size, is not valid:  It must be &gt; 0 &amp;&amp; &lt;= &quot;</span><span class="cm">,</span> <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="cm">,</span><span class="q">&quot; ...&quot;</span><span class="sc">;</span>
+ 338   <span class="s">}</span>
+ 339 
+ 340   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> &lt;= <span class="i">$Size</span><span class="s">)</span> <span class="s">{</span>
+ 341     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 342   <span class="s">}</span>
+ 343   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_FoldFingerprintsBitVector</span><span class="s">(</span><span class="q">&#39;BySize&#39;</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 344 <span class="s">}</span>
+ 345 
+ 346 <span class="c"># Fold fingerprints bit vector by recursively reducing its size by half untill bit density of set bits is greater than</span>
+ 347 <span class="c">#  or equal to specified density...</span>
+ 348 <span class="c">#</span>
+<a name="FoldFingerprintsBitVectorByDensity-"></a> 349 <span class="k">sub </span><span class="m">FoldFingerprintsBitVectorByDensity</span> <span class="s">{</span>
+ 350   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Density</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 351 
+ 352   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$Density</span> &gt; <span class="n">0</span> &amp;&amp; <span class="i">$Density</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 353     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;FoldFingerprintsBitVectorByDensity: Specified bit density, $Density, is not valid:  It must be &gt; 0 &amp;&amp; &lt;= 1 ...&quot;</span><span class="sc">;</span>
+ 354   <span class="s">}</span>
+ 355 
+ 356   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetDensityOfSetBits</span><span class="s">(</span><span class="s">)</span> &gt;= <span class="i">$Density</span><span class="s">)</span> <span class="s">{</span>
+ 357     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 358   <span class="s">}</span>
+ 359   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_FoldFingerprintsBitVector</span><span class="s">(</span><span class="q">&#39;ByDensity&#39;</span><span class="cm">,</span> <span class="i">$Density</span><span class="s">)</span><span class="sc">;</span>
+ 360 <span class="s">}</span>
+ 361 
+ 362 <span class="c"># Fold fingerprints bit vector using size or density and return folded fingerprint bit vector...</span>
+ 363 <span class="c">#</span>
+<a name="_FoldFingerprintsBitVector-"></a> 364 <span class="k">sub </span><span class="m">_FoldFingerprintsBitVector</span> <span class="s">{</span>
+ 365   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Mode</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 366 
+ 367   <span class="c"># Fold upto size of 8 bits...</span>
+ 368   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> &lt;= <span class="n">8</span><span class="s">)</span> <span class="s">{</span>
+ 369     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 370   <span class="s">}</span>
+ 371 
+ 372   <span class="c"># Check size or density....</span>
+ 373   <span class="k">if</span> <span class="s">(</span><span class="i">$Mode</span> =~ <span class="q">/^BySize$/i</span><span class="s">)</span> <span class="s">{</span>
+ 374     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> &lt;= <span class="i">$Value</span><span class="s">)</span> <span class="s">{</span>
+ 375       <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 376     <span class="s">}</span>
+ 377   <span class="s">}</span>
+ 378   <span class="k">elsif</span> <span class="s">(</span><span class="i">$Mode</span> =~ <span class="q">/^ByDensity$/i</span><span class="s">)</span> <span class="s">{</span>
+ 379     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetDensityOfSetBits</span><span class="s">(</span><span class="s">)</span> &gt;= <span class="i">$Value</span><span class="s">)</span> <span class="s">{</span>
+ 380       <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 381     <span class="s">}</span>
+ 382   <span class="s">}</span>
+ 383   <span class="k">else</span> <span class="s">{</span>
+ 384     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 385   <span class="s">}</span>
+ 386 
+ 387   <span class="c"># Recursively reduce its size by half...</span>
+ 388   <span class="k">my</span><span class="s">(</span><span class="i">$FirstHalfBinaryString</span><span class="cm">,</span> <span class="i">$SecondHalfBinaryString</span><span class="cm">,</span> <span class="i">$FirstHalfFingerprintsBitVector</span><span class="cm">,</span> <span class="i">$SecondHalfFingerprintsBitVector</span><span class="cm">,</span> <span class="i">$FoldedFingerprintsBitVector</span><span class="cm">,</span> <span class="i">$BinaryString</span><span class="cm">,</span> <span class="i">$StringLength</span><span class="s">)</span><span class="sc">;</span>
+ 389 
+ 390   <span class="i">$BinaryString</span> = <span class="i">$This</span><span class="i">-&gt;GetBitsAsBinaryString</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 391   <span class="i">$StringLength</span> = <span class="k">length</span> <span class="i">$BinaryString</span><span class="sc">;</span>
+ 392 
+ 393   <span class="i">$FirstHalfBinaryString</span> = <span class="k">substr</span><span class="s">(</span><span class="i">$BinaryString</span><span class="cm">,</span> <span class="n">0</span><span class="cm">,</span> <span class="i">$StringLength</span>/<span class="n">2</span><span class="s">)</span><span class="sc">;</span>
+ 394   <span class="i">$SecondHalfBinaryString</span> = <span class="k">substr</span><span class="s">(</span><span class="i">$BinaryString</span><span class="cm">,</span> <span class="i">$StringLength</span>/<span class="n">2</span><span class="s">)</span><span class="sc">;</span>
+ 395 
+ 396   <span class="i">$FirstHalfFingerprintsBitVector</span> = <span class="i">NewFromBinaryString</span><span class="s">(</span><span class="i">$FirstHalfBinaryString</span><span class="s">)</span><span class="sc">;</span>
+ 397   <span class="i">$SecondHalfFingerprintsBitVector</span> = <span class="i">NewFromBinaryString</span><span class="s">(</span><span class="i">$SecondHalfBinaryString</span><span class="s">)</span><span class="sc">;</span>
+ 398 
+ 399   <span class="i">$FoldedFingerprintsBitVector</span> = <span class="i">$FirstHalfFingerprintsBitVector</span> | <span class="i">$SecondHalfFingerprintsBitVector</span><span class="sc">;</span>
+ 400 
+ 401   <span class="k">return</span> <span class="i">$FoldedFingerprintsBitVector</span><span class="i">-&gt;_FoldFingerprintsBitVector</span><span class="s">(</span><span class="i">$Mode</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 402 <span class="s">}</span>
+ 403 
+ 404 <span class="c"># Is first bit vector subset of second bit vector?</span>
+ 405 <span class="c">#</span>
+ 406 <span class="c"># For a bit vector to be a subset of another bit vector, both vectors must be of</span>
+ 407 <span class="c"># the same size and the bit positions set in first vector must also be set in the</span>
+ 408 <span class="c"># secons bit vector.</span>
+ 409 <span class="c">#</span>
+ 410 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 411 <span class="c">#</span>
+<a name="IsSubSet-"></a> 412 <span class="k">sub </span><span class="m">IsSubSet ($$)</span> <span class="s">{</span>
+ 413   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 414 
+ 415   <span class="k">if</span> <span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> != <span class="i">$FingerprintsBitVectorB</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 416     <span class="k">return</span> <span class="n">0</span><span class="sc">;</span>
+ 417   <span class="s">}</span>
+ 418   <span class="k">my</span><span class="s">(</span><span class="i">$AndFingerprintsBitVector</span><span class="s">)</span><span class="sc">;</span>
+ 419 
+ 420   <span class="i">$AndFingerprintsBitVector</span> = <span class="i">$FingerprintsBitVectorA</span> &amp; <span class="i">$FingerprintsBitVectorB</span><span class="sc">;</span>
+ 421 
+ 422   <span class="k">return</span> <span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span> == <span class="i">$AndFingerprintsBitVector</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 423 <span class="s">}</span>
+ 424 
+ 425 <span class="c"># Return a string containing vector values...</span>
+<a name="StringifyFingerprintsBitVector-"></a> 426 <span class="k">sub </span><span class="m">StringifyFingerprintsBitVector</span> <span class="s">{</span>
+ 427   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 428   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorString</span><span class="s">)</span><span class="sc">;</span>
+ 429 
+ 430   <span class="c"># BitVector size information...</span>
+ 431   <span class="c">#</span>
+ 432   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">SpecifiedSize</span>} != <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 433     <span class="i">$FingerprintsBitVectorString</span> = <span class="q">&quot;SpecifiedSize: &quot;</span> . <span class="i">$This</span>-&gt;{<span class="w">SpecifiedSize</span>} . <span class="q">&quot;; BitVectorSize: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 434   <span class="s">}</span>
+ 435   <span class="k">else</span> <span class="s">{</span>
+ 436     <span class="i">$FingerprintsBitVectorString</span> = <span class="q">&quot;BitVectorSize: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 437   <span class="s">}</span>
+ 438   <span class="k">my</span><span class="s">(</span><span class="i">$NumOfSetBits</span><span class="cm">,</span> <span class="i">$BitDensity</span><span class="s">)</span><span class="sc">;</span>
+ 439   <span class="i">$NumOfSetBits</span> = <span class="i">$This</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 440   <span class="i">$BitDensity</span> = <span class="i">$This</span><span class="i">-&gt;GetFingerprintsBitDensity</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 441 
+ 442   <span class="i">$FingerprintsBitVectorString</span> .= <span class="q">&quot;; NumOfOnBits: $NumOfSetBits; BitDensity: $BitDensity&quot;</span><span class="sc">;</span>
+ 443 
+ 444   <span class="c"># BitVector values...</span>
+ 445   <span class="i">$FingerprintsBitVectorString</span> .= <span class="q">&quot;; BitVector: &quot;</span> . <span class="i">$This</span><span class="i">-&gt;StringifyBitVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 446 
+ 447   <span class="k">return</span> <span class="i">$FingerprintsBitVectorString</span><span class="sc">;</span>
+ 448 <span class="s">}</span>
+ 449 
+ 450 <span class="c"># For two fingerprints bit vectors A and B of same size, let:</span>
+ 451 <span class="c">#</span>
+ 452 <span class="c">#  Na = Number of bits set to &quot;1&quot; in A</span>
+ 453 <span class="c">#  Nb = Number of bits set to &quot;1&quot; in B</span>
+ 454 <span class="c">#  Nc = Number of bits set to &quot;1&quot; in both A and B</span>
+ 455 <span class="c">#  Nd = Number of bits set to &quot;0&quot; in both A and B</span>
+ 456 <span class="c">#</span>
+ 457 <span class="c">#  Nt = Number of bits set to &quot;1&quot; or &quot;0&quot; in A or B = Size of A or B = Na + Nb - Nc + Nd</span>
+ 458 <span class="c">#</span>
+ 459 <span class="c">#  Na - Nc = Number of bits set to &quot;1&quot; in A but not in B</span>
+ 460 <span class="c">#  Nb - Nc = Number of bits set to &quot;1&quot; in B but not in A</span>
+ 461 <span class="c">#</span>
+ 462 <span class="c"># Various similarity coefficients [ Ref 40 - 42 ] for a pair of bit vectors A and B are</span>
+ 463 <span class="c"># defined as follows:</span>
+ 464 <span class="c">#</span>
+ 465 <span class="c"># . BaroniUrbani: ( SQRT( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as Buser )</span>
+ 466 <span class="c">#</span>
+ 467 <span class="c"># . Buser: ( SQRT ( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as BaroniUrbani )</span>
+ 468 <span class="c">#</span>
+ 469 <span class="c"># . Cosine: Nc / SQRT ( Na * Nb ) (same as Ochiai)</span>
+ 470 <span class="c">#</span>
+ 471 <span class="c"># . Dice: (2 * Nc) / ( Na + Nb )</span>
+ 472 <span class="c">#</span>
+ 473 <span class="c"># . Dennis: ( Nc * Nd - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / SQRT ( Nt * Na * Nb)</span>
+ 474 <span class="c">#</span>
+ 475 <span class="c"># . Forbes: ( Nt * Nc ) / ( Na * Nb )</span>
+ 476 <span class="c">#</span>
+ 477 <span class="c"># . Fossum: ( Nt * ( ( Nc - 1/2 ) ** 2 ) / ( Na * Nb )</span>
+ 478 <span class="c">#</span>
+ 479 <span class="c"># . Hamann: ( ( Nc + Nd ) - ( Na - Nc ) - ( Nb - Nc ) ) / Nt</span>
+ 480 <span class="c">#</span>
+ 481 <span class="c"># . Jaccard: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Tanimoto)</span>
+ 482 <span class="c">#</span>
+ 483 <span class="c"># . Kulczynski1: Nc / ( ( Na - Nc ) + ( Nb - Nc) ) = Nc / ( Na + Nb - 2Nc )</span>
+ 484 <span class="c">#</span>
+ 485 <span class="c"># . Kulczynski2: ( ( Nc / 2 ) * ( 2 * Nc + ( Na - Nc ) + ( Nb - Nc) ) ) / ( ( Nc + ( Na - Nc ) ) * ( Nc + ( Nb - Nc ) ) ) = 0.5 * ( Nc / Na + Nc / Nb )</span>
+ 486 <span class="c">#</span>
+ 487 <span class="c"># . Matching: ( Nc + Nd ) / Nt</span>
+ 488 <span class="c">#</span>
+ 489 <span class="c"># . McConnaughey: ( Nc ** 2 - ( Na - Nc ) * ( Nb - Nc) ) / (  Na * Nb )</span>
+ 490 <span class="c">#</span>
+ 491 <span class="c"># . Ochiai: Nc / SQRT ( Na * Nb ) (same as Cosine)</span>
+ 492 <span class="c">#</span>
+ 493 <span class="c"># . Pearson: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) / SQRT ( Na * Nb * (  Na - Nc + Nd ) * ( Nb - Nc + Nd ) )</span>
+ 494 <span class="c">#</span>
+ 495 <span class="c"># . RogersTanimoto: ( Nc + Nd ) / ( ( Na - Nc)  + ( Nb  - Nc) + Nt) = ( Nc + Nd ) / ( Na  + Nb  - 2Nc + Nt)</span>
+ 496 <span class="c">#</span>
+ 497 <span class="c"># . RussellRao: Nc / Nt</span>
+ 498 <span class="c">#</span>
+ 499 <span class="c"># . Simpson: Nc / MIN ( Na, Nb)</span>
+ 500 <span class="c">#</span>
+ 501 <span class="c"># . SkoalSneath1: Nc / ( Nc + 2 * ( Na - Nc)  + 2 * ( Nb - Nc) ) = Nc / ( 2 * Na + 2 * Nb - 3 * Nc )</span>
+ 502 <span class="c">#</span>
+ 503 <span class="c"># . SkoalSneath2: ( 2 * Nc + 2 * Nd ) / ( Nc + Nd + Nt )</span>
+ 504 <span class="c">#</span>
+ 505 <span class="c"># . SkoalSneath3: ( Nc + Nd ) / ( ( Na - Nc ) + ( Nb - Nc ) ) = ( Nc + Nd ) / ( Na + Nb - 2 * Nc  )</span>
+ 506 <span class="c">#</span>
+ 507 <span class="c"># . Tanimoto: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Jaccard)</span>
+ 508 <span class="c">#</span>
+ 509 <span class="c"># . Tversky: Nc / ( alpha * ( Na - Nc ) + ( 1 - alpha) * ( Nb - Nc) + Nc ) = Nc / ( alpha * ( Na - Nb )  + Nb)</span>
+ 510 <span class="c">#</span>
+ 511 <span class="c"># . Yule: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / ( ( Nc * Nd ) + ( ( Na - Nc ) * ( Nb - Nc ) )  )</span>
+ 512 <span class="c">#</span>
+ 513 <span class="c">#</span>
+ 514 <span class="c"># Values of Tanimoto/Jaccard and Tversky coefficients are dependent on only those bit which</span>
+ 515 <span class="c"># are set to &quot;1&quot; in both A and B. In order to take into account all bit positions, modified versions</span>
+ 516 <span class="c"># of Tanimoto [ Ref. 42 ] and Tversky [  Ref. 43 ] have been developed.</span>
+ 517 <span class="c">#</span>
+ 518 <span class="c"># Let:</span>
+ 519 <span class="c">#</span>
+ 520 <span class="c">#  Na&#39; = Number of bits set to &quot;0&quot; in A</span>
+ 521 <span class="c">#  Nb&#39; = Number of bits set to &quot;0&quot; in B</span>
+ 522 <span class="c">#  Nc&#39; = Number of bits set to &quot;0&quot; in both A and B</span>
+ 523 <span class="c">#</span>
+ 524 <span class="c"># . Tanimoto&#39;: Nc&#39; /  ( ( Na&#39; - Nc&#39;) + ( Nb&#39; - Nc&#39; ) + Nc&#39; ) = Nc&#39; / ( Na&#39; + Nb&#39; - Nc&#39; )</span>
+ 525 <span class="c">#</span>
+ 526 <span class="c"># . Tversky&#39;: Nc&#39; / ( alpha * ( Na&#39; - Nc&#39; ) + ( 1 - alpha) * ( Nb&#39; - Nc&#39; ) + Nc&#39; ) = Nc&#39; / ( alpha * ( Na&#39; - Nb&#39; )  + Nb&#39;)</span>
+ 527 <span class="c">#</span>
+ 528 <span class="c"># Then:</span>
+ 529 <span class="c">#</span>
+ 530 <span class="c"># . WeightedTanimoto = beta * Tanimoto + (1 - beta) * Tanimoto&#39;</span>
+ 531 <span class="c">#</span>
+ 532 <span class="c"># . WeightedTversky = beta * Tversky + (1 - beta) * Tversky&#39;</span>
+ 533 <span class="c">#</span>
+ 534 <span class="c">#</span>
+ 535 
+ 536 <span class="c"># Calculate BaroniUrbani similarity coefficient for two same size bit vectors.</span>
+ 537 <span class="c">#</span>
+ 538 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 539 <span class="c">#</span>
+<a name="BaroniUrbaniSimilarityCoefficient-"></a> 540 <span class="k">sub </span><span class="m">BaroniUrbaniSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 541   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 542 
+ 543   <span class="k">return</span> <span class="i">BuserSimilarityCoefficient</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 544 <span class="s">}</span>
+ 545 
+ 546 <span class="c"># Calculate Buser similarity coefficient for two same size bit vectors.</span>
+ 547 <span class="c">#</span>
+ 548 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 549 <span class="c">#</span>
+<a name="BuserSimilarityCoefficient-"></a> 550 <span class="k">sub </span><span class="m">BuserSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 551   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 552   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 553 
+ 554   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 555   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 556   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 557 
+ 558   <span class="i">$Numerator</span> = <span class="k">sqrt</span><span class="s">(</span><span class="i">$Nc</span>*<span class="i">$Nd</span><span class="s">)</span> + <span class="i">$Nc</span><span class="sc">;</span>
+ 559   <span class="i">$Denominator</span> = <span class="k">sqrt</span><span class="s">(</span><span class="i">$Nc</span>*<span class="i">$Nd</span><span class="s">)</span> + <span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>  + <span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span> <span class="s">)</span> + <span class="i">$Nc</span><span class="sc">;</span>
+ 560 
+ 561   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 562 <span class="s">}</span>
+ 563 
+ 564 <span class="c"># Calculate Cosine similarity coefficient for two same size bit vectors.</span>
+ 565 <span class="c">#</span>
+ 566 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 567 <span class="c">#</span>
+<a name="CosineSimilarityCoefficient-"></a> 568 <span class="k">sub </span><span class="m">CosineSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 569   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 570   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 571 
+ 572   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 573 
+ 574   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 575   <span class="i">$Denominator</span> = <span class="k">sqrt</span><span class="s">(</span><span class="i">$Na</span>*<span class="i">$Nb</span><span class="s">)</span><span class="sc">;</span>
+ 576 
+ 577   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 578 <span class="s">}</span>
+ 579 
+ 580 <span class="c"># Calculate Dice similarity coefficient for two same size bit vectors.</span>
+ 581 <span class="c">#</span>
+ 582 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 583 <span class="c">#</span>
+<a name="DiceSimilarityCoefficient-"></a> 584 <span class="k">sub </span><span class="m">DiceSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 585   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 586   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 587 
+ 588   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 589 
+ 590   <span class="i">$Numerator</span> = <span class="n">2</span>*<span class="i">$Nc</span><span class="sc">;</span>
+ 591   <span class="i">$Denominator</span> = <span class="i">$Na</span> + <span class="i">$Nb</span><span class="sc">;</span>
+ 592 
+ 593   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 594 <span class="s">}</span>
+ 595 
+ 596 <span class="c"># Calculate Dennis similarity coefficient for two same size bit vectors.</span>
+ 597 <span class="c">#</span>
+ 598 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 599 <span class="c">#</span>
+<a name="DennisSimilarityCoefficient-"></a> 600 <span class="k">sub </span><span class="m">DennisSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 601   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 602   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 603 
+ 604   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 605   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 606   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 607 
+ 608   <span class="i">$Numerator</span> = <span class="i">$Nc</span>*<span class="i">$Nd</span> - <span class="s">(</span><span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 609   <span class="i">$Denominator</span> = <span class="k">sqrt</span><span class="s">(</span><span class="i">$Nt</span>*<span class="i">$Na</span>*<span class="i">$Nb</span><span class="s">)</span><span class="sc">;</span>
+ 610 
+ 611   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 612 <span class="s">}</span>
+ 613 
+ 614 <span class="c"># Calculate Forbes similarity coefficient for two same size bit vectors.</span>
+ 615 <span class="c">#</span>
+ 616 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 617 <span class="c">#</span>
+<a name="ForbesSimilarityCoefficient-"></a> 618 <span class="k">sub </span><span class="m">ForbesSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 619   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 620   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 621 
+ 622   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 623   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 624   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 625 
+ 626   <span class="i">$Numerator</span> = <span class="i">$Nt</span>*<span class="i">$Nc</span><span class="sc">;</span>
+ 627   <span class="i">$Denominator</span> = <span class="i">$Na</span>*<span class="i">$Nb</span><span class="sc">;</span>
+ 628 
+ 629   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 630 <span class="s">}</span>
+ 631 
+ 632 <span class="c"># Calculate Fossum similarity coefficient for two same size bit vectors.</span>
+ 633 <span class="c">#</span>
+ 634 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 635 <span class="c">#</span>
+<a name="FossumSimilarityCoefficient-"></a> 636 <span class="k">sub </span><span class="m">FossumSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 637   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 638   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 639 
+ 640   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 641   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 642   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 643 
+ 644   <span class="i">$Numerator</span> =  <span class="i">$Nt</span>*<span class="s">(</span><span class="s">(</span><span class="i">$Nc</span> - <span class="n">0.5</span><span class="s">)</span>** <span class="n">2</span><span class="s">)</span><span class="sc">;</span>
+ 645   <span class="i">$Denominator</span> =  <span class="i">$Na</span>*<span class="i">$Nb</span> <span class="sc">;</span>
+ 646 
+ 647   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 648 <span class="s">}</span>
+ 649 
+ 650 <span class="c"># Calculate Hamann similarity coefficient for two same size bit vectors.</span>
+ 651 <span class="c">#</span>
+ 652 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 653 <span class="c">#</span>
+<a name="HamannSimilarityCoefficient-"></a> 654 <span class="k">sub </span><span class="m">HamannSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 655   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 656   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 657 
+ 658   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 659   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 660   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 661 
+ 662   <span class="i">$Numerator</span> =  <span class="s">(</span><span class="i">$Nc</span> + <span class="i">$Nd</span> <span class="s">)</span> - <span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span> - <span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span> <span class="sc">;</span>
+ 663   <span class="i">$Denominator</span> = <span class="i">$Nt</span><span class="sc">;</span>
+ 664 
+ 665   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 666 <span class="s">}</span>
+ 667 
+ 668 <span class="c"># Calculate Jacard similarity coefficient for two same size bit vectors.</span>
+ 669 <span class="c">#</span>
+ 670 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 671 <span class="c">#</span>
+<a name="JacardSimilarityCoefficient-"></a> 672 <span class="k">sub </span><span class="m">JacardSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 673   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 674 
+ 675   <span class="k">return</span> <span class="i">TanimotoSimilarityCoefficient</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 676 <span class="s">}</span>
+ 677 
+ 678 <span class="c"># Calculate Kulczynski1 similarity coefficient for two same size bit vectors.</span>
+ 679 <span class="c">#</span>
+ 680 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 681 <span class="c">#</span>
+<a name="Kulczynski1SimilarityCoefficient-"></a> 682 <span class="k">sub </span><span class="m">Kulczynski1SimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 683   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 684   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 685 
+ 686   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 687 
+ 688   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 689   <span class="i">$Denominator</span> =  <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="n">2</span>*<span class="i">$Nc</span><span class="sc">;</span>
+ 690 
+ 691   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 692 <span class="s">}</span>
+ 693 
+ 694 <span class="c"># Calculate Kulczynski2 similarity coefficient for two same size bit vectors.</span>
+ 695 <span class="c">#</span>
+ 696 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 697 <span class="c">#</span>
+<a name="Kulczynski2SimilarityCoefficient-"></a> 698 <span class="k">sub </span><span class="m">Kulczynski2SimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 699   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 700   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 701 
+ 702   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 703 
+ 704   <span class="i">$Numerator</span> = <span class="n">0.5</span>*<span class="s">(</span><span class="i">$Na</span>*<span class="i">$Nc</span> + <span class="i">$Nb</span>*<span class="i">$Nc</span><span class="s">)</span><span class="sc">;</span>
+ 705   <span class="i">$Denominator</span> = <span class="i">$Na</span>*<span class="i">$Nb</span><span class="sc">;</span>
+ 706 
+ 707   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 708 <span class="s">}</span>
+ 709 
+ 710 <span class="c"># Calculate Matching similarity coefficient for two same size bit vectors.</span>
+ 711 <span class="c">#</span>
+ 712 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 713 <span class="c">#</span>
+<a name="MatchingSimilarityCoefficient-"></a> 714 <span class="k">sub </span><span class="m">MatchingSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 715   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 716   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 717 
+ 718   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 719   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 720   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 721 
+ 722   <span class="i">$Numerator</span> =  <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 723   <span class="i">$Denominator</span> = <span class="i">$Nt</span><span class="sc">;</span>
+ 724 
+ 725   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 726 <span class="s">}</span>
+ 727 
+ 728 <span class="c"># Calculate McConnaughey similarity coefficient for two same size bit vectors.</span>
+ 729 <span class="c">#</span>
+ 730 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 731 <span class="c">#</span>
+<a name="McConnaugheySimilarityCoefficient-"></a> 732 <span class="k">sub </span><span class="m">McConnaugheySimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 733   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 734   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 735 
+ 736   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 737 
+ 738   <span class="i">$Numerator</span> =  <span class="i">$Nc</span>**<span class="n">2</span> - <span class="s">(</span><span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 739   <span class="i">$Denominator</span> = <span class="i">$Na</span>*<span class="i">$Nb</span> <span class="sc">;</span>
+ 740 
+ 741   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 742 <span class="s">}</span>
+ 743 
+ 744 <span class="c"># Calculate Ochiai similarity coefficient for two same size bit vectors.</span>
+ 745 <span class="c">#</span>
+ 746 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 747 <span class="c">#</span>
+<a name="OchiaiSimilarityCoefficient-"></a> 748 <span class="k">sub </span><span class="m">OchiaiSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 749   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 750 
+ 751   <span class="k">return</span> <span class="i">CosineSimilarityCoefficient</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 752 <span class="s">}</span>
+ 753 
+ 754 <span class="c"># Calculate Pearson similarity coefficient for two same size bit vectors.</span>
+ 755 <span class="c">#</span>
+ 756 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 757 <span class="c">#</span>
+<a name="PearsonSimilarityCoefficient-"></a> 758 <span class="k">sub </span><span class="m">PearsonSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 759   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 760   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 761 
+ 762   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 763   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 764   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 765 
+ 766   <span class="i">$Numerator</span> = <span class="s">(</span><span class="i">$Nc</span>*<span class="i">$Nd</span> <span class="s">)</span> - <span class="s">(</span><span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 767   <span class="i">$Denominator</span> =  <span class="k">sqrt</span><span class="s">(</span><span class="i">$Na</span>*<span class="i">$Nb</span>*<span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span> <span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 768 
+ 769   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 770 <span class="s">}</span>
+ 771 
+ 772 <span class="c"># Calculate RogersTanimoto similarity coefficient for two same size bit vectors.</span>
+ 773 <span class="c">#</span>
+ 774 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 775 <span class="c">#</span>
+<a name="RogersTanimotoSimilarityCoefficient-"></a> 776 <span class="k">sub </span><span class="m">RogersTanimotoSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 777   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 778   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 779 
+ 780   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 781   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 782   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 783 
+ 784   <span class="i">$Numerator</span> = <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 785   <span class="i">$Denominator</span> =  <span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>  + <span class="s">(</span><span class="i">$Nb</span>  - <span class="i">$Nc</span><span class="s">)</span> + <span class="i">$Nt</span><span class="sc">;</span>
+ 786 
+ 787   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 788 <span class="s">}</span>
+ 789 
+ 790 <span class="c"># Calculate RussellRao similarity coefficient for two same size bit vectors.</span>
+ 791 <span class="c">#</span>
+ 792 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 793 <span class="c">#</span>
+<a name="RussellRaoSimilarityCoefficient-"></a> 794 <span class="k">sub </span><span class="m">RussellRaoSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 795   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 796   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 797 
+ 798   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 799   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 800   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 801 
+ 802   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 803   <span class="i">$Denominator</span> = <span class="i">$Nt</span><span class="sc">;</span>
+ 804 
+ 805   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 806 <span class="s">}</span>
+ 807 
+ 808 <span class="c"># Calculate Simpson similarity coefficient for two same size bit vectors.</span>
+ 809 <span class="c">#</span>
+ 810 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 811 <span class="c">#</span>
+<a name="SimpsonSimilarityCoefficient-"></a> 812 <span class="k">sub </span><span class="m">SimpsonSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 813   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 814   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 815 
+ 816   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 817 
+ 818   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 819   <span class="i">$Denominator</span> =  <span class="i">min</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="s">)</span><span class="sc">;</span>
+ 820 
+ 821   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 822 <span class="s">}</span>
+ 823 
+ 824 <span class="c"># Calculate SkoalSneath1 similarity coefficient for two same size bit vectors.</span>
+ 825 <span class="c">#</span>
+ 826 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 827 <span class="c">#</span>
+<a name="SkoalSneath1SimilarityCoefficient-"></a> 828 <span class="k">sub </span><span class="m">SkoalSneath1SimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 829   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 830   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 831 
+ 832   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 833 
+ 834   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 835   <span class="i">$Denominator</span> = <span class="i">$Nc</span> + <span class="n">2</span>*<span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>  + <span class="n">2</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="sc">;</span>
+ 836 
+ 837   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 838 <span class="s">}</span>
+ 839 
+ 840 <span class="c"># Calculate SkoalSneath2 similarity coefficient for two same size bit vectors.</span>
+ 841 <span class="c">#</span>
+ 842 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 843 <span class="c">#</span>
+<a name="SkoalSneath2SimilarityCoefficient-"></a> 844 <span class="k">sub </span><span class="m">SkoalSneath2SimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 845   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 846   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 847 
+ 848   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 849   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 850   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 851 
+ 852   <span class="i">$Numerator</span> = <span class="n">2</span>*<span class="i">$Nc</span> + <span class="n">2</span>*<span class="i">$Nd</span>  <span class="sc">;</span>
+ 853   <span class="i">$Denominator</span> = <span class="i">$Nc</span> + <span class="i">$Nd</span> + <span class="i">$Nt</span> <span class="sc">;</span>
+ 854 
+ 855   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 856 <span class="s">}</span>
+ 857 
+ 858 <span class="c"># Calculate SkoalSneath3 similarity coefficient for two same size bit vectors.</span>
+ 859 <span class="c">#</span>
+ 860 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 861 <span class="c">#</span>
+<a name="SkoalSneath3SimilarityCoefficient-"></a> 862 <span class="k">sub </span><span class="m">SkoalSneath3SimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 863   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 864   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 865 
+ 866   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 867   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 868   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 869 
+ 870   <span class="i">$Numerator</span> =  <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 871   <span class="i">$Denominator</span> = <span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span> + <span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span> <span class="s">)</span> <span class="sc">;</span>
+ 872 
+ 873   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 874 <span class="s">}</span>
+ 875 
+ 876 <span class="c"># Calculate Tanimoto similarity coefficient for two same size bit vectors.</span>
+ 877 <span class="c">#</span>
+ 878 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 879 <span class="c">#</span>
+<a name="TanimotoSimilarityCoefficient-"></a> 880 <span class="k">sub </span><span class="m">TanimotoSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 881   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 882   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 883 
+ 884   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 885 
+ 886   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 887   <span class="i">$Denominator</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span><span class="sc">;</span>
+ 888 
+ 889   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 890 <span class="s">}</span>
+ 891 
+ 892 <span class="c"># Calculate Tversky similarity coefficient for two same size bit vectors.</span>
+ 893 <span class="c">#</span>
+ 894 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 895 <span class="c">#</span>
+<a name="TverskySimilarityCoefficient-"></a> 896 <span class="k">sub </span><span class="m">TverskySimilarityCoefficient ($$$)</span> <span class="s">{</span>
+ 897   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="cm">,</span> <span class="i">$Alpha</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 898   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 899 
+ 900   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Alpha</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$Alpha</span> &gt;= <span class="n">0</span> &amp;&amp; <span class="i">$Alpha</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 901     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;TverskySimilarityCoefficient: Alpha parameters must be defined and its value must be &gt;=0 and &lt;=1 ...&quot;</span><span class="sc">;</span>
+ 902   <span class="s">}</span>
+ 903 
+ 904   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 905 
+ 906   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 907   <span class="i">$Denominator</span> =  <span class="i">$Alpha</span>*<span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nb</span> <span class="s">)</span>  + <span class="i">$Nb</span><span class="sc">;</span>
+ 908 
+ 909   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 910 <span class="s">}</span>
+ 911 
+ 912 <span class="c"># Calculate Yule similarity coefficient for two same size bit vectors.</span>
+ 913 <span class="c">#</span>
+ 914 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 915 <span class="c">#</span>
+<a name="YuleSimilarityCoefficient-"></a> 916 <span class="k">sub </span><span class="m">YuleSimilarityCoefficient ($$)</span> <span class="s">{</span>
+ 917   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 918   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="cm">,</span> <span class="i">$Nt</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="s">)</span><span class="sc">;</span>
+ 919 
+ 920   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 921   <span class="i">$Nd</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 922   <span class="i">$Nt</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span> + <span class="i">$Nd</span><span class="sc">;</span>
+ 923 
+ 924   <span class="i">$Numerator</span> = <span class="s">(</span><span class="i">$Nc</span>*<span class="i">$Nd</span><span class="s">)</span> - <span class="s">(</span><span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="s">)</span> <span class="sc">;</span>
+ 925   <span class="i">$Denominator</span> = <span class="s">(</span><span class="i">$Nc</span>*<span class="i">$Nd</span><span class="s">)</span> + <span class="s">(</span><span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nc</span><span class="s">)</span>*<span class="s">(</span><span class="i">$Nb</span> - <span class="i">$Nc</span><span class="s">)</span><span class="s">)</span>  <span class="sc">;</span>
+ 926 
+ 927   <span class="k">return</span>  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 928 <span class="s">}</span>
+ 929 
+ 930 <span class="c"># Calculate WeightedTanimoto similarity coefficient for two same size bit vectors.</span>
+ 931 <span class="c">#</span>
+ 932 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 933 <span class="c">#</span>
+<a name="WeightedTanimotoSimilarityCoefficient-"></a> 934 <span class="k">sub </span><span class="m">WeightedTanimotoSimilarityCoefficient ($$$)</span> <span class="s">{</span>
+ 935   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="cm">,</span> <span class="i">$Beta</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 936   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$TanimotoForSetBits</span><span class="cm">,</span> <span class="i">$TanimotoForClearBits</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="cm">,</span> <span class="i">$WeightedTanimoto</span><span class="s">)</span><span class="sc">;</span>
+ 937 
+ 938   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Beta</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$Beta</span> &gt;= <span class="n">0</span> &amp;&amp; <span class="i">$Beta</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 939     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;WeightedTanimotoSimilarityCoefficient: Beta parameters must be defined and its value must be &gt;=0 and &lt;=1 ...&quot;</span><span class="sc">;</span>
+ 940   <span class="s">}</span>
+ 941 
+ 942   <span class="c"># Get Tanimoto for set bits...</span>
+ 943   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 944 
+ 945   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 946   <span class="i">$Denominator</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span><span class="sc">;</span>
+ 947   <span class="i">$TanimotoForSetBits</span> = <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 948 
+ 949   <span class="c"># Get Tanimoto for clear bits...</span>
+ 950   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 951 
+ 952   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 953   <span class="i">$Denominator</span> = <span class="i">$Na</span> + <span class="i">$Nb</span> - <span class="i">$Nc</span><span class="sc">;</span>
+ 954   <span class="i">$TanimotoForClearBits</span> = <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 955 
+ 956   <span class="i">$WeightedTanimoto</span> = <span class="i">$Beta</span>*<span class="i">$TanimotoForSetBits</span> + <span class="s">(</span><span class="n">1</span> - <span class="i">$Beta</span><span class="s">)</span>*<span class="i">$TanimotoForClearBits</span><span class="sc">;</span>
+ 957 
+ 958   <span class="k">return</span>  <span class="i">$WeightedTanimoto</span><span class="sc">;</span>
+ 959 <span class="s">}</span>
+ 960 
+ 961 <span class="c"># Calculate WeightedTversky similarity coefficient for two same size bit vectors.</span>
+ 962 <span class="c">#</span>
+ 963 <span class="c"># This functionality can be either invoked as a class function or an object method.</span>
+ 964 <span class="c">#</span>
+<a name="WeightedTverskySimilarityCoefficient-"></a> 965 <span class="k">sub </span><span class="m">WeightedTverskySimilarityCoefficient ($$$)</span> <span class="s">{</span>
+ 966   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="cm">,</span> <span class="i">$Alpha</span><span class="cm">,</span> <span class="i">$Beta</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 967   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$TverskyForSetBits</span><span class="cm">,</span> <span class="i">$TverskyForClearBits</span><span class="cm">,</span> <span class="i">$Numerator</span><span class="cm">,</span> <span class="i">$Denominator</span><span class="cm">,</span> <span class="i">$WeightedTversky</span><span class="s">)</span><span class="sc">;</span>
+ 968 
+ 969   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Alpha</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$Alpha</span> &gt;= <span class="n">0</span> &amp;&amp; <span class="i">$Alpha</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 970     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;WeightedTverskySimilarityCoefficient: Alpha parameters must be defined and its value must be &gt;=0 and &lt;=1 ...&quot;</span><span class="sc">;</span>
+ 971   <span class="s">}</span>
+ 972   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Beta</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$Beta</span> &gt;= <span class="n">0</span> &amp;&amp; <span class="i">$Beta</span> &lt;= <span class="n">1</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 973     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;WeightedTverskySimilarityCoefficient: Beta parameters must be defined and its value must be &gt;=0 and &lt;=1 ...&quot;</span><span class="sc">;</span>
+ 974   <span class="s">}</span>
+ 975 
+ 976   <span class="c"># Get Tversky for set bits...</span>
+ 977   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonSetBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 978 
+ 979   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 980   <span class="i">$Denominator</span> =  <span class="i">$Alpha</span>*<span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nb</span> <span class="s">)</span>  + <span class="i">$Nb</span><span class="sc">;</span>
+ 981   <span class="i">$TverskyForSetBits</span> =  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 982 
+ 983   <span class="c"># Get Tversky for clear bits...</span>
+ 984   <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span> = <span class="i">_GetNumOfIndividualAndCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+ 985 
+ 986   <span class="i">$Numerator</span> = <span class="i">$Nc</span><span class="sc">;</span>
+ 987   <span class="i">$Denominator</span> =  <span class="i">$Alpha</span>*<span class="s">(</span><span class="i">$Na</span> - <span class="i">$Nb</span> <span class="s">)</span>  + <span class="i">$Nb</span><span class="sc">;</span>
+ 988   <span class="i">$TverskyForClearBits</span> =  <span class="i">$Denominator</span> ? <span class="s">(</span><span class="i">$Numerator</span>/<span class="i">$Denominator</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 989 
+ 990   <span class="i">$WeightedTversky</span> = <span class="i">$Beta</span>*<span class="i">$TverskyForSetBits</span> + <span class="s">(</span><span class="n">1</span> - <span class="i">$Beta</span><span class="s">)</span>*<span class="i">$TverskyForClearBits</span><span class="sc">;</span>
+ 991 
+ 992   <span class="k">return</span>  <span class="i">$WeightedTversky</span><span class="sc">;</span>
+ 993 <span class="s">}</span>
+ 994 
+ 995 <span class="c"># Get number of Na, Nb and Nc bits in bit vector A and B to be used for similarity coefficient calculations...</span>
+ 996 <span class="c">#</span>
+<a name="_GetNumOfIndividualAndCommonSetBits-"></a> 997 <span class="k">sub </span><span class="m">_GetNumOfIndividualAndCommonSetBits ($$)</span> <span class="s">{</span>
+ 998   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 999   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="s">)</span><span class="sc">;</span>
+1000 
+1001   <span class="c"># Number of bits set to &quot;1&quot; in A</span>
+1002   <span class="i">$Na</span> = <span class="i">$FingerprintsBitVectorA</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1003 
+1004   <span class="c"># Number of bits set to &quot;1&quot; in B</span>
+1005   <span class="i">$Nb</span> = <span class="i">$FingerprintsBitVectorB</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1006 
+1007   <span class="c"># Number of bits set to &quot;1&quot; in both A and B</span>
+1008   <span class="k">my</span><span class="s">(</span><span class="i">$NcBitVector</span><span class="s">)</span><span class="sc">;</span>
+1009   <span class="i">$NcBitVector</span> = <span class="i">$FingerprintsBitVectorA</span> &amp; <span class="i">$FingerprintsBitVectorB</span><span class="sc">;</span>
+1010   <span class="i">$Nc</span> = <span class="i">$NcBitVector</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1011 
+1012   <span class="k">return</span> <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span><span class="sc">;</span>
+1013 <span class="s">}</span>
+1014 
+1015 <span class="c"># Get number of Nd bits in bit vector A and B to be used for similarity coefficient calculations...</span>
+1016 <span class="c">#</span>
+<a name="_GetNumOfCommonClearBits-"></a>1017 <span class="k">sub </span><span class="m">_GetNumOfCommonClearBits ($$)</span> <span class="s">{</span>
+1018   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1019   <span class="k">my</span><span class="s">(</span><span class="i">$Nd</span><span class="cm">,</span> <span class="i">$NdBitVector</span><span class="s">)</span><span class="sc">;</span>
+1020 
+1021   <span class="c">#  Number of bits set to &quot;0&quot; in both A and B</span>
+1022   <span class="i">$NdBitVector</span> = ~<span class="i">$FingerprintsBitVectorA</span> &amp; ~<span class="i">$FingerprintsBitVectorB</span><span class="sc">;</span>
+1023   <span class="i">$Nd</span> = <span class="i">$NdBitVector</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1024 
+1025   <span class="c"># Correct for number of clear bits used for padding...</span>
+1026   <span class="k">if</span> <span class="s">(</span><span class="i">_IsNumOfClearBitsCorrectionRequired</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1027     <span class="i">$Nd</span> = <span class="i">$Nd</span> - <span class="i">_GetNumOfClearBitsCorrection</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="s">)</span><span class="sc">;</span>
+1028   <span class="s">}</span>
+1029   <span class="k">elsif</span> <span class="s">(</span><span class="i">_IsNumOfClearBitsCorrectionRequired</span><span class="s">(</span><span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1030     <span class="i">$Nd</span> = <span class="i">$Nd</span> - <span class="i">_GetNumOfClearBitsCorrection</span><span class="s">(</span><span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+1031   <span class="s">}</span>
+1032 
+1033   <span class="k">return</span> <span class="i">$Nd</span><span class="sc">;</span>
+1034 <span class="s">}</span>
+1035 
+1036 <span class="c"># Get number of Na, Nb and Nc bits in bit vector A and B to be used for similarity coefficient calculations...</span>
+1037 <span class="c">#</span>
+<a name="_GetNumOfIndividualAndCommonClearBits-"></a>1038 <span class="k">sub </span><span class="m">_GetNumOfIndividualAndCommonClearBits ($$)</span> <span class="s">{</span>
+1039   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1040   <span class="k">my</span><span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="cm">,</span> <span class="i">$Nd</span><span class="s">)</span><span class="sc">;</span>
+1041 
+1042   <span class="c"># Number of bits set to &quot;0&quot; in A</span>
+1043   <span class="i">$Na</span> = <span class="i">$FingerprintsBitVectorA</span><span class="i">-&gt;GetNumOfClearBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1044 
+1045   <span class="c"># Correct for number of clear bits used for padding...</span>
+1046   <span class="k">if</span> <span class="s">(</span><span class="i">_IsNumOfClearBitsCorrectionRequired</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1047     <span class="i">$Na</span> = <span class="i">$Na</span> - <span class="i">_GetNumOfClearBitsCorrection</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="s">)</span><span class="sc">;</span>
+1048   <span class="s">}</span>
+1049 
+1050   <span class="c"># Number of bits set to &quot;0&quot; in B</span>
+1051   <span class="i">$Nb</span> = <span class="i">$FingerprintsBitVectorB</span><span class="i">-&gt;GetNumOfClearBits</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1052 
+1053   <span class="c"># Correct for number of clear bits used for padding...</span>
+1054   <span class="k">if</span> <span class="s">(</span><span class="i">_IsNumOfClearBitsCorrectionRequired</span><span class="s">(</span><span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1055     <span class="i">$Nb</span> = <span class="i">$Nb</span> - <span class="i">_GetNumOfClearBitsCorrection</span><span class="s">(</span><span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+1056   <span class="s">}</span>
+1057 
+1058   <span class="c"># Number of bits set to &quot;0&quot; in both A and B</span>
+1059   <span class="i">$Nc</span> = <span class="i">_GetNumOfCommonClearBits</span><span class="s">(</span><span class="i">$FingerprintsBitVectorA</span><span class="cm">,</span> <span class="i">$FingerprintsBitVectorB</span><span class="s">)</span><span class="sc">;</span>
+1060 
+1061   <span class="k">return</span> <span class="s">(</span><span class="i">$Na</span><span class="cm">,</span> <span class="i">$Nb</span><span class="cm">,</span> <span class="i">$Nc</span><span class="s">)</span><span class="sc">;</span>
+1062 <span class="s">}</span>
+1063 
+1064 <span class="c"># Irrespective of specified size, Perl functions used to handle bit data data in</span>
+1065 <span class="c"># BitVector class automatically sets the size to the next nearest power of 2</span>
+1066 <span class="c"># and clear the extra bits.</span>
+1067 <span class="c">#</span>
+1068 <span class="c"># SpecifiedSize is used by this class to process any aribitray size during similarity</span>
+1069 <span class="c"># coefficient calculations.</span>
+1070 <span class="c">#</span>
+1071 <span class="c"># Assuming the FingerprintsBitBector class only manipulates bits upto specified</span>
+1072 <span class="c"># size, a correction for the extra bits added by BitVector class needs to be applied</span>
+1073 <span class="c"># to number of clear bits.</span>
+1074 <span class="c">#</span>
+<a name="_GetNumOfClearBitsCorrection-"></a>1075 <span class="k">sub </span><span class="m">_GetNumOfClearBitsCorrection</span> <span class="s">{</span>
+1076   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVector</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1077 
+1078   <span class="k">return</span> <span class="s">(</span><span class="i">$FingerprintsBitVector</span>-&gt;{<span class="w">Size</span>} - <span class="i">$FingerprintsBitVector</span>-&gt;{<span class="w">SpecifiedSize</span>}<span class="s">)</span><span class="sc">;</span>
+1079 <span class="s">}</span>
+1080 
+1081 <span class="c"># Is number of clear bits correction required?</span>
+1082 <span class="c">#</span>
+<a name="_IsNumOfClearBitsCorrectionRequired-"></a>1083 <span class="k">sub </span><span class="m">_IsNumOfClearBitsCorrectionRequired</span> <span class="s">{</span>
+1084   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsBitVector</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1085 
+1086   <span class="k">return</span> <span class="s">(</span><span class="i">$FingerprintsBitVector</span>-&gt;{<span class="w">Size</span>} &gt; <span class="i">$FingerprintsBitVector</span>-&gt;{<span class="w">SpecifiedSize</span>}<span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+1087 <span class="s">}</span>
+1088 
+1089 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

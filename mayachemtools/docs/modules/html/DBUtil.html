@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:DBUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ConversionsUtil.html" title="ConversionsUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FileIO.html" title="FileIO.html">Next</a></td><td width="34%" align="middle"><strong>DBUtil.pm</strong></td><td width="33%" align="right"><a href="././code/DBUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/DBUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/DBUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/DBUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/DBUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>DBUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use DBUtil;</p>
+<p>use DBUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>DBUtil</strong> module provides the following functions:</p>
+<p> <a href="#dbconnect">DBConnect</a>, <a href="#dbdisconnect">DBDisconnect</a>, <a href="#dbfetchschematablenames">DBFetchSchemaTableNames</a>, <a href="#dbsqltotextfile">DBSQLToTextFile</a>
+, <a href="#dbsetupdescribesql">DBSetupDescribeSQL</a>, <a href="#dbsetupselectsql">DBSetupSelectSQL</a>
+</p><p>DBUtil package uses Perl DBI for interacting with MySQL Oracle, and PostgreSQL
+databases.</p>
+<p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="dbconnect" class="item"><strong>DBConnect</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DBHandle = DBConnect($DBDriver, $DBName, $DBHost, $DBUser, $DBPassword);</div>
+<p>Connects to a database using specified parameters and returns a <strong>DBHandle</strong>.</p>
+</dd>
+<dt><strong><a name="dbdisconnect" class="item"><strong>DBDisconnect</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    DBDisconnect($DBHandle);</div>
+<p>Disconnects from a database specified by <em>DBHandle</em>.</p>
+</dd>
+<dt><strong><a name="dbfetchschematablenames" class="item"><strong>DBFetchSchemaTableNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @SchemaTableNames = DBFetchSchemaTableNames($DBDriver, $DBHandle,
+                       $SchemaName);</div>
+<p>Returns an array of all the table names in a database <em>SchemaName</em>.</p>
+</dd>
+<dt><strong><a name="dbsetupdescribesql" class="item"><strong>DBSetupDescribeSQL</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DescribeSQL = DBSetupDescribeSQL($DBDriver, $TableName, [$SchemaName]);</div>
+<p>Sets up and returns a SQL statement to describe a table for MySQ, Oracle or PostgreSQL.</p>
+</dd>
+<dt><strong><a name="dbsetupselectsql" class="item"><strong>DBSetupSelectSQL</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SelectSQL = DBSetupSelectSQL($DBDriver, $TableName, $SchemaName);</div>
+<p>Sets up and returns a SQL statement to retrieve all columns from a table for MySQL,
+Oracle, or PostgreSQL.</p>
+</dd>
+<dt><strong><a name="dbsqltotextfile" class="item"><strong>DBSQLToTextFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = DBSQLToTextFile($DBHandle, $SQL, \*TEXTFILE, $OutDelim,
+              $OutQuote, [$ExportDataLabels, $ExportLOBs,
+              $ReplaceNullStr]);</div>
+<p>Executes a <em>SQL</em> statement and export all data into a text file.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ConversionsUtil.html" title="ConversionsUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FileIO.html" title="FileIO.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>DBUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

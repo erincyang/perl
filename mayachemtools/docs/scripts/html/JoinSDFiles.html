@@ -1,0 +1,95 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:JoinSDFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoTextFiles.html" title="InfoTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./JoinTextFiles.html" title="JoinTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>JoinSDFiles.pl</strong></td><td width="33%" align="right"><a href="././code/JoinSDFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/JoinSDFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/JoinSDFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/JoinSDFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/JoinSDFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>JoinSDFiles.pl - Join multiple SDFiles into a single SDFile</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>JoinSDFiles.pl  SDFiles...</p>
+<p>JoinSDFiles.pl [<strong>-h, --help</strong>] [<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> rootname]
+[<strong>-w, --workingdir</strong> dirname] SDFiles...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Multiple <em>SDFiles</em> are joined to generate a single SDFile. The file names
+are separated by spaces. The valid file extensions are <em>.sdf</em> and <em>.sd</em>.
+All other file names are ignored. All the SD files in a current directory can be
+specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New SD file name is generated using the root: &lt;Root&gt;.sdf. Default file
+name:&lt;FirstSDFileName&gt;1To&lt;Count&gt;Joined.sdf.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To join SD files, type:</p>
+<div class="ExampleBox">
+    % JoinSDFiles.pl -o Sample1.sdf Sample2.sdf
+    <br/>% JoinSDFiles.pl -o *.sdf</div>
+<p>To join all Sample*.sdf files in a directory, SomeDir, and generate a new file NewSample.sdf, type:</p>
+<div class="ExampleBox">
+    % JoinSDFiles.pl -r NewSample -w SomeDir -o *.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./MolFilesToSD.html">MolFilesToSD.pl</a>,&nbsp<a href="./SDToMolFiles.html">SDToMolFiles.pl</a>,&nbsp<a href="./SplitSDFiles.html">SplitSDFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoTextFiles.html" title="InfoTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./JoinTextFiles.html" title="JoinTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>JoinSDFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

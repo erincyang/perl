@@ -1,0 +1,156 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:FileUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SDFileIO.html" title="SDFileIO.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./AtomNeighborhoodsFingerprints.html" title="AtomNeighborhoodsFingerprints.html">Next</a></td><td width="34%" align="middle"><strong>FileUtil.pm</strong></td><td width="33%" align="right"><a href="././code/FileUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/FileUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/FileUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/FileUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/FileUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>FileUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use FileUtil;</p>
+<p>use FileUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>FileUtil</strong> module provides the following functions:</p>
+<p> <a href="#checkfiletype">CheckFileType</a>, <a href="#convertcygwinpath">ConvertCygwinPath</a>, <a href="#expandfilenames">ExpandFileNames</a>, <a href="#filemodificationtimeanddate">FileModificationTimeAndDate</a>
+, <a href="#filesize">FileSize</a>, <a href="#formatfilesize">FormatFileSize</a>, <a href="#formattedfilemodificationtimeanddate">FormattedFileModificationTimeAndDate</a>
+, <a href="#getmayachemtoolslibdirname">GetMayaChemToolsLibDirName</a>, <a href="#getusagefrompod">GetUsageFromPod</a>, <a href="#parsefilename">ParseFileName</a>
+</p><p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="checkfiletype" class="item"><strong>CheckFileType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = CheckFileType($FileName, $FileExts);</div>
+<p>Based on <em>FileExts</em>, decides type of <em>FileName</em> and return 1 or 0.</p>
+</dd>
+<dt><strong><a name="convertcygwinpath" class="item"><strong>ConvertCygwinPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewPath = ConvertCygwinPath($Path);</div>
+<p>Check to see whether <em>Path</em> contains any Cygwin drive specification and convert
+it into Windows path.</p>
+</dd>
+<dt><strong><a name="expandfilenames" class="item"><strong>ExpandFileNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @FilesList = ExpandFileNames(\@Files, $FileExts);
+<br/>    @FilesList = ExpandFileNames(\@Files, $FileExts, $IncludeDirName);</div>
+<p>For each directory name or wild card file name in <em>Files</em>, generate all file names which
+correspond to the specification along with match to any extensions in <em>FileExts</em> and return an
+array <strong>FileList</strong> containing these file names and other names. <em>IncludeDirName</em> controls
+controls whether directory prefixes are included in expanded file names. Default is to always
+append directory name before expanded file name.</p>
+<p>Notes:</p>
+<div class="OptionsBox">
+    . Multiple file extensions are delimited by spaces.
+<br/>    . Wild card, *, is supported in directory and file names along with file
+      extensions.
+<br/>    . For a specified directory name in the files list, all the files in the
+      directory are retrieved using Perl opendir function and files filtered using file
+      extensions. The file names &quot;.&quot; and &quot;..&quot; returned by opendir are ignored.
+<br/>    . For file names containing wild cards with and without any explicit file
+      extension specification in the file name, all the files in the directory are retrieved
+      using Perl opendir function and files filtered using file name along with any
+      file extension. The file names &quot;.&quot; and &quot;..&quot; returned by opendir are ignored.</div>
+</dd>
+<dt><strong><a name="formattedfilemodificationtimeanddate" class="item"><strong>FormattedFileModificationTimeAndDate</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($TimeString, $DateString) =
+         FormattedFileModificationTimeAndDate($FileName);</div>
+<p>Returns a formatted time and date string corresponding to <em>FileName</em> modification time.</p>
+</dd>
+<dt><strong><a name="filemodificationtimeanddate" class="item"><strong>FileModificationTimeAndDate</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($Hours, $Mins, $Secs, $DayName, $MonthName, $Month, $Year) =
+         FileModificationTimeAndDate($FileName);</div>
+<p>Returns file modification time and date values for specified <em>FileName</em>.</p>
+</dd>
+<dt><strong><a name="formatfilesize" class="item"><strong>FormatFileSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FormattedSize= FormatFileSize($Size, [$Precision]);</div>
+<p>Formats the file size in bytes to human readable value and returns a formatted file
+size string.</p>
+</dd>
+<dt><strong><a name="filesize" class="item"><strong>FileSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size= FileSize($FileName);</div>
+<p>Returns size of <em>FileName</em> in bytes</p>
+</dd>
+<dt><strong><a name="getmayachemtoolslibdirname" class="item"><strong>GetMayaChemToolsLibDirName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MayaChemToolsLibDir = GetMayaChemToolsLibDirName();</div>
+<p>Returns MayaChemTools lib directory name by parsing <strong>INC</strong> values to extract
+<strong>MAYACHEMTOOLS/lib</strong> directory location: first entry in <strong>INC</strong> path should contain
+MayaChemTools lib location.</p>
+</dd>
+<dt><strong><a name="getusagefrompod" class="item"><strong>GetUsageFromPod</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ScriptUsage = GetUsageFromPod($AbsoluteScriptPath);</div>
+<p>Generates a <strong>ScriptUsage</strong> string from pod documentation in the script file using
+pod2text or perdoc.bat Perl utitities.</p>
+</dd>
+<dt><strong><a name="parsefilename" class="item"><strong>ParseFileName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($FileDir, $FileName, $FileExt) = ParseFileName($FullFileName);</div>
+<p>Splits <em>FullFileName</em> into directory name, file name, and extension. <strong>FileDir</strong> is
+set to current directory for absent directory name in <em>FullFileName</em>. And <em>FileExt</em>
+is set to NULL string for <em>FullFileName</em> without any extension.</p>
+<p>This function doesn't perform checking ragarding the presence of the directory <em>FileDir</em>
+and <em>FullFileName</em> and the <em>FullFileName</em> without any extension is assumed to be
+a file instead of a directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./TextUtil.html">TextUtil.pm</a>,&nbsp<a href="./TimeUtil.html">TimeUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SDFileIO.html" title="SDFileIO.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./AtomNeighborhoodsFingerprints.html" title="AtomNeighborhoodsFingerprints.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>FileUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ExtractFromSequenceFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromSDFiles.html" title="ExtractFromSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ExtractFromTextFiles.html" title="ExtractFromTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>ExtractFromSequenceFiles.pl</strong></td><td width="33%" align="right"><a href="././code/ExtractFromSequenceFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ExtractFromSequenceFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ExtractFromSequenceFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ExtractFromSequenceFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ExtractFromSequenceFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ExtractFromSequenceFiles.pl - Extract data from sequence and alignment files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>ExtractFromSequenceFiles.pl SequenceFile(s) AlignmentFile(s)...</p>
+<p>ExtractFromSequenceFiles.pl [<strong>-h, --help</strong>] [<strong>-i, --IgnoreGaps</strong> yes | no]
+[<strong>-m, --mode</strong> SequenceID | SequenceNum | SequenceNumRange] [<strong>-o, --overwrite</strong>]
+[<strong>-r, --root</strong> rootname] [<strong>-s, --Sequences</strong> &quot;SequenceID, [SequenceID,...]&quot; | &quot;SequenceNum, [SequenceNum,...]&quot; |
+&quot;StartingSeqNum, EndingSeqNum&quot;] [<strong>--SequenceIDMatch</strong> Exact | Relaxed]
+[<strong>-w, --WorkingDir</strong> dirname] SequenceFile(s) AlignmentFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Extract specific data from <em>SequenceFile(s) and AlignmentFile(s)</em> and generate
+FASTA files. You can extract sequences using sequence IDs or sequence numbers.</p>
+<p>The file names are separated by spaces. All the sequence files in a current directory can
+be specified by <em>*.aln</em>, <em>*.msf</em>, <em>*.fasta</em>, <em>*.fta</em>, <em>*.pir</em> or any other supported
+formats; additionally, <em>DirName</em> corresponds to all the sequence files in the current directory
+with any of the supported file extension: <em>.aln, .msf, .fasta, .fta, and .pir</em>.</p>
+<p>Supported sequence formats are: <em>ALN/CLustalW</em>, <em>GCG/MSF</em>, <em>PILEUP/MSF</em>, <em>Pearson/FASTA</em>,
+and <em>NBRF/PIR</em>. Instead of using file extensions, file formats are detected by parsing the contents
+of <em>SequenceFile(s) and AlignmentFile(s)</em>.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-i, --IgnoreGaps</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Ignore gaps or gap columns during during generation of new sequence or alignment file(s).
+Possible values: <em>yes or no</em>. Default value: <em>yes</em>.</p>
+<p>In order to remove gap columns, length of all the sequence must be same; otherwise,
+this option is ignored.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>SequenceID | SequenceNum | SequenceNumRange</em></strong></dt>
+<dd>
+<p>Specify how to extract data from sequence files: extract sequences using sequence
+IDs or sequence numbers. Possible values: <em>SequenceID | SequenceNum
+| SequenceNumRange</em>. Default: <em>SequenceNum</em> with value of 1.</p>
+<p>The sequence numbers correspond to position of sequences starting from 1 for first sequence
+in <em>SequenceFile(s) and AlignmentFile(s)</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New sequence file name is generated using the root: &lt;Root&gt;&lt;Mode&gt;.&lt;Ext&gt;. Default new file:
+&lt;SequenceFileName&gt;&lt;Mode&gt;.&lt;Ext&gt;. This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-s, --Sequences</strong> <em>&quot;SequenceID,[SequenceID,...]&quot; | &quot;SequenceNum,[SequenceNum,...]&quot; | &quot;StartingSeqNum,EndingSeqNum&quot;</em></strong></dt>
+<dd>
+<p>This value is <strong>-m, --mode</strong> specific. In general, it's a comma delimites list of sequence IDs or sequence
+numbers.</p>
+<p>For <em>SequenceID</em> value of <strong>-m, --mode</strong> option, input value format is: <em>SequenceID,...</em>. Examples:</p>
+<div class="OptionsBox">
+    ACHE_BOVIN
+<br/>    ACHE_BOVIN,ACHE_HUMAN</div>
+<p>For <em>SequenceNum</em> value of <strong>-m, --mode</strong> option, input value format is: <em>SequenceNum,...</em>. Examples:</p>
+<div class="OptionsBox">
+    2
+<br/>    1,5</div>
+<p>For <em>SequenceNum</em> value of <strong>-m, --mode</strong> option, input value format is: <em>StaringSeqNum,EndingSeqNum</em>. Examples:</p>
+<div class="OptionsBox">
+    2,4</div>
+</dd>
+<dt><strong><strong>--SequenceIDMatch</strong> <em>Exact | Relaxed</em></strong></dt>
+<dd>
+<p>Sequence IDs matching criterion during <em>SequenceID</em> value of <strong>-m, --mode</strong> option: match
+specified sequence ID exactly or as sub string against sequence IDs in the files. Possible
+values: <em>Exact | Relaxed</em>. Default: <em>Relaxed</em>. Sequence ID match is case insenstitive
+during both options.</p>
+</dd>
+<dt><strong><strong>--SequenceLength</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum sequence length per line in sequence file(s). Default: <em>80</em>.</p>
+</dd>
+<dt><strong><strong>-w --WorkingDir</strong> <em>text</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To extract first sequence from Sample1.fasta sequence file and generate Sample1SequenceNum.fasta
+sequence file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl -o Sample1.fasta</div>
+<p>To extract first sequence from Sample1.aln alignment file and generate Sample1SequenceNum.fasta
+sequence file without any column gaps, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl -o Sample1.aln</div>
+<p>To extract first sequence from Sample1.aln alignment file and generate Sample1SequenceNum.fasta
+sequence file with column gaps, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl --IgnroreGaps No -o Sample1.aln</div>
+<p>To extract sequence number 1 and 4 from Sample1.fasta sequence file and generate
+Sample1SequenceNum.fasta sequence file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl -o -m SequenceNum --Sequences 1,4
+      -o Sample1.fasta</div>
+<p>To extract sequences from sequence  number 1 to 4 from Sample1.fasta sequence file and generate
+Sample1SequenceNumRange.fasta sequence file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl -o -m SequenceNumRange --Sequences
+      1,4 -o Sample1.fasta</div>
+<p>To extract sequence ID &quot;Q9P993/104-387&quot; from sequence  from Sample1.fasta sequence file and generate
+Sample1SequenceID.fasta sequence file, type:</p>
+<div class="ExampleBox">
+    % ExtractFromSequenceFiles.pl -o -m SequenceID --Sequences
+      &quot;Q9P993/104-387&quot; --SequenceIDMatch Exact -o Sample1.fasta</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AnalyzeSequenceFilesData.html">AnalyzeSequenceFilesData.pl</a>,&nbsp<a href="./InfoSequenceFiles.html">InfoSequenceFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromSDFiles.html" title="ExtractFromSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ExtractFromTextFiles.html" title="ExtractFromTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ExtractFromSequenceFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

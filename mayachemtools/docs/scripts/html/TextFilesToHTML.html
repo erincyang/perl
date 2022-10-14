@@ -1,0 +1,280 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:TextFilesToHTML.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SplitTextFiles.html" title="SplitTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextFilesToSDFiles.html" title="TextFilesToSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>TextFilesToHTML.pl</strong></td><td width="33%" align="right"><a href="././code/TextFilesToHTML.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/TextFilesToHTML.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/TextFilesToHTML.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/TextFilesToHTML.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/TextFilesToHTML.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>TextFilesToHTML.pl - Generate HTML table file(s) from TextFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>TextFilesToHTML.pl ... TextFile(s)...</p>
+<p>TextFilesToHTML.pl [<strong>-a, --align</strong> left | center | right,[top | middle | bottom]] [<strong>-b, --border</strong> borderwidth] [<strong>--cellpadding</strong> padding]
+[<strong>--cellspacing</strong> spacing] [<strong>--footer</strong> string] [<strong>-d, --displaylinks</strong> top | bottom | both]
+[<strong>--displaylinksinfo</strong> line | table | both] [<strong>-h, --help</strong>]
+[<strong>--headeralign</strong> left | center | right,[top | middle | bottom]] [<strong>--headercolor</strong> &quot;#RRGGBB&quot;]
+[<strong>--highlight</strong> &quot;fieldlabel,datatype,criterion,value,[fieldlabel,datatype,criterion,value,]...&quot;]
+[<strong>--highlightby</strong> colnum | collabel] [<strong>--highlightcolor</strong> &quot;#RRGGBB,#RRGGBB&quot;]
+[<strong>--highlightstyle</strong> text | background] [<strong>--indelim</strong> comma | semicolon] [<strong>-m, --mode</strong> plain | shade | highlight | shadedhighlight]
+[<strong>-n, --numrows</strong> number] [<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> rootname]
+[<strong>--stylesheet</strong> old | new | none] [<strong>--stylesheetname</strong> filename] [<strong> --shadecolor</strong> &quot;#RRGGBB,#RRGGBB&quot;]
+[<strong>-t, --title</strong> string] [<strong>--titledisplay</strong> yes | no] [<strong>-w, --workingdir</strong> dirname] TextFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Generate HTML file(s) from <em>TextFile(s)</em>. The HTML file(s) contain data tables and appropriate
+navigational links to view other tables. These files can be generated for local viewing or
+deployment on a web server. A variety of options are provided to control style and
+appearence of tables.</p>
+<p>Multiple <em>TextFile(s)</em> names are separated by spaces. The valid file extensions are <em>.csv</em> and
+<em>.tsv</em> for comma/semicolon and tab delimited text files respectively. All other file names
+are ignored. All the text files in a current directory can be specified by <em>*.csv</em>,
+<em>*.tsv</em>, or the current directory name. The <strong>--indelim</strong> option determines the
+format of <em>TextFile(s)</em>. Any file which doesn't correspond to the format indicated
+by <strong>--indelim</strong> option is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --align</strong> <em>left | center | right,[top | middle | bottom]</em></strong></dt>
+<dd>
+<p>Horizontal and vertical alignment for table rows except for header row which is specified
+using <strong>--headeralign</strong> option. Possible horizontal alignment values: <em>left, center, or right</em>.
+Possible vertical alignment values: <em>top, middle, or bottom</em>.</p>
+<p>Default values: <em>left,middle</em></p>
+</dd>
+<dt><strong><strong>-b, --border</strong> <em>borderwidth</em></strong></dt>
+<dd>
+<p>Table border width. Default value: 1 for <em>plain</em> and <em>highlight</em> mode; 0 for <em>shade</em>
+and <em>shadedhightlight</em> mode. Zero indicates no border.</p>
+</dd>
+<dt><strong><strong>--cellpadding</strong> <em>padding</em></strong></dt>
+<dd>
+<p>Table cell padding. Default value: <em>2</em>.</p>
+</dd>
+<dt><strong><strong>--cellspacing</strong> <em>spacing</em></strong></dt>
+<dd>
+<p>Table cell spacing. Default value: <em>1</em>.</p>
+</dd>
+<dt><strong><strong>--footer</strong> <em>string</em></strong></dt>
+<dd>
+<p>Text string to be included at bottom of each HTML file. Default: none.</p>
+</dd>
+<dt><strong><strong>-d, --displaylinks</strong> <em>top | bottom | both</em></strong></dt>
+<dd>
+<p>Specify where to display navigation links in each HTML file for accessing all other HTML
+files. Possible values: <em>top, bottom, or both</em>. Default value: <em>both</em>. This option is
+only valid during multiple HTML files generation for an input file.</p>
+</dd>
+<dt><strong><strong>--displaylinksinfo</strong> <em>line | table | both</em></strong></dt>
+<dd>
+<p>Control display of additional information along with navigational links: Showing line
+n of m is displyed for line and showing table n of m for table. Possible values: <em>line
+| table | both</em>. Default: <em>both</em>. This option is only valid  during multiple HTML files generation.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message</p>
+</dd>
+<dt><strong><strong>--headeralign</strong> <em>left | center | right,[top | middle | bottom]</em></strong></dt>
+<dd>
+<p>Horizontal and vertical alignment for table header rows. Possible horizontal alignment
+values: <em>left, center, or right</em>. Possible vertical alignment values: <em>top, middle, or bottom</em>.</p>
+<p>Default values: <em>center,middle</em></p>
+</dd>
+<dt><strong><strong>--headercolor</strong> <em>&quot;#RRGGBB&quot;</em></strong></dt>
+<dd>
+<p>Color used to fill background of table header row containing column labels
+represented as a hexadecimal string. None for <strong>-m, --mode</strong> option value
+of <em>plain</em> and <em>#ccccff</em>, light blue, for others.</p>
+</dd>
+<dt><strong><strong>--highlight</strong> <em>&quot;fieldlabel,datatype,criterion,value,[fieldlabel,datatype,criterion,value,]...&quot;</em></strong></dt>
+<dd>
+<p>This value is mode specific. It specifies how to highlight various column values
+for each text file. Same set of quartets values are applied to all <em>TextFile(s)</em>.</p>
+<p>For <em>highlightbycolnum</em> mode, input text format contains these quartets:
+<em>colnum,datatype,criterion,value,...</em>. Possible datatype values: <em>numeric or text</em>.
+Possible criterion values: <em>le, ge, or eq</em>. Examples: &quot;1,numeric,le,450&gt;&quot; or
+&quot;2,numeric,ge,150,6,numeric,le,10&quot;.</p>
+<p>For <em>highlightbycollabel</em> mode, input text format contains these quartets:
+<em>collabel,datatype,criterion,value,...</em>.</p>
+</dd>
+<dt><strong><strong>--highlightby</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>This value is mode specific. It indicates how columns to be highlighted are specified
+using <strong>--hightlight</strong> option. Possible values: <em>colnum or collabel</em>. Default value: <em>colnum</em>.</p>
+</dd>
+<dt><strong><strong>--highlightcolor</strong> <em>&quot;#RRGGBB,#RRGGBB&quot;</em></strong></dt>
+<dd>
+<p>Colors used to highlight column values during <em>highlight</em> and <em>shadedhightlight</em>
+mode represented as hexadecimal strings.</p>
+<p>For <strong>--highlighstyle</strong> option values of <em>text</em> and <em>background</em>, these colors represent
+text or background colors respectively. For a specific column, first color string is used for
+values which meet criterion indicated by <strong>--highlight</strong> option; the second color is used
+for rest of the values.</p>
+<p>Default values for <em>background</em> <strong>--highlightstyle</strong>: <em>#0fff0f,#ff0f0f</em>. And default values for
+<em>text</em> <strong>--highlightstyle</strong>: <em>#0fbb0f,#ff0f0f</em>. Hexadecimal strings for both <strong>--highlightstyle</strong>
+colors correspond to <em>reddish</em> and <em>greenish</em>.</p>
+</dd>
+<dt><strong><strong>--highlightstyle</strong> <em>text | background</em></strong></dt>
+<dd>
+<p>This value is mode specific. It indicates highlight style used to differentiate column
+values which pass a specified criterion from others. Possible values: <em>text or
+background</em>. Default: <em>background</em>.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>plain | shade | highlight | shadedhighlight</em></strong></dt>
+<dd>
+<p>Specify how to generate HTML table(s): plain tables with line borders, background of
+alternate rows filled with a specified color, column values hightlighted using a specified
+criteria, or combination of previous two styles.</p>
+<p>Possible values: <em>plain, shade, highlight, or shadedhighlight</em>. Default: <em>shade</em>.</p>
+</dd>
+<dt><strong><strong>-n, --numrows</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum number of rows per table. Default value: <em>100</em>. Use 0 to put all rows into
+one table. For <em>TextFile(s)</em> with more than maximum number of specified rows,
+multiple HTML tables, with appropriate navigation links, are created.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New file or directory name is generated using the root: &lt;root&gt;.html or &lt;root&gt;-html.
+Default new file name: &lt;InitialTextFileName&gt;.html. Default directory name:
+&lt;InitialTextFileName&gt;-html.</p>
+<p>For <em>TextFile(s)</em> with more than maximum number of rows specified per table,
+this directory tree is generated using &lt;Name&gt; where &lt;Name&gt; corresponds to &lt;root&gt;
+or &lt;InitialTextFileName&gt;:Top dir - &lt;Name&gt;-html; Sub dirs - html and mols. &lt;Top dir&gt; contains
+&lt;Name&gt;.html and &lt;Name&gt;.css files and &lt;sub dir&gt; html conatins various
+&lt;Name&gt;Lines&lt;Start&gt;To&lt;End&gt;.html files; &lt;sub dir&gt; mols is created as needed and contains</p>
+<p>This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>--stylesheet</strong> <em>old | new | none</em></strong></dt>
+<dd>
+<p>Controls usage of stylesheet for newly generated HTML file(s). Possible values: <em>old,
+new, or none</em>. Default value: <em>new</em>.</p>
+<p>Stylesheet file contains various properties which control apperance of HTML pages:
+type, size, and color of fonts; background color; and so on.</p>
+<p>For <em>old</em> value, an existing stylesheet file specified by <strong>--stylesheetname</strong> option is
+used for each HTML file; no new stylesheet file is created. This option is quite handy
+for deploying HTML file(s) on a web server: assuming you specify a valid stylesheet
+file location relative to your WWWRoot, a reference to this stylesheet is added to each
+HTML file. For local deployment of HTML file(s), a complete path to a local stylesheet
+is fine as well.</p>
+<p>For <em>create</em> value, a new stylesheet is created and reference to this local stylesheet
+is added to each HTML file. Use option <strong>--stylesheetname</strong> to specify name.</p>
+<p>For <em>none</em> value, stylesheet usage is completely ignored.</p>
+</dd>
+<dt><strong><strong>--stylesheetname</strong> <em>filename</em></strong></dt>
+<dd>
+<p>Stylesheet file name to be used in conjunction with <strong>-s --stylesheet</strong> option. It is only
+valid for <em>old</em> value of <strong>-s --stylesheet</strong> option. Specify a valid stylesheet file location
+relative to your WWWRoot and a reference to this stylesheet is added to each HTML
+file. Example: &quot;/stylesheets/MyStyleSheet.css&quot;. Or a complete path name to a local
+stylesheet file.</p>
+<p>For <em>create</em> value of <strong>-s --stylesheet</strong> option, a new stylesheet file is created using
+<strong>-r --root</strong> option. And value of <strong>--stylesheetname</strong> is simply ignored.</p>
+</dd>
+<dt><strong><strong> --shadecolor</strong> <em>&quot;#RRGGBB,#RRGGBB&quot;</em></strong></dt>
+<dd>
+<p>Colors used to fill background of rows during <em>shade</em> and <em>shadedhightlight</em> mode
+represented as a pair of hexadecimal string; the first and second color values
+are used for odd and even number rows respectively.</p>
+<p>Default value: <em>&quot;#ffffff,#e0e9eb&quot;</em> - it's white and very light blue for odd and even number rows.</p>
+</dd>
+<dt><strong><strong>-t, --title</strong> <em>string</em></strong></dt>
+<dd>
+<p>Title for HTML table(s). Default value: &lt;TextFileName&gt;. For multiple input files,
+<strong>-r --root</strong> option is used to generate appropriate titles.</p>
+</dd>
+<dt><strong><strong>--titledisplay</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Display title for HTML table(s). Possible values: <em>yes or no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To generate HTML tables with rows background filled with white and greyish colors and
+navigation links on top and botton of each page, type:</p>
+<div class="ExampleBox">
+    % TextFilesToHTML.pl -o Sample1.csv</div>
+<p>To generate HTML tables with rows background filled with golden and greyish colors,
+navigation links on top and botton of each page, 10 rows in each table, greyish header
+row color, and cell spacing of 1, type:</p>
+<div class="ExampleBox">
+    % TextFilesToHTML.pl -o -n 10 --headeralign &quot;center&quot; --headercolor
+      &quot;#a1a1a1&quot; --shadecolor &quot;#ddd700,#d1d1d1&quot; --cellspacing 1
+      Sample1.csv</div>
+<p>To generate plain HTML tables with 10 rows in each table and navigation links only at
+the bottom, type:</p>
+<div class="ExampleBox">
+    % TextFilesToHTML.pl -o -n 10 --displaylinks bottom -m plain
+      Sample1.csv</div>
+<p>To highlight values in column 3 using specified highlight criteria and fill in default background
+colors, type:</p>
+<div class="ExampleBox">
+    % TextFilesToHTML.pl -n 10 --highlight &quot;3,numeric,le,450&quot;
+      --highlightby colnum --highlightstyle background -m
+      shadedhighlight -o Sample1.csv</div>
+<p>To highlight values in column MolWeight using specified highlight criteria, color the text using
+default colors, and add a footer message in every page, type:</p>
+<div class="ExampleBox">
+    % TextFilesToHTML.pl -n 4 --highlight &quot;MolWeight,numeric,le,500&quot;
+      --highlightby collabel --highlightstyle text -m shadedhighlight -o
+      --footer &quot;Copyright (C) MayaChemTools&quot; --cellspacing 1 Sample1.csv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>,&nbsp<a href="./SplitTextFiles.html">SplitTextFiles.pl</a>,&nbsp<a href="./SortTextFiles.html">SortTextFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SplitTextFiles.html" title="SplitTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextFilesToSDFiles.html" title="TextFilesToSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>TextFilesToHTML.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

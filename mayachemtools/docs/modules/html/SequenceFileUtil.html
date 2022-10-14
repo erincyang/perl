@@ -1,0 +1,237 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:SequenceFileUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SDFileUtil.html" title="SDFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./StatisticsUtil.html" title="StatisticsUtil.html">Next</a></td><td width="34%" align="middle"><strong>SequenceFileUtil.pm</strong></td><td width="33%" align="right"><a href="././code/SequenceFileUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SequenceFileUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SequenceFileUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SequenceFileUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SequenceFileUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SequenceFileUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use SequenceFileUtil ;</p>
+<p>use SequenceFileUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>SequenceFileUtil</strong> module provides the following functions:</p>
+<p> <a href="#aresequencelengthsidentical">AreSequenceLengthsIdentical</a>, <a href="#calcuatepercentsequenceidentity">CalcuatePercentSequenceIdentity</a>
+, <a href="#calculatepercentsequenceidentitymatrix">CalculatePercentSequenceIdentityMatrix</a>, <a href="#getlongestsequence">GetLongestSequence</a>, <a href="#getsequencelength">GetSequenceLength</a>
+, <a href="#getshortestsequence">GetShortestSequence</a>, <a href="#isclustalwsequencefile">IsClustalWSequenceFile</a>, <a href="#isgapresidue">IsGapResidue</a>, <a href="#ismsfsequencefile">IsMSFSequenceFile</a>
+, <a href="#ispirfastasequencefile">IsPIRFastaSequenceFile</a>, <a href="#ispearsonfastasequencefile">IsPearsonFastaSequenceFile</a>, <a href="#issupportedsequencefile">IsSupportedSequenceFile</a>
+, <a href="#readclustalwsequencefile">ReadClustalWSequenceFile</a>, <a href="#readmsfsequencefile">ReadMSFSequenceFile</a>, <a href="#readpirfastasequencefile">ReadPIRFastaSequenceFile</a>
+, <a href="#readpearsonfastasequencefile">ReadPearsonFastaSequenceFile</a>, <a href="#readsequencefile">ReadSequenceFile</a>, <a href="#removesequencealignmentgapcolumns">RemoveSequenceAlignmentGapColumns</a>
+, <a href="#removesequencegaps">RemoveSequenceGaps</a>, <a href="#writepearsonfastasequencefile">WritePearsonFastaSequenceFile</a>
+, <a href="#sequencefileutil module provides various methods to process sequence">SequenceFileUtil module provides various methods to process sequence</a>
+, <a href="#files and retreive appropriate information.">files and retreive appropriate information.</a>
+</p><p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="aresequencelengthsidentical" class="item"><strong>AreSequenceLengthsIdentical</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = AreSequenceLengthsIdentical($SequencesDataRef);</div>
+<p>Checks the lengths of all the sequences available in <em>SequencesDataRef</em> and returns 1
+or 0 based whether lengths of all the sequence is same.</p>
+</dd>
+<dt><strong><a name="calcuatepercentsequenceidentity" class="item"><strong>CalcuatePercentSequenceIdentity</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PercentIdentity =
+       AreSequenceLengthsIdenticalAreSequenceLengthsIdentical(
+          $Sequence1, $Sequence2, [$IgnoreGaps, $Precision]);</div>
+<p>Returns percent identity between <em>Sequence1</em> and <em>Sequence2</em>. Optional arguments
+<em>IgnoreGaps</em> and <em>Precision</em> control handling of gaps in sequences and precision of the
+returned value. By default, gaps are ignored and precision is set up to 1 decimal.</p>
+</dd>
+<dt><strong><a name="calculatepercentsequenceidentitymatrix" class="item"><strong>CalculatePercentSequenceIdentityMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $IdentityMatrixDataRef = CalculatePercentSequenceIdentityMatrix(
+                             $SequencesDataRef, [$IgnoreGaps,
+                             $Precision]);</div>
+<p>Calculate pairwise percent identity between all the sequences available in <em>SequencesDataRef</em>
+and returns a reference to identity matrix hash. Optional arguments <em>IgnoreGaps</em> and
+<em>Precision</em> control handling of gaps in sequences and precision of the returned value. By default, gaps
+are ignored and precision is set up to 1 decimal.</p>
+</dd>
+<dt><strong><a name="getsequencelength" class="item"><strong>GetSequenceLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SeqquenceLength = GetSequenceLength($Sequence, [$IgnoreGaps]);</div>
+<p>Returns length of the specified sequence. Optional argument <em>IgnoreGaps</em> controls handling
+of gaps. By default, gaps are ignored.</p>
+</dd>
+<dt><strong><a name="getshortestsequence" class="item"><strong>GetShortestSequence</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+   ($ID, $Sequence, $SeqLen, $Description) = GetShortestSequence(
+&nbsp;&nbsp;&nbsp;       $SequencesDataRef, [$IgnoreGaps]);</div>
+<p>Checks the lengths of all the sequences available in $SequencesDataRef and returns $ID,
+$Sequence, $SeqLen, and $Description values for the shortest sequence. Optional arguments $IgnoreGaps
+controls handling of gaps in sequences. By default, gaps are ignored.</p>
+</dd>
+<dt><strong><a name="getlongestsequence" class="item"><strong>GetLongestSequence</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+   ($ID, $Sequence, $SeqLen, $Description) = GetLongestSequence(
+&nbsp;&nbsp;&nbsp;       $SequencesDataRef, [$IgnoreGaps]);</div>
+<p>Checks the lengths of all the sequences available in <em>SequencesDataRef</em> and returns <strong>ID</strong>,
+<strong>Sequence</strong>, <strong>SeqLen</strong>, and <strong>Description</strong> values for the longest sequence. Optional argument
+$<em>IgnoreGaps</em> controls handling of gaps in sequences. By default, gaps are ignored.</p>
+</dd>
+<dt><strong><a name="isgapresidue" class="item"><strong>IsGapResidue</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = AreSequenceLengthsIdentical($Residue);</div>
+<p>Returns 1 or 0 based on whether <em>Residue</em> corresponds to a gap. Any character other than A to Z is
+considered a gap residue.</p>
+</dd>
+<dt><strong><a name="issupportedsequencefile" class="item"><strong>IsSupportedSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsSupportedSequenceFile($SequenceFile);</div>
+<p>Returns 1 or 0 based on whether <em>SequenceFile</em> corresponds to a supported sequence
+format.</p>
+</dd>
+<dt><strong><a name="isclustalwsequencefile" class="item"><strong>IsClustalWSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsClustalWSequenceFile($SequenceFile);</div>
+<p>Returns 1 or 0 based on whether <em>SequenceFile</em> corresponds to Clustal sequence alignment
+format.</p>
+</dd>
+<dt><strong><a name="ispearsonfastasequencefile" class="item"><strong>IsPearsonFastaSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsPearsonFastaSequenceFile($SequenceFile);</div>
+<p>Returns 1 or 0 based on whether <em>SequenceFile</em> corresponds to Pearson FASTA sequence
+format.</p>
+</dd>
+<dt><strong><a name="ispirfastasequencefile" class="item"><strong>IsPIRFastaSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsPIRFastaSequenceFile($SequenceFile);</div>
+<p>Returns 1 or 0 based on whether <em>SequenceFile</em> corresponds to PIR FASTA sequence
+format.</p>
+</dd>
+<dt><strong><a name="ismsfsequencefile" class="item"><strong>IsMSFSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsClustalWSequenceFile($SequenceFile);</div>
+<p>Returns 1 or 0 based on whether <em>SequenceFile</em> corresponds to MSF sequence alignment
+format.</p>
+</dd>
+<dt><strong><a name="readsequencefile" class="item"><strong>ReadSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SequenceDataMapRef = ReadSequenceFile($SequenceFile);</div>
+<p>Reads <em>SequenceFile</em> and returns reference to a hash containing following key/value
+pairs:</p>
+<div class="OptionsBox">
+    $SequenceDataMapRef-&gt;{IDs} - Array of sequence IDs
+<br/>    $SequenceDataMapRef-&gt;{Count} - Number of sequences
+<br/>    $SequenceDataMapRef-&gt;{Description}{$ID} - Sequence description
+<br/>    $SequenceDataMapRef-&gt;{Sequence}{$ID} - Sequence for a specific ID
+<br/>    $SequenceDataMapRef-&gt;{Sequence}{InputFileType} - File format</div>
+</dd>
+<dt><strong><a name="readclustalwsequencefile" class="item"><strong>ReadClustalWSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SequenceDataMapRef = ReadClustalWSequenceFile($SequenceFile);</div>
+<p>Reads ClustalW <em>SequenceFile</em> and returns reference to a hash containing following key/value
+pairs as describes in <strong>ReadSequenceFile</strong> method.</p>
+</dd>
+<dt><strong><a name="readmsfsequencefile" class="item"><strong>ReadMSFSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SequenceDataMapRef = ReadMSFSequenceFile($SequenceFile);</div>
+<p>Reads MSF <em>SequenceFile</em> and returns reference to a hash containing following key/value
+pairs as describes in <strong>ReadSequenceFile</strong> method.</p>
+</dd>
+<dt><strong><a name="readpirfastasequencefile" class="item"><strong>ReadPIRFastaSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SequenceDataMapRef = ReadPIRFastaSequenceFile($SequenceFile);</div>
+<p>Reads PIR FASTA <em>SequenceFile</em> and returns reference to a hash containing following key/value
+pairs as describes in <strong>ReadSequenceFile</strong> method.</p>
+</dd>
+<dt><strong><a name="readpearsonfastasequencefile" class="item"><strong>ReadPearsonFastaSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SequenceDataMapRef = ReadPearsonFastaSequenceFile($SequenceFile);</div>
+<p>Reads Pearson FASTA <em>SequenceFile</em> and returns reference to a hash containing following key/value
+pairs as describes in <strong>ReadSequenceFile</strong> method.</p>
+</dd>
+<dt><strong><a name="removesequencegaps" class="item"><strong>RemoveSequenceGaps</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SeqWithoutGaps = RemoveSequenceGaps($Sequence);</div>
+<p>Removes gaps from <em>Sequence</em> and return a sequence without any gaps.</p>
+</dd>
+<dt><strong><a name="removesequencealignmentgapcolumns" class="item"><strong>RemoveSequenceAlignmentGapColumns</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewAlignmentDataMapRef = RemoveSequenceAlignmentGapColumns(
+                              $AlignmentDataMapRef);</div>
+<p>Using input alignment data map ref containing following keys, generate a new hash with
+same set of keys after residue columns containg only gaps have been removed:</p>
+<div class="OptionsBox">
+    {IDs} : Array of IDs in order as they appear in file
+<br/>    {Count}: ID count
+<br/>    {Description}{$ID} : Description data
+<br/>    {Sequence}{$ID} : Sequence data</div>
+</dd>
+<dt><strong><a name="writepearsonfastasequencefile" class="item"><strong>WritePearsonFastaSequenceFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    WritePearsonFastaSequenceFile($SequenceFileName, $SequenceDataRef,
+                                  [$MaxLength]);</div>
+<p>Using sequence data specified via <em>SequenceDataRef</em>, write out a Pearson FASTA sequence
+file. Optional argument <em>MaxLength</em> controls maximum length sequence in each line; default is
+80.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./PDBFileUtil.html">PDBFileUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SDFileUtil.html" title="SDFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./StatisticsUtil.html" title="StatisticsUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>SequenceFileUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

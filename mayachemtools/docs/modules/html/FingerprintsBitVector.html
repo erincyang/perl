@@ -1,0 +1,553 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Fingerprints::FingerprintsBitVector.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Fingerprints.html" title="Fingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FingerprintsFileUtil.html" title="FingerprintsFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>Fingerprints::FingerprintsBitVector.pm</strong></td><td width="33%" align="right"><a href="././code/FingerprintsBitVector.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/FingerprintsBitVector.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/FingerprintsBitVector.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/FingerprintsBitVector.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/FingerprintsBitVector.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>FingerprintsBitVector</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Fingerprints::FingerprintsBitVector;</p>
+<p>use Fingerprints::FingerprintsBitVector qw(:coefficients);</p>
+<p>use Fingerprints::FingerprintsBitVector qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>FingerprintsBitVector</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#baroniurbanisimilaritycoefficient">BaroniUrbaniSimilarityCoefficient</a>, <a href="#busersimilaritycoefficient">BuserSimilarityCoefficient</a>
+, <a href="#cosinesimilaritycoefficient">CosineSimilarityCoefficient</a>, <a href="#dennissimilaritycoefficient">DennisSimilarityCoefficient</a>
+, <a href="#dicesimilaritycoefficient">DiceSimilarityCoefficient</a>, <a href="#foldfingerprintsbitvectorbydensity">FoldFingerprintsBitVectorByDensity</a>
+, <a href="#foldfingerprintsbitvectorbysize">FoldFingerprintsBitVectorBySize</a>, <a href="#forbessimilaritycoefficient">ForbesSimilarityCoefficient</a>
+, <a href="#fossumsimilaritycoefficient">FossumSimilarityCoefficient</a>, <a href="#getbitsasbinarystring">GetBitsAsBinaryString</a>, <a href="#getbitsasdecimalstring">GetBitsAsDecimalString</a>
+, <a href="#getbitsashexadecimalstring">GetBitsAsHexadecimalString</a>, <a href="#getbitsasoctalstring">GetBitsAsOctalString</a>, <a href="#getbitsasrawbinarystring">GetBitsAsRawBinaryString</a>
+, <a href="#getdescription">GetDescription</a>, <a href="#getfingerprintsbitdensity">GetFingerprintsBitDensity</a>, <a href="#getid">GetID</a>, <a href="#getspecifiedsize">GetSpecifiedSize</a>
+, <a href="#getsupportedsimilaritycoefficients">GetSupportedSimilarityCoefficients</a>, <a href="#getvectortype">GetVectorType</a>, <a href="#hamannsimilaritycoefficient">HamannSimilarityCoefficient</a>
+, <a href="#isfingerprintsbitvector">IsFingerprintsBitVector</a>, <a href="#issubset">IsSubSet</a>, <a href="#jacardsimilaritycoefficient">JacardSimilarityCoefficient</a>
+, <a href="#kulczynski1similaritycoefficient">Kulczynski1SimilarityCoefficient</a>, <a href="#kulczynski2similaritycoefficient">Kulczynski2SimilarityCoefficient</a>
+, <a href="#matchingsimilaritycoefficient">MatchingSimilarityCoefficient</a>, <a href="#mcconnaugheysimilaritycoefficient">McConnaugheySimilarityCoefficient</a>
+, <a href="#newfrombinarystring">NewFromBinaryString</a>, <a href="#newfromdecimalstring">NewFromDecimalString</a>, <a href="#newfromhexadecimalstring">NewFromHexadecimalString</a>
+, <a href="#newfromoctalstring">NewFromOctalString</a>, <a href="#newfromrawbinarystring">NewFromRawBinaryString</a>, <a href="#ochiaisimilaritycoefficient">OchiaiSimilarityCoefficient</a>
+, <a href="#pearsonsimilaritycoefficient">PearsonSimilarityCoefficient</a>, <a href="#rogerstanimotosimilaritycoefficient">RogersTanimotoSimilarityCoefficient</a>
+, <a href="#russellraosimilaritycoefficient">RussellRaoSimilarityCoefficient</a>, <a href="#setdescription">SetDescription</a>, <a href="#setid">SetID</a>, <a href="#setspecifiedsize">SetSpecifiedSize</a>
+, <a href="#setvectortype">SetVectorType</a>, <a href="#simpsonsimilaritycoefficient">SimpsonSimilarityCoefficient</a>, <a href="#skoalsneath1similaritycoefficient">SkoalSneath1SimilarityCoefficient</a>
+, <a href="#skoalsneath2similaritycoefficient">SkoalSneath2SimilarityCoefficient</a>, <a href="#skoalsneath3similaritycoefficient">SkoalSneath3SimilarityCoefficient</a>
+, <a href="#stringifyfingerprintsbitvector">StringifyFingerprintsBitVector</a>, <a href="#tanimotosimilaritycoefficient">TanimotoSimilarityCoefficient</a>
+, <a href="#tverskysimilaritycoefficient">TverskySimilarityCoefficient</a>, <a href="#weightedtanimotosimilaritycoefficient">WeightedTanimotoSimilarityCoefficient</a>
+, <a href="#weightedtverskysimilaritycoefficient">WeightedTverskySimilarityCoefficient</a>, <a href="#yulesimilaritycoefficient">YuleSimilarityCoefficient</a>
+</p><p>The methods available to create fingerprints bit vector from strings and to calculate similarity
+coefficient between two bit vectors can also be invoked as class functions.</p>
+<p><strong>FingerprintsBitVector</strong> class is derived from <strong>BitVector</strong> class which provides the functionality
+to manipulate bits.</p>
+<p>For two fingerprints bit vectors A and B of same size, let:</p>
+<div class="OptionsBox">
+    Na = Number of bits set to &quot;1&quot; in A
+<br/>    Nb = Number of bits set to &quot;1&quot; in B
+<br/>    Nc = Number of bits set to &quot;1&quot; in both A and B
+<br/>    Nd = Number of bits set to &quot;0&quot; in both A and B</div>
+<div class="OptionsBox">
+    Nt = Number of bits set to &quot;1&quot; or &quot;0&quot; in A or B (Size of A or B)
+<br/>    Nt = Na + Nb - Nc + Nd</div>
+<div class="OptionsBox">
+    Na - Nc = Number of bits set to &quot;1&quot; in A but not in B
+<br/>    Nb - Nc = Number of bits set to &quot;1&quot; in B but not in A</div>
+<p>Then, various similarity coefficients [ Ref. 40 - 42 ] for a pair of bit vectors A and B are
+defined as follows:</p>
+<p>BaroniUrbani: ( SQRT( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as Buser )</p>
+<p>Buser: ( SQRT ( Nc * Nd ) + Nc ) / (  SQRT ( Nc * Nd ) + Nc + ( Na - Nc )  + ( Nb - Nc ) ) ( same as BaroniUrbani )</p>
+<p>Cosine: Nc / SQRT ( Na * Nb ) (same as Ochiai)</p>
+<p>Dice: (2 * Nc) / ( Na + Nb )</p>
+<p>Dennis: ( Nc * Nd - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / SQRT ( Nt * Na * Nb)</p>
+<p>Forbes: ( Nt * Nc ) / ( Na * Nb )</p>
+<p>Fossum: ( Nt * ( ( Nc - 1/2 ) ** 2 ) / ( Na * Nb )</p>
+<p>Hamann: ( ( Nc + Nd ) - ( Na - Nc ) - ( Nb - Nc ) ) / Nt</p>
+<p>Jaccard: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Tanimoto)</p>
+<p>Kulczynski1: Nc / ( ( Na - Nc ) + ( Nb - Nc) ) = Nc / ( Na + Nb - 2Nc )</p>
+<p>Kulczynski2: ( ( Nc / 2 ) * ( 2 * Nc + ( Na - Nc ) + ( Nb - Nc) ) ) / ( ( Nc + ( Na - Nc ) ) * ( Nc + ( Nb - Nc ) ) )
+= 0.5 * ( Nc / Na + Nc / Nb )</p>
+<p>Matching: ( Nc + Nd ) / Nt</p>
+<p>McConnaughey: ( Nc ** 2 - ( Na - Nc ) * ( Nb - Nc) ) / (  Na * Nb )</p>
+<p>Ochiai: Nc / SQRT ( Na * Nb ) (same as Cosine)</p>
+<p>Pearson: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) / SQRT ( Na * Nb * (  Na - Nc + Nd ) * ( Nb - Nc + Nd ) )</p>
+<p>RogersTanimoto: ( Nc + Nd ) / ( ( Na - Nc)  + ( Nb  - Nc) + Nt) = ( Nc + Nd ) / ( Na  + Nb  - 2Nc + Nt)</p>
+<p>RussellRao: Nc / Nt</p>
+<p>Simpson: Nc / MIN ( Na, Nb)</p>
+<p>SkoalSneath1: Nc / ( Nc + 2 * ( Na - Nc)  + 2 * ( Nb - Nc) ) = Nc / ( 2 * Na + 2 * Nb - 3 * Nc )</p>
+<p>SkoalSneath2: ( 2 * Nc + 2 * Nd ) / ( Nc + Nd + Nt )</p>
+<p>SkoalSneath3: ( Nc + Nd ) / ( ( Na - Nc ) + ( Nb - Nc ) ) = ( Nc + Nd ) / ( Na + Nb - 2 * Nc  )</p>
+<p>Tanimoto: Nc /  ( ( Na - Nc) + ( Nb - Nc ) + Nc ) = Nc / ( Na + Nb - Nc ) (same as Jaccard)</p>
+<p>Tversky: Nc / ( alpha * ( Na - Nc ) + ( 1 - alpha) * ( Nb - Nc) + Nc ) = Nc / ( alpha * ( Na - Nb )  + Nb)</p>
+<p>Yule: ( ( Nc * Nd ) - ( ( Na - Nc ) * ( Nb - Nc ) ) ) / ( ( Nc * Nd ) + ( ( Na - Nc ) * ( Nb - Nc ) )  )</p>
+<p>The values of Tanimoto/Jaccard and Tversky coefficients are dependent on only those bit which
+are set to &quot;1&quot; in both A and B. In order to take into account all bit positions, modified versions
+of Tanimoto [ Ref. 42 ] and Tversky [  Ref. 43 ] have been developed.</p>
+<p>Let:</p>
+<div class="OptionsBox">
+    Na' = Number of bits set to &quot;0&quot; in A
+<br/>    Nb' = Number of bits set to &quot;0&quot; in B
+<br/>    Nc' = Number of bits set to &quot;0&quot; in both A and B</div>
+<p>Tanimoto': Nc' /  ( ( Na' - Nc') + ( Nb' - Nc' ) + Nc' ) = Nc' / ( Na' + Nb' - Nc' )</p>
+<p>Tversky': Nc' / ( alpha * ( Na' - Nc' ) + ( 1 - alpha) * ( Nb' - Nc' ) + Nc' ) = Nc' / ( alpha * ( Na' - Nb' )  + Nb')</p>
+<p>Then:</p>
+<p>WeightedTanimoto = beta * Tanimoto + (1 - beta) * Tanimoto'</p>
+<p>WeightedTversky = beta * Tversky + (1 - beta) * Tversky'</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFPBitVector = new Fingerprints::FingerprintsBitVector($Size);</div>
+<p>Creates a new <em>FingerprintsBitVector</em> object of size <em>Size</em> and returns  newly created
+<strong>FingerprintsBitVector</strong>. Bit numbers range from 0 to 1 less than <em>Size</em>.</p>
+</dd>
+<dt><strong><a name="baroniurbanisimilaritycoefficient" class="item"><strong>BaroniUrbaniSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;BaroniUrbaniSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              BaroniUrbaniSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>BaroniUrbani</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="busersimilaritycoefficient" class="item"><strong>BuserSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;BuserSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::BuserSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Buser</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="cosinesimilaritycoefficient" class="item"><strong>CosineSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;CosineSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::CosineSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Cosine</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="dennissimilaritycoefficient" class="item"><strong>DennisSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;DennisSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::DennisSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Dennis</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="dicesimilaritycoefficient" class="item"><strong>DiceSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;DiceSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::DiceSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Dice</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="foldfingerprintsbitvectorbydensity" class="item"><strong>FoldFingerprintsBitVectorByDensity</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;FoldFingerprintsBitVectorByDensity($Density);</div>
+<p>Folds <em>FingerprintsBitVector</em> by recursively reducing its size by half until bit density of set bits is
+greater than or equal to specified <em>Density</em> and returns folded <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="foldfingerprintsbitvectorbysize" class="item"><strong>FoldFingerprintsBitVectorBySize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;FoldFingerprintsBitVectorBySize($Size);</div>
+<p>Folds <em>FingerprintsBitVector</em> by recursively reducing its size by half until size is less than or equal to
+specified <em>Size</em> and returns folded <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="forbessimilaritycoefficient" class="item"><strong>ForbesSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;ForbesSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::ForbesSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Forbes</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="fossumsimilaritycoefficient" class="item"><strong>FossumSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;FossumSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::FossumSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Fossum</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="getbitsasbinarystring" class="item"><strong>GetBitsAsBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BinaryASCIIString = $FingerprintsBitVector-&gt;GetBitsAsBinaryString();</div>
+<p>Returns fingerprints as a binary ASCII string containing 0s and 1s.</p>
+</dd>
+<dt><strong><a name="getbitsashexadecimalstring" class="item"><strong>GetBitsAsHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HexadecimalString = $FingerprintsBitVector-&gt;GetBitsAsHexadecimalString();</div>
+<p>Returns fingerprints as a hexadecimal string.</p>
+</dd>
+<dt><strong><a name="getbitsasrawbinarystring" class="item"><strong>GetBitsAsRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RawBinaryString = $FingerprintsBitVector-&gt;GetBitsAsRawBinaryString();</div>
+<p>Returns fingerprints as a raw binary string containing packed bit values for each byte.</p>
+</dd>
+<dt><strong><a name="getdescription" class="item"><strong>GetDescription</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Description = $FingerprintsBitVector-&gt;GetDescription();</div>
+<p>Returns a string containing description of fingerprints bit vector.</p>
+</dd>
+<dt><strong><a name="getfingerprintsbitdensity" class="item"><strong>GetFingerprintsBitDensity</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitDensity = $FingerprintsBitVector-&gt;GetFingerprintsBitDensity();</div>
+<p>Returns <em>BitDensity</em> of <em>FingerprintsBitVector</em> corresponding to bits set to 1s.</p>
+</dd>
+<dt><strong><a name="getid" class="item"><strong>GetID</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ID = $FingerprintsBitVector-&gt;GetID();</div>
+<p>Returns <em>ID</em> of <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="getvectortype" class="item"><strong>GetVectorType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VectorType = $FingerprintsBitVector-&gt;GetVectorType();</div>
+<p>Returns <em>VectorType</em> of <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="getspecifiedsize" class="item"><strong>GetSpecifiedSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $FingerprintsBitVector-&gt;GetSpecifiedSize();</div>
+<p>Returns value of specified size for bit vector.</p>
+</dd>
+<dt><strong><a name="getsupportedsimilaritycoefficients" class="item"><strong>GetSupportedSimilarityCoefficients</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @SimilarityCoefficient =
+       Fingerprints::FingerprintsBitVector::GetSupportedSimilarityCoefficients();</div>
+<p>Returns an array containing names of supported similarity coefficients.</p>
+</dd>
+<dt><strong><a name="hamannsimilaritycoefficient" class="item"><strong>HamannSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;HamannSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::HamannSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Hamann</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="isfingerprintsbitvector" class="item"><strong>IsFingerprintsBitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = Fingerprints::FingerprintsBitVector::
+              IsFingerprintsBitVector($Object);</div>
+<p>Returns 1 or 0 based on whether <em>Object</em> is a <strong>FingerprintsBitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="issubset" class="item"><strong>IsSubSet</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $FingerprintsBitVector-&gt;IsSubSet($OtherFPBitVector);
+<br/>    $Status = Fingerprints::FingerprintsBitVector::IsSubSet(
+              $FPBitVectorA, $FPBitVectorB);</div>
+<p>Returns 1 or 0 based on whether first firngerprints bit vector is a subset of second
+fingerprints bit vector.</p>
+<p>For a bit vector to be a subset of another bit vector, both vectors must be of
+the same size and the bit positions set in first vector must also be set in the
+second bit vector.</p>
+</dd>
+<dt><strong><a name="jacardsimilaritycoefficient" class="item"><strong>JacardSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;JacardSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::JacardSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Jacard</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="kulczynski1similaritycoefficient" class="item"><strong>Kulczynski1SimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;Kulczynski1SimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              Kulczynski1SimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Kulczynski1</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="kulczynski2similaritycoefficient" class="item"><strong>Kulczynski2SimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;Kulczynski2SimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              Kulczynski2SimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Kulczynski2</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="matchingsimilaritycoefficient" class="item"><strong>MatchingSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;MatchingSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              MatchingSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Matching</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="mcconnaugheysimilaritycoefficient" class="item"><strong>McConnaugheySimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;McConnaugheySimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              McConnaugheySimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>McConnaughey</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="newfrombinarystring" class="item"><strong>NewFromBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFPBitVector = $FingerprintsBitVector-&gt;NewFromBinaryString(
+                      $BinaryString);
+<br/>    $NewFPBitVector = Fingerprints::FingerprintsBitVector::NewFromBinaryString(
+                      $BinaryString);</div>
+<p>Creates a new <em>FingerprintsBitVector</em> using <em>BinaryString</em> and returns new
+<strong>FingerprintsBitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="newfromhexadecimalstring" class="item"><strong>NewFromHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFPBitVector = $FingerprintsBitVector-&gt;NewFromHexadecimalString(
+                      $HexdecimalString);
+<br/>    $NewFPBitVector = Fingerprints::FingerprintsBitVector::
+                    NewFromHexadecimalString(
+                      $HexdecimalString);</div>
+<p>Creates a new <em>FingerprintsBitVector</em> using <em>HexdecimalString</em> and returns new
+<strong>FingerprintsBitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="newfromrawbinarystring" class="item"><strong>NewFromRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFPBitVector = $FingerprintsBitVector-&gt;NewFromRawBinaryString(
+                      $RawBinaryString);
+<br/>    $NewFPBitVector = Fingerprints::FingerprintsBitVector::
+                      NewFromRawBinaryString(
+                      $RawBinaryString);</div>
+<p>Creates a new <em>FingerprintsBitVector</em> using <em>RawBinaryString</em> and returns new
+<strong>FingerprintsBitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="ochiaisimilaritycoefficient" class="item"><strong>OchiaiSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;OchiaiSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::OchiaiSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Ochiai</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="pearsonsimilaritycoefficient" class="item"><strong>PearsonSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;PearsonSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::PearsonSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Pearson</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="rogerstanimotosimilaritycoefficient" class="item"><strong>RogersTanimotoSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;RogersTanimotoSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              RogersTanimotoSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>RogersTanimoto</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="russellraosimilaritycoefficient" class="item"><strong>RussellRaoSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;RussellRaoSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              RussellRaoSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>RussellRao</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="setspecifiedsize" class="item"><strong>SetSpecifiedSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;SetSpecifiedSize($Size);</div>
+<p>Sets specified size for fingerprints bit vector.</p>
+<p>Irrespective of specified size, Perl functions used to handle bit data in <strong>BitVector</strong> class
+automatically sets the size to the next nearest power of 2. <em>SpecifiedSize</em> is used by
+<strong>FingerprintsBitVector</strong> class to process any aribitray size during similarity coefficient calculations.</p>
+</dd>
+<dt><strong><a name="setdescription" class="item"><strong>SetDescription</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;SetDescription($Description);</div>
+<p>Sets <em>Description</em> of fingerprints bit vector and returns <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="setid" class="item"><strong>SetID</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;SetID($ID);</div>
+<p>Sets <em>ID</em> of fingerprints bit vector and returns <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="setvectortype" class="item"><strong>SetVectorType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FingerprintsBitVector-&gt;SetVectorType($VectorType);</div>
+<p>Sets <em>VectorType</em> of fingerprints bit vector and returns <em>FingerprintsBitVector</em>.</p>
+</dd>
+<dt><strong><a name="simpsonsimilaritycoefficient" class="item"><strong>SimpsonSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;SimpsonSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::SimpsonSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Simpson</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="skoalsneath1similaritycoefficient" class="item"><strong>SkoalSneath1SimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;SkoalSneath1SimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              SkoalSneath1SimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>SkoalSneath1</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="skoalsneath2similaritycoefficient" class="item"><strong>SkoalSneath2SimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;SkoalSneath2SimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              SkoalSneath2SimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>SkoalSneath2</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="skoalsneath3similaritycoefficient" class="item"><strong>SkoalSneath3SimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;SkoalSneath3SimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              SkoalSneath3SimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>SkoalSneath3</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em></p>
+</dd>
+<dt><strong><a name="stringifyfingerprintsbitvector" class="item"><strong>StringifyFingerprintsBitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $FingerprintsBitVector-&gt;StringifyFingerprintsBitVector();</div>
+<p>Returns a string containing information about <em>FingerprintsBitVector</em> object.</p>
+</dd>
+<dt><strong><a name="tanimotosimilaritycoefficient" class="item"><strong>TanimotoSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;TanimotoSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              TanimotoSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Tanimoto</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="tverskysimilaritycoefficient" class="item"><strong>TverskySimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;TverskySimilarityCoefficient(
+              $OtherFingerprintBitVector, $Alpha);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::
+              TverskySimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB, $Alpha);</div>
+<p>Returns value of <em>Tversky</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="weightedtanimotosimilaritycoefficient" class="item"><strong>WeightedTanimotoSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value =
+       $FingerprintsBitVector-&gt;WeightedTanimotoSimilarityCoefficient(
+         $OtherFingerprintBitVector, $Beta);
+<br/>    $Value =
+       Fingerprints::FingerprintsBitVector::
+         WeightedTanimotoSimilarityCoefficient(
+         $FingerprintsBitVectorA, $FingerprintBitVectorB, $Beta);</div>
+<p>Returns value of <em>WeightedTanimoto</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="weightedtverskysimilaritycoefficient" class="item"><strong>WeightedTverskySimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value =
+       $FingerprintsBitVector-&gt;WeightedTverskySimilarityCoefficient(
+          $OtherFingerprintBitVector, $Alpha, $Beta);
+<br/>    $Value =
+      Fingerprints::FingerprintsBitVector::
+        WeightedTverskySimilarityCoefficient(
+        $FingerprintsBitVectorA, $FingerprintBitVectorB, $Alpha, $Beta);</div>
+<p>Returns value of <em>WeightedTversky</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+<dt><strong><a name="yulesimilaritycoefficient" class="item"><strong>YuleSimilarityCoefficient</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $FingerprintsBitVector-&gt;YuleSimilarityCoefficient(
+              $OtherFingerprintBitVector);
+<br/>    $Value = Fingerprints::FingerprintsBitVector::YuleSimilarityCoefficient(
+              $FingerprintsBitVectorA, $FingerprintBitVectorB);</div>
+<p>Returns value of <em>Yule</em> similarity coefficient between two same size <em>FingerprintsBitVectors</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./BitVector.html">BitVector.pm</a>,&nbsp<a href="./FingerprintsStringUtil.html">FingerprintsStringUtil.pm</a>,&nbsp<a href="./FingerprintsVector.html">FingerprintsVector.pm</a>,&nbsp<a href="./Vector.html">Vector.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Fingerprints.html" title="Fingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FingerprintsFileUtil.html" title="FingerprintsFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Fingerprints::FingerprintsBitVector.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

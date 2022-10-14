@@ -1,0 +1,797 @@
+<html>
+<head>
+<title>MayaChemTools:Code:Fingerprints::AtomNeighborhoodsFingerprints.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-Fingerprints::AtomNeighborhoodsFingerprints-"></a>   1 <span class="k">package </span><span class="i">Fingerprints::AtomNeighborhoodsFingerprints</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: AtomNeighborhoodsFingerprints.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:24 $</span>
+   5 <span class="c"># $Revision: 1.29 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Fingerprints::Fingerprints</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">Molecule</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">AtomTypes::AtomicInvariantsAtomTypes</span><span class="sc">;</span>
+  36 <span class="k">use</span> <span class="w">AtomTypes::DREIDINGAtomTypes</span><span class="sc">;</span>
+  37 <span class="k">use</span> <span class="w">AtomTypes::EStateAtomTypes</span><span class="sc">;</span>
+  38 <span class="k">use</span> <span class="w">AtomTypes::FunctionalClassAtomTypes</span><span class="sc">;</span>
+  39 <span class="k">use</span> <span class="w">AtomTypes::MMFF94AtomTypes</span><span class="sc">;</span>
+  40 <span class="k">use</span> <span class="w">AtomTypes::SLogPAtomTypes</span><span class="sc">;</span>
+  41 <span class="k">use</span> <span class="w">AtomTypes::SYBYLAtomTypes</span><span class="sc">;</span>
+  42 <span class="k">use</span> <span class="w">AtomTypes::TPSAAtomTypes</span><span class="sc">;</span>
+  43 <span class="k">use</span> <span class="w">AtomTypes::UFFAtomTypes</span><span class="sc">;</span>
+  44 
+  45 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  46 
+  47 <span class="i">@ISA</span> = <span class="q">qw(Fingerprints::Fingerprints Exporter)</span><span class="sc">;</span>
+  48 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  49 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  50 
+  51 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  52 
+  53 <span class="c"># Setup class variables...</span>
+  54 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  55 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  56 
+  57 <span class="c"># Overload Perl functions...</span>
+  58 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyAtomNeighborhoodsFingerprints&#39;</span><span class="sc">;</span>
+  59 
+  60 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  61 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  62   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  63 
+  64   <span class="c"># Initialize object...</span>
+  65   <span class="k">my</span> <span class="i">$This</span> = <span class="i">$Class</span><span class="i">-&gt;SUPER::new</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  66   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  67   <span class="i">$This</span><span class="i">-&gt;_InitializeAtomNeighborhoodsFingerprints</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  68 
+  69   <span class="i">$This</span><span class="i">-&gt;_InitializeAtomNeighborhoodsFingerprintsProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  70 
+  71   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  72 <span class="s">}</span>
+  73 
+  74 <span class="c"># Initialize object data...</span>
+  75 <span class="c">#</span>
+<a name="_InitializeAtomNeighborhoodsFingerprints-"></a>  76 <span class="k">sub </span><span class="m">_InitializeAtomNeighborhoodsFingerprints</span> <span class="s">{</span>
+  77   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  78 
+  79   <span class="c"># Type of fingerprint...</span>
+  80   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="q">&#39;AtomNeighborhoods&#39;</span><span class="sc">;</span>
+  81 
+  82   <span class="c"># Type of vector...</span>
+  83   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="q">&#39;FingerprintsVector&#39;</span><span class="sc">;</span>
+  84 
+  85   <span class="c"># Type of FingerprintsVector...</span>
+  86   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="q">&#39;AlphaNumericalValues&#39;</span><span class="sc">;</span>
+  87 
+  88   <span class="c"># Minimum and maximum atomic neighborhoods radii...</span>
+  89   <span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} = <span class="n">0</span><span class="sc">;</span>
+  90   <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>} = <span class="n">2</span><span class="sc">;</span>
+  91 
+  92   <span class="c"># Atom identifier type to use for atom IDs in atom neighborhood atoms...</span>
+  93   <span class="c">#</span>
+  94   <span class="c"># Currently supported values are: AtomicInvariantsAtomTypes, DREIDINGAtomTypes,</span>
+  95   <span class="c"># EStateAtomTypes, FunctionalClassAtomTypes, MMFF94AtomTypes, SLogPAtomTypes,</span>
+  96   <span class="c"># SYBYLAtomTypes, TPSAAtomTypes, UFFAtomTypes</span>
+  97   <span class="c">#</span>
+  98   <span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  99 
+ 100   <span class="c"># Atom types assigned to each heavy atom...</span>
+ 101   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 102 
+ 103   <span class="c"># Atom neighorhoods with in specified atom radii..</span>
+ 104   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 105 
+ 106   <span class="c"># Atom neighborhoods atom types count at different neighborhoods...</span>
+ 107   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 108 
+ 109   <span class="c"># Atom neighborhood identifiers using specified atom identifier types methodology...</span>
+ 110   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 111 <span class="s">}</span>
+ 112 
+ 113 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a> 114 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+ 115   <span class="c">#Class name...</span>
+ 116   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+ 117 <span class="s">}</span>
+ 118 
+ 119 <span class="c"># Initialize object properties....</span>
+<a name="_InitializeAtomNeighborhoodsFingerprintsProperties-"></a> 120 <span class="k">sub </span><span class="m">_InitializeAtomNeighborhoodsFingerprintsProperties</span> <span class="s">{</span>
+ 121   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 122 
+ 123   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 124   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 125     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 126     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 127   <span class="s">}</span>
+ 128 
+ 129   <span class="c"># Make sure molecule object was specified...</span>
+ 130   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">Molecule</span>}<span class="s">)</span> <span class="s">{</span>
+ 131     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated without specifying molecule...&quot;</span><span class="sc">;</span>
+ 132   <span class="s">}</span>
+ 133   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">Size</span>}<span class="s">)</span> <span class="s">{</span>
+ 134     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated with a user specified size: It&#39;s an arbitrary length vector...&quot;</span><span class="sc">;</span>
+ 135   <span class="s">}</span>
+ 136   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">AtomIdentifierType</span>}<span class="s">)</span> <span class="s">{</span>
+ 137     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated without specifying AtomIdentifierType...&quot;</span><span class="sc">;</span>
+ 138   <span class="s">}</span>
+ 139 
+ 140   <span class="i">$This</span><span class="i">-&gt;_InitializeFingerprintsVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 141 
+ 142   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 143 <span class="s">}</span>
+ 144 
+ 145 <span class="c"># Set atom identifier type..</span>
+ 146 <span class="c">#</span>
+<a name="SetAtomIdentifierType-"></a> 147 <span class="k">sub </span><span class="m">SetAtomIdentifierType</span> <span class="s">{</span>
+ 148   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$IdentifierType</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 149 
+ 150   <span class="k">if</span> <span class="s">(</span><span class="i">$IdentifierType</span> !~ <span class="q">/^(AtomicInvariantsAtomTypes|DREIDINGAtomTypes|EStateAtomTypes|FunctionalClassAtomTypes|MMFF94AtomTypes|SLogPAtomTypes|SYBYLAtomTypes|TPSAAtomTypes|UFFAtomTypes)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 151     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomIdentifierType: Specified value, $IdentifierType, for AtomIdentifierType is not vaild. Supported types in current release of MayaChemTools: AtomicInvariantsAtomTypes, DREIDINGAtomTypes, EStateAtomTypes, FunctionalClassAtomTypes, MMFF94AtomTypes, SLogPAtomTypes, SYBYLAtomTypes, TPSAAtomTypes, and UFFAtomTypes.&quot;</span><span class="sc">;</span>
+ 152   <span class="s">}</span>
+ 153 
+ 154   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>}<span class="s">)</span> <span class="s">{</span>
+ 155     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomIdentifierType: Can&#39;t change intial atom identifier type:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 156   <span class="s">}</span>
+ 157 
+ 158   <span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} = <span class="i">$IdentifierType</span><span class="sc">;</span>
+ 159 
+ 160   <span class="c"># Initialize atom identifier type information...</span>
+ 161   <span class="i">$This</span><span class="i">-&gt;_InitializeAtomIdentifierTypeInformation</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 162 
+ 163   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 164 <span class="s">}</span>
+ 165 
+ 166 <span class="c"># Set minimum atom neighborhood radius...</span>
+ 167 <span class="c">#</span>
+<a name="SetMinNeighborhoodRadius-"></a> 168 <span class="k">sub </span><span class="m">SetMinNeighborhoodRadius</span> <span class="s">{</span>
+ 169   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 170 
+ 171   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 172     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMinNeighborhoodRadius: MinNeighborhoodRadius value, $Value, is not valid:  It must be an  integer...&quot;</span><span class="sc">;</span>
+ 173   <span class="s">}</span>
+ 174 
+ 175   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> &lt; <span class="n">0</span> <span class="s">)</span> <span class="s">{</span>
+ 176     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMinNeighborhoodRadius: MinNeighborhoodRadius value, $Value, is not valid:  It must be &gt;= 0...&quot;</span><span class="sc">;</span>
+ 177   <span class="s">}</span>
+ 178   <span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 179 
+ 180   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 181 <span class="s">}</span>
+ 182 
+ 183 <span class="c"># Set maximum atom neighborhood radius...</span>
+ 184 <span class="c">#</span>
+<a name="SetMaxNeighborhoodRadius-"></a> 185 <span class="k">sub </span><span class="m">SetMaxNeighborhoodRadius</span> <span class="s">{</span>
+ 186   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 187 
+ 188   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 189     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMaxNeighborhoodRadius: MaxNeighborhoodRadius value, $Value, is not valid:  It must be an  integer...&quot;</span><span class="sc">;</span>
+ 190   <span class="s">}</span>
+ 191 
+ 192   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> &lt; <span class="n">0</span> <span class="s">)</span> <span class="s">{</span>
+ 193     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMaxNeighborhoodRadius: MaxNeighborhoodRadius value, $Value, is not valid:  It must be &gt;= 0...&quot;</span><span class="sc">;</span>
+ 194   <span class="s">}</span>
+ 195   <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 196 
+ 197   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 198 <span class="s">}</span>
+ 199 
+ 200 <span class="c"># Generate fingerprints description...</span>
+ 201 <span class="c">#</span>
+<a name="GetDescription-"></a> 202 <span class="k">sub </span><span class="m">GetDescription</span> <span class="s">{</span>
+ 203   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 204 
+ 205   <span class="c"># Is description explicity set?</span>
+ 206   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Description</span>}<span class="s">)</span> <span class="s">{</span>
+ 207     <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">Description</span>}<span class="sc">;</span>
+ 208   <span class="s">}</span>
+ 209 
+ 210   <span class="c"># Generate fingerprints description...</span>
+ 211 
+ 212   <span class="k">return</span> <span class="q">&quot;$This-&gt;{Type}:$This-&gt;{AtomIdentifierType}:MinRadius$This-&gt;{MinNeighborhoodRadius}:MaxRadius$This-&gt;{MaxNeighborhoodRadius}&quot;</span><span class="sc">;</span>
+ 213 <span class="s">}</span>
+ 214 
+ 215 <span class="c"># Generate atom neighborhood [ Ref 53-56, Ref 73 ] fingerprints...</span>
+ 216 <span class="c">#</span>
+ 217 <span class="c"># Methodology:</span>
+ 218 <span class="c">#   . Assign atom types to all non-hydrogen atoms in the molecule</span>
+ 219 <span class="c">#   . Get atom neighborhoods up to MaxNeighborhoodRadis</span>
+ 220 <span class="c">#   . Count unqiue atom types at each neighborhood radii for all heavy atoms</span>
+ 221 <span class="c">#   . Generate neighborhood identifiers for all neighborhoods around central</span>
+ 222 <span class="c">#     heavy atom</span>
+ 223 <span class="c">#      . Atom neighborhood identifier for a specific radii is generated using neighborhood</span>
+ 224 <span class="c">#        radius, assigned atom type and its count as follows:</span>
+ 225 <span class="c">#</span>
+ 226 <span class="c">#            NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;</span>
+ 227 <span class="c">#</span>
+ 228 <span class="c">#      . Atom neighborhood identifier for a central atom at all specified radii is generated</span>
+ 229 <span class="c">#        by concatenating neighborhood identifiers at each radii by colon:</span>
+ 230 <span class="c">#</span>
+ 231 <span class="c">#            NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;:NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;:</span>
+ 232 <span class="c">#</span>
+ 233 <span class="c">#   . Set final fingerprints as list of neighborhood atom indentifiers</span>
+ 234 <span class="c">#</span>
+<a name="GenerateFingerprints-"></a> 235 <span class="k">sub </span><span class="m">GenerateFingerprints</span> <span class="s">{</span>
+ 236   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 237 
+ 238   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="s">)</span> <span class="s">{</span>
+ 239     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;GenerateFingerprints: No fingerpritns generated: MinLength, $This-&gt;{MinNeighborhoodRadius}, must be less than MaxLength, $This-&gt;{MaxNeighborhoodRadius}...&quot;</span><span class="sc">;</span>
+ 240   <span class="s">}</span>
+ 241 
+ 242   <span class="c"># Cache appropriate molecule data...</span>
+ 243   <span class="i">$This</span><span class="i">-&gt;_SetupMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 244 
+ 245   <span class="c"># Assign atom types to all heavy atoms...</span>
+ 246   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span><span class="i">-&gt;_AssignAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 247     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateFingerprints: $This-&gt;{AtomIdentifierType} fingerprints generation didn&#39;t succeed: Couldn&#39;t assign valid $This-&gt;{AtomIdentifierType} to all atoms...&quot;</span><span class="sc">;</span>
+ 248     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 249   <span class="s">}</span>
+ 250 
+ 251   <span class="c"># Intialize atom neighborhoods information...</span>
+ 252   <span class="i">$This</span><span class="i">-&gt;_InitializeAtomNeighborhoods</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 253 
+ 254   <span class="c"># Identify atom neighborhoods with in specified radii...</span>
+ 255   <span class="i">$This</span><span class="i">-&gt;_GetAtomNeighborhoods</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 256 
+ 257   <span class="c"># Count atom neighborhoods atom types...</span>
+ 258   <span class="i">$This</span><span class="i">-&gt;_CountAtomNeighborhoodsAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 259 
+ 260   <span class="c"># Genenerate atom neighborhood identifiers...</span>
+ 261   <span class="i">$This</span><span class="i">-&gt;_GenerateAtomNeighborhoodIdentifiers</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 262 
+ 263   <span class="c"># Set final fingerprints...</span>
+ 264   <span class="i">$This</span><span class="i">-&gt;_SetFinalFingerprints</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 265 
+ 266   <span class="c"># Clear cached molecule data...</span>
+ 267   <span class="i">$This</span><span class="i">-&gt;_ClearMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 268 
+ 269   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 270 <span class="s">}</span>
+ 271 
+ 272 <span class="c"># Assign appropriate atom types to all heavy atoms...</span>
+ 273 <span class="c">#</span>
+<a name="_AssignAtomTypes-"></a> 274 <span class="k">sub </span><span class="m">_AssignAtomTypes</span> <span class="s">{</span>
+ 275   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 276   <span class="k">my</span><span class="s">(</span><span class="i">$SpecifiedAtomTypes</span><span class="cm">,</span> <span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 277 
+ 278   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 279   <span class="i">$IgnoreHydrogens</span> = <span class="n">1</span><span class="sc">;</span>
+ 280 
+ 281   <span class="i">$SpecifiedAtomTypes</span> = <span class="k">undef</span><span class="sc">;</span>
+ 282 
+ 283   <span class="j">IDENTIFIERTYPE:</span> <span class="s">{</span>
+ 284     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^AtomicInvariantsAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 285       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::AtomicInvariantsAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="cm">,</span> <span class="q">&#39;AtomicInvariantsToUse&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}<span class="s">)</span><span class="sc">;</span>
+ 286       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 287     <span class="s">}</span>
+ 288 
+ 289     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^DREIDINGAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 290       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::DREIDINGAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 291       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 292     <span class="s">}</span>
+ 293 
+ 294     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^EStateAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 295       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::EStateAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 296       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 297     <span class="s">}</span>
+ 298 
+ 299     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^FunctionalClassAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 300       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::FunctionalClassAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="cm">,</span> <span class="q">&#39;FunctionalClassesToUse&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}<span class="s">)</span><span class="sc">;</span>
+ 301       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 302     <span class="s">}</span>
+ 303 
+ 304     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^MMFF94AtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 305       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::MMFF94AtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 306       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 307     <span class="s">}</span>
+ 308 
+ 309     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^SLogPAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 310       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::SLogPAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 311       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 312     <span class="s">}</span>
+ 313     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^SYBYLAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 314       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::SYBYLAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 315       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 316     <span class="s">}</span>
+ 317 
+ 318     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^TPSAAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 319       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::TPSAAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnorePhosphorus&#39;</span> <span class="cm">=&gt;</span> <span class="n">0</span><span class="cm">,</span> <span class="q">&#39;IgnoreSulfur&#39;</span> <span class="cm">=&gt;</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 320       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 321     <span class="s">}</span>
+ 322 
+ 323     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^UFFAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 324       <span class="i">$SpecifiedAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::UFFAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="i">$IgnoreHydrogens</span><span class="s">)</span><span class="sc">;</span>
+ 325       <span class="k">last</span> <span class="j">IDENTIFIERTYPE</span><span class="sc">;</span>
+ 326     <span class="s">}</span>
+ 327 
+ 328     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_AssignAtomTypes: Unknown atom indentifier type $This-&gt;{AtomIdentifierType}...&quot;</span><span class="sc">;</span>
+ 329   <span class="s">}</span>
+ 330 
+ 331   <span class="c"># Assign atom types...</span>
+ 332   <span class="i">$SpecifiedAtomTypes</span><span class="i">-&gt;AssignAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 333 
+ 334   <span class="c"># Make sure atom types assignment is successful...</span>
+ 335   <span class="k">if</span> <span class="s">(</span>!<span class="i">$SpecifiedAtomTypes</span><span class="i">-&gt;IsAtomTypesAssignmentSuccessful</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 336     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 337   <span class="s">}</span>
+ 338 
+ 339   <span class="c"># Collect assigned atom types...</span>
+ 340   <span class="j">ATOM:</span> <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 341     <span class="k">if</span> <span class="s">(</span><span class="i">$Atom</span><span class="i">-&gt;IsHydrogen</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 342       <span class="k">next</span> <span class="j">ATOM</span><span class="sc">;</span>
+ 343     <span class="s">}</span>
+ 344     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 345     <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID</span>} = <span class="i">$SpecifiedAtomTypes</span><span class="i">-&gt;GetAtomType</span><span class="s">(</span><span class="i">$Atom</span><span class="s">)</span><span class="sc">;</span>
+ 346   <span class="s">}</span>
+ 347 
+ 348   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 349 <span class="s">}</span>
+ 350 
+ 351 <span class="c"># Initialize topological atom pairs between specified distance range...</span>
+ 352 <span class="c">#</span>
+<a name="_InitializeAtomNeighborhoods-"></a> 353 <span class="k">sub </span><span class="m">_InitializeAtomNeighborhoods</span> <span class="s">{</span>
+ 354   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 355   <span class="k">my</span><span class="s">(</span><span class="i">$Radius</span><span class="s">)</span><span class="sc">;</span>
+ 356 
+ 357   <span class="c"># Initialize atom neighborhood count information between specified radii...</span>
+ 358   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 359 
+ 360   <span class="k">for</span> <span class="i">$Radius</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} .. <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="s">)</span> <span class="s">{</span>
+ 361     <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 362   <span class="s">}</span>
+ 363 
+ 364   <span class="c"># Initialize atom neighborhoods atoms information at all specified radii...</span>
+ 365   <span class="c">#</span>
+ 366   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 367 
+ 368   <span class="k">for</span> <span class="i">$Radius</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="s">)</span> <span class="s">{</span>
+ 369     <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}{<span class="i">$Radius</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 370   <span class="s">}</span>
+ 371 
+ 372   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 373 <span class="s">}</span>
+ 374 
+ 375 <span class="c"># Collect atom neighborhoods upto maximum neighborhood radius...</span>
+ 376 <span class="c">#</span>
+ 377 <span class="c"># Notes:</span>
+ 378 <span class="c">#  . Fingerprints are only generated for neighborhoods between specified minimum</span>
+ 379 <span class="c">#    and maximum neighborhood radii.</span>
+ 380 <span class="c">#</span>
+<a name="_GetAtomNeighborhoods-"></a> 381 <span class="k">sub </span><span class="m">_GetAtomNeighborhoods</span> <span class="s">{</span>
+ 382   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 383   <span class="k">my</span><span class="s">(</span><span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$MaxRadius</span><span class="cm">,</span> <span class="i">$Radius</span><span class="cm">,</span> <span class="i">$Molecule</span><span class="s">)</span><span class="sc">;</span>
+ 384 
+ 385   <span class="i">$MaxRadius</span> = <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="sc">;</span>
+ 386   <span class="i">$Molecule</span> = <span class="i">$This</span><span class="i">-&gt;GetMolecule</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 387 
+ 388   <span class="c"># Collect atom neighborhoods...</span>
+ 389 
+ 390   <span class="j">ATOM:</span> <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 391     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 392     <span class="i">$Radius</span> = <span class="n">0</span><span class="sc">;</span>
+ 393 
+ 394     <span class="k">if</span> <span class="s">(</span><span class="i">$MaxRadius</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 395       <span class="c"># Atom is its own neighborhood at 0 radius...</span>
+ 396       <span class="k">my</span><span class="s">(</span><span class="i">@AtomNeighborhoodsAtoms</span><span class="s">)</span><span class="sc">;</span>
+ 397 
+ 398       <span class="i">@AtomNeighborhoodsAtoms</span> = <span class="s">(</span><span class="i">$Atom</span><span class="s">)</span><span class="sc">;</span>
+ 399       <span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>} = \<span class="i">@AtomNeighborhoodsAtoms</span><span class="sc">;</span>
+ 400 
+ 401       <span class="k">next</span> <span class="j">ATOM</span><span class="sc">;</span>
+ 402     <span class="s">}</span>
+ 403 
+ 404     <span class="c"># Collect available atom neighborhoods at different neighborhood radii levels...</span>
+ 405     <span class="k">my</span><span class="s">(</span><span class="i">$AtomNeighborhoodAtomsRef</span><span class="s">)</span><span class="sc">;</span>
+ 406 
+ 407     <span class="k">for</span> <span class="i">$AtomNeighborhoodAtomsRef</span> <span class="s">(</span><span class="i">$Molecule</span><span class="i">-&gt;GetAtomNeighborhoodsWithRadiusUpto</span><span class="s">(</span><span class="i">$Atom</span><span class="cm">,</span> <span class="i">$MaxRadius</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 408       <span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>} = <span class="i">$AtomNeighborhoodAtomsRef</span><span class="sc">;</span>
+ 409       <span class="i">$Radius</span>++<span class="sc">;</span>
+ 410     <span class="s">}</span>
+ 411   <span class="s">}</span>
+ 412   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 413 <span class="s">}</span>
+ 414 
+ 415 <span class="c"># Count atom neighborhoods atom types for each non-hydrogen central atoms with</span>
+ 416 <span class="c"># neighborhoods in specified radii range...</span>
+ 417 <span class="c">#</span>
+<a name="_CountAtomNeighborhoodsAtomTypes-"></a> 418 <span class="k">sub </span><span class="m">_CountAtomNeighborhoodsAtomTypes</span> <span class="s">{</span>
+ 419   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 420   <span class="k">my</span><span class="s">(</span><span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$NeighborhoodAtomID</span><span class="cm">,</span> <span class="i">$Radius</span><span class="cm">,</span> <span class="i">$NeighborhoodAtom</span><span class="cm">,</span> <span class="i">$NeighborhoodAtomType</span><span class="cm">,</span> <span class="i">$AtomNeighborhoodAtomsRef</span><span class="s">)</span><span class="sc">;</span>
+ 421 
+ 422   <span class="j">RADIUS:</span> <span class="k">for</span> <span class="i">$Radius</span> <span class="s">(</span><span class="k">sort</span> <span class="s">{</span> <span class="i">$a</span> &lt;=&gt; <span class="i">$b</span> <span class="s">}</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}} <span class="s">)</span> <span class="s">{</span>
+ 423     <span class="k">if</span> <span class="s">(</span><span class="i">$Radius</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} || <span class="i">$Radius</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="s">)</span> <span class="s">{</span>
+ 424       <span class="k">next</span> <span class="j">RADIUS</span><span class="sc">;</span>
+ 425     <span class="s">}</span>
+ 426     <span class="c"># Go over the neighborhoods of each atom at the current radius...</span>
+ 427     <span class="k">for</span> <span class="i">$AtomID</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}{<span class="i">$Radius</span>}}<span class="s">)</span> <span class="s">{</span>
+ 428       <span class="i">$AtomNeighborhoodAtomsRef</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoods</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}<span class="sc">;</span>
+ 429       <span class="j">NEIGHBORHOODATOM:</span> <span class="k">for</span> <span class="i">$NeighborhoodAtom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$AtomNeighborhoodAtomsRef</span>}<span class="s">)</span> <span class="s">{</span>
+ 430         <span class="k">if</span> <span class="s">(</span><span class="i">$NeighborhoodAtom</span><span class="i">-&gt;IsHydrogen</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 431           <span class="k">next</span> <span class="j">NEIGHBORHOODATOM</span><span class="sc">;</span>
+ 432         <span class="s">}</span>
+ 433         <span class="i">$NeighborhoodAtomID</span> = <span class="i">$NeighborhoodAtom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 434         <span class="i">$NeighborhoodAtomType</span> = <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$NeighborhoodAtomID</span>}<span class="sc">;</span>
+ 435 
+ 436         <span class="c"># Count neighbothood atom types for each atom at different radii...</span>
+ 437         <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}<span class="s">)</span> <span class="s">{</span>
+ 438           <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 439         <span class="s">}</span>
+ 440         <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}{<span class="i">$NeighborhoodAtomType</span>}<span class="s">)</span> <span class="s">{</span>
+ 441           <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}{<span class="i">$NeighborhoodAtomType</span>} += <span class="n">1</span><span class="sc">;</span>
+ 442         <span class="s">}</span>
+ 443         <span class="k">else</span> <span class="s">{</span>
+ 444           <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}{<span class="i">$NeighborhoodAtomType</span>} = <span class="n">1</span><span class="sc">;</span>
+ 445         <span class="s">}</span>
+ 446       <span class="s">}</span>
+ 447     <span class="s">}</span>
+ 448   <span class="s">}</span>
+ 449   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 450 <span class="s">}</span>
+ 451 
+ 452 <span class="c"># Generate atom neighborhood identifiers for each non-hydrogen atom using atom</span>
+ 453 <span class="c"># neighborhood atom types and their count information...</span>
+ 454 <span class="c">#</span>
+ 455 <span class="c"># Let:</span>
+ 456 <span class="c">#   NR&lt;n&gt; = Neighborhood radius</span>
+ 457 <span class="c">#   AtomType = Assigned atom type</span>
+ 458 <span class="c">#   ATC&lt;n&gt; = AtomType count</span>
+ 459 <span class="c">#</span>
+ 460 <span class="c"># Then:</span>
+ 461 <span class="c">#</span>
+ 462 <span class="c">#   AtomNeighborhoodAtomIdentifier for a neighborhood atom generated for</span>
+ 463 <span class="c">#   AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</span>
+ 464 <span class="c">#</span>
+ 465 <span class="c">#     NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;</span>
+ 466 <span class="c">#</span>
+ 467 <span class="c">#   AtomNeighborhoodsIdentifier for all specified atom neighbothoods of an atom generated for</span>
+ 468 <span class="c">#   AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</span>
+ 469 <span class="c">#</span>
+ 470 <span class="c">#     NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;;NR&lt;n&gt;-&lt;AtomType&gt;-ATC&lt;n&gt;;...</span>
+ 471 <span class="c">#</span>
+<a name="_GenerateAtomNeighborhoodIdentifiers-"></a> 472 <span class="k">sub </span><span class="m">_GenerateAtomNeighborhoodIdentifiers</span> <span class="s">{</span>
+ 473   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 474   <span class="k">my</span><span class="s">(</span><span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$Radius</span><span class="cm">,</span> <span class="i">$AtomType</span><span class="cm">,</span> <span class="i">$AtomTypeCount</span><span class="cm">,</span> <span class="i">$AtomNeighborhoodIdentifier</span><span class="cm">,</span> <span class="i">@AtomNeighborhoodIdentifiers</span><span class="s">)</span><span class="sc">;</span>
+ 475 
+ 476   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 477 
+ 478   <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 479     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 480     <span class="i">@AtomNeighborhoodIdentifiers</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 481     <span class="j">RADIUS:</span> <span class="k">for</span> <span class="i">$Radius</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinNeighborhoodRadius</span>} .. <span class="i">$This</span>-&gt;{<span class="w">MaxNeighborhoodRadius</span>}<span class="s">)</span> <span class="s">{</span>
+ 482       <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}<span class="s">)</span> <span class="s">{</span>
+ 483         <span class="k">next</span> <span class="j">RADIUS</span><span class="sc">;</span>
+ 484       <span class="s">}</span>
+ 485       <span class="k">for</span> <span class="i">$AtomType</span> <span class="s">(</span><span class="k">sort</span> <span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}}<span class="s">)</span> <span class="s">{</span>
+ 486         <span class="i">$AtomTypeCount</span> = <span class="i">$This</span>-&gt;{<span class="w">NeighborhoodAtomTypesCount</span>}{<span class="i">$Radius</span>}{<span class="i">$AtomID</span>}{<span class="i">$AtomType</span>}<span class="sc">;</span>
+ 487         <span class="k">push</span> <span class="i">@AtomNeighborhoodIdentifiers</span><span class="cm">,</span> <span class="q">&quot;NR${Radius}-${AtomType}-ATC${AtomTypeCount}&quot;</span><span class="sc">;</span>
+ 488       <span class="s">}</span>
+ 489     <span class="s">}</span>
+ 490     <span class="i">$AtomNeighborhoodIdentifier</span> = <span class="k">join</span><span class="s">(</span><span class="q">&quot;:&quot;</span><span class="cm">,</span> <span class="i">@AtomNeighborhoodIdentifiers</span><span class="s">)</span><span class="sc">;</span>
+ 491     <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}}<span class="cm">,</span> <span class="i">$AtomNeighborhoodIdentifier</span><span class="sc">;</span>
+ 492   <span class="s">}</span>
+ 493 
+ 494   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 495 <span class="s">}</span>
+ 496 
+ 497 <span class="c"># Set final fingerprits vector...</span>
+ 498 <span class="c">#</span>
+<a name="_SetFinalFingerprints-"></a> 499 <span class="k">sub </span><span class="m">_SetFinalFingerprints</span> <span class="s">{</span>
+ 500   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 501 
+ 502   <span class="c"># Mark successful generation of fingerprints...</span>
+ 503   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsGenerated</span>} = <span class="n">1</span><span class="sc">;</span>
+ 504 
+ 505   <span class="c"># Sort AtomNeighborhoodsIdentifiers..</span>
+ 506   <span class="c">#</span>
+ 507   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}} = <span class="k">sort</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}}<span class="sc">;</span>
+ 508 
+ 509   <span class="c"># Add sorted atom neighborhood identifiers to FingerprintsVector which is already defined</span>
+ 510   <span class="c"># during initialization containing AlphaNumericalValues...</span>
+ 511   <span class="c">#</span>
+ 512   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;AddValues</span><span class="s">(</span>\<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomNeighborhoodsIdentifiers</span>}}<span class="s">)</span><span class="sc">;</span>
+ 513 
+ 514   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 515 <span class="s">}</span>
+ 516 
+ 517 <span class="c"># Cache  appropriate molecule data...</span>
+ 518 <span class="c">#</span>
+<a name="_SetupMoleculeDataCache-"></a> 519 <span class="k">sub </span><span class="m">_SetupMoleculeDataCache</span> <span class="s">{</span>
+ 520   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 521 
+ 522   <span class="c"># Get all non-hydrogen atoms...</span>
+ 523   <span class="k">my</span><span class="s">(</span><span class="i">$NegateAtomCheckMethod</span><span class="s">)</span><span class="sc">;</span>
+ 524   <span class="i">$NegateAtomCheckMethod</span> = <span class="n">1</span><span class="sc">;</span>
+ 525   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="i">$This</span><span class="i">-&gt;GetMolecule</span><span class="s">(</span><span class="s">)</span><span class="i">-&gt;GetAtoms</span><span class="s">(</span><span class="q">&quot;IsHydrogen&quot;</span><span class="cm">,</span> <span class="i">$NegateAtomCheckMethod</span><span class="s">)</span><span class="sc">;</span>
+ 526 
+ 527   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 528 <span class="s">}</span>
+ 529 
+ 530 <span class="c"># Clear cached molecule data...</span>
+ 531 <span class="c">#</span>
+<a name="_ClearMoleculeDataCache-"></a> 532 <span class="k">sub </span><span class="m">_ClearMoleculeDataCache</span> <span class="s">{</span>
+ 533   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 534 
+ 535   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 536 
+ 537   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 538 <span class="s">}</span>
+ 539 
+ 540 <span class="c"># Set atomic invariants to use for atom identifiers...</span>
+ 541 <span class="c">#</span>
+<a name="SetAtomicInvariantsToUse-"></a> 542 <span class="k">sub </span><span class="m">SetAtomicInvariantsToUse</span> <span class="s">{</span>
+ 543   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@Values</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 544   <span class="k">my</span><span class="s">(</span><span class="i">$FirstValue</span><span class="cm">,</span> <span class="i">$TypeOfFirstValue</span><span class="cm">,</span> <span class="i">$AtomicInvariant</span><span class="cm">,</span> <span class="i">$SpecifiedAtomicInvariant</span><span class="cm">,</span> <span class="i">$AtomicInvariantValue</span><span class="cm">,</span> <span class="i">@SpecifiedAtomicInvariants</span><span class="cm">,</span> <span class="i">@AtomicInvariantsToUse</span><span class="s">)</span><span class="sc">;</span>
+ 545 
+ 546   <span class="k">if</span> <span class="s">(</span>!<span class="i">@Values</span><span class="s">)</span> <span class="s">{</span>
+ 547     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetAtomicInvariantsToUse: No values specified...&quot;</span><span class="sc">;</span>
+ 548     <span class="k">return</span><span class="sc">;</span>
+ 549   <span class="s">}</span>
+ 550 
+ 551   <span class="i">$FirstValue</span> = <span class="i">$Values</span>[<span class="n">0</span>]<span class="sc">;</span>
+ 552   <span class="i">$TypeOfFirstValue</span> = <span class="k">ref</span> <span class="i">$FirstValue</span><span class="sc">;</span>
+ 553 
+ 554   <span class="i">@SpecifiedAtomicInvariants</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 555   <span class="i">@AtomicInvariantsToUse</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 556 
+ 557   <span class="k">if</span> <span class="s">(</span><span class="i">$TypeOfFirstValue</span> =~ <span class="q">/^ARRAY/</span><span class="s">)</span> <span class="s">{</span>
+ 558     <span class="k">push</span> <span class="i">@SpecifiedAtomicInvariants</span><span class="cm">,</span> <span class="i">@</span>{<span class="i">$FirstValue</span>}<span class="sc">;</span>
+ 559   <span class="s">}</span>
+ 560   <span class="k">else</span> <span class="s">{</span>
+ 561     <span class="k">push</span> <span class="i">@SpecifiedAtomicInvariants</span><span class="cm">,</span> <span class="i">@Values</span><span class="sc">;</span>
+ 562   <span class="s">}</span>
+ 563 
+ 564   <span class="c"># Make sure specified AtomicInvariants are valid...</span>
+ 565   <span class="k">for</span> <span class="i">$SpecifiedAtomicInvariant</span> <span class="s">(</span><span class="i">@SpecifiedAtomicInvariants</span><span class="s">)</span> <span class="s">{</span>
+ 566     <span class="k">if</span> <span class="s">(</span>!<span class="i">AtomTypes::AtomicInvariantsAtomTypes::IsAtomicInvariantAvailable</span><span class="s">(</span><span class="i">$SpecifiedAtomicInvariant</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 567       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomicInvariantsToUse: Specified atomic invariant, $SpecifiedAtomicInvariant, is not supported...\n &quot;</span><span class="sc">;</span>
+ 568     <span class="s">}</span>
+ 569     <span class="i">$AtomicInvariant</span> = <span class="i">$SpecifiedAtomicInvariant</span><span class="sc">;</span>
+ 570     <span class="k">push</span> <span class="i">@AtomicInvariantsToUse</span><span class="cm">,</span> <span class="i">$AtomicInvariant</span><span class="sc">;</span>
+ 571   <span class="s">}</span>
+ 572 
+ 573   <span class="c"># Set atomic invariants to use...</span>
+ 574   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 575   <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}}<span class="cm">,</span> <span class="i">@AtomicInvariantsToUse</span><span class="sc">;</span>
+ 576 
+ 577   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 578 <span class="s">}</span>
+ 579 
+ 580 <span class="c"># Set functional classes to use for atom identifiers...</span>
+ 581 <span class="c">#</span>
+<a name="SetFunctionalClassesToUse-"></a> 582 <span class="k">sub </span><span class="m">SetFunctionalClassesToUse</span> <span class="s">{</span>
+ 583   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@Values</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 584   <span class="k">my</span><span class="s">(</span><span class="i">$FirstValue</span><span class="cm">,</span> <span class="i">$TypeOfFirstValue</span><span class="cm">,</span> <span class="i">$FunctionalClass</span><span class="cm">,</span> <span class="i">$SpecifiedFunctionalClass</span><span class="cm">,</span> <span class="i">@SpecifiedFunctionalClasses</span><span class="cm">,</span> <span class="i">@FunctionalClassesToUse</span><span class="s">)</span><span class="sc">;</span>
+ 585 
+ 586   <span class="k">if</span> <span class="s">(</span>!<span class="i">@Values</span><span class="s">)</span> <span class="s">{</span>
+ 587     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetFunctionalClassesToUse: No values specified...&quot;</span><span class="sc">;</span>
+ 588     <span class="k">return</span><span class="sc">;</span>
+ 589   <span class="s">}</span>
+ 590 
+ 591   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} !~ <span class="q">/^FunctionalClassAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 592     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetFunctionalClassesToUse: FunctionalClassesToUse can&#39;t be set for InitialAtomIdentifierType of $This-&gt;{AtomIdentifierType}...&quot;</span><span class="sc">;</span>
+ 593     <span class="k">return</span><span class="sc">;</span>
+ 594   <span class="s">}</span>
+ 595 
+ 596   <span class="i">$FirstValue</span> = <span class="i">$Values</span>[<span class="n">0</span>]<span class="sc">;</span>
+ 597   <span class="i">$TypeOfFirstValue</span> = <span class="k">ref</span> <span class="i">$FirstValue</span><span class="sc">;</span>
+ 598 
+ 599   <span class="i">@SpecifiedFunctionalClasses</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 600   <span class="i">@FunctionalClassesToUse</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 601 
+ 602   <span class="k">if</span> <span class="s">(</span><span class="i">$TypeOfFirstValue</span> =~ <span class="q">/^ARRAY/</span><span class="s">)</span> <span class="s">{</span>
+ 603     <span class="k">push</span> <span class="i">@SpecifiedFunctionalClasses</span><span class="cm">,</span> <span class="i">@</span>{<span class="i">$FirstValue</span>}<span class="sc">;</span>
+ 604   <span class="s">}</span>
+ 605   <span class="k">else</span> <span class="s">{</span>
+ 606     <span class="k">push</span> <span class="i">@SpecifiedFunctionalClasses</span><span class="cm">,</span> <span class="i">@Values</span><span class="sc">;</span>
+ 607   <span class="s">}</span>
+ 608 
+ 609   <span class="c"># Make sure specified FunctionalClasses are valid...</span>
+ 610   <span class="k">for</span> <span class="i">$SpecifiedFunctionalClass</span> <span class="s">(</span><span class="i">@SpecifiedFunctionalClasses</span><span class="s">)</span> <span class="s">{</span>
+ 611     <span class="k">if</span> <span class="s">(</span>!<span class="i">AtomTypes::FunctionalClassAtomTypes::IsFunctionalClassAvailable</span><span class="s">(</span><span class="i">$SpecifiedFunctionalClass</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 612       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFunctionalClassesToUse: Specified functional class, $SpecifiedFunctionalClass, is not supported...\n &quot;</span><span class="sc">;</span>
+ 613     <span class="s">}</span>
+ 614     <span class="k">push</span> <span class="i">@FunctionalClassesToUse</span><span class="cm">,</span> <span class="i">$SpecifiedFunctionalClass</span><span class="sc">;</span>
+ 615   <span class="s">}</span>
+ 616 
+ 617   <span class="c"># Set functional classes to use...</span>
+ 618   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 619   <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}}<span class="cm">,</span> <span class="i">@FunctionalClassesToUse</span><span class="sc">;</span>
+ 620 
+ 621   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 622 <span class="s">}</span>
+ 623 
+ 624 <span class="c"># Initialize atom indentifier type information...</span>
+ 625 <span class="c">#</span>
+ 626 <span class="c"># Current supported values:</span>
+ 627 <span class="c">#</span>
+ 628 <span class="c"># AtomicInvariantsAtomTypes, DREIDINGAtomTypes, EStateAtomTypes, FunctionalClassAtomTypes,</span>
+ 629 <span class="c"># MMFF94AtomTypes, SLogPAtomTypes, SYBYLAtomTypes, TPSAAtomTypes, UFFAtomTypes</span>
+ 630 <span class="c">#</span>
+<a name="_InitializeAtomIdentifierTypeInformation-"></a> 631 <span class="k">sub </span><span class="m">_InitializeAtomIdentifierTypeInformation</span> <span class="s">{</span>
+ 632   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 633 
+ 634   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^AtomicInvariantsAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 635     <span class="i">$This</span><span class="i">-&gt;_InitializeAtomicInvariantsAtomTypesInformation</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 636   <span class="s">}</span>
+ 637   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^FunctionalClassAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 638     <span class="i">$This</span><span class="i">-&gt;_InitializeFunctionalClassAtomTypesInformation</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 639   <span class="s">}</span>
+ 640   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^(DREIDINGAtomTypes|EStateAtomTypes|MMFF94AtomTypes|SLogPAtomTypes|SYBYLAtomTypes|TPSAAtomTypes|UFFAtomTypes)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 641     <span class="c"># Nothing to do for now...</span>
+ 642   <span class="s">}</span>
+ 643   <span class="k">else</span> <span class="s">{</span>
+ 644     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_InitializeAtomIdentifierTypeInformation: Unknown atom indentifier type $This-&gt;{AtomIdentifierType}...&quot;</span><span class="sc">;</span>
+ 645   <span class="s">}</span>
+ 646 
+ 647   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 648 <span class="s">}</span>
+ 649 
+ 650 <span class="c"># Initialize atomic invariants atom types to use for generating atom identifiers...</span>
+ 651 <span class="c">#</span>
+ 652 <span class="c"># Let:</span>
+ 653 <span class="c">#   AS = Atom symbol corresponding to element symbol</span>
+ 654 <span class="c">#</span>
+ 655 <span class="c">#   X&lt;n&gt;   = Number of non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 656 <span class="c">#   BO&lt;n&gt; = Sum of bond orders to non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 657 <span class="c">#   LBO&lt;n&gt; = Largest bond order of non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 658 <span class="c">#   SB&lt;n&gt; = Number of single bonds to non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 659 <span class="c">#   DB&lt;n&gt; = Number of double bonds to non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 660 <span class="c">#   TB&lt;n&gt; = Number of triple bonds to non-hydrogen atom neighbors or heavy atoms attached to atom</span>
+ 661 <span class="c">#   H&lt;n&gt;   = Number of implicit and explicit hydrogens for atom</span>
+ 662 <span class="c">#   Ar     = Aromatic annotation indicating whether atom is aromatic</span>
+ 663 <span class="c">#   RA     = Ring atom annotation indicating whether atom is a ring</span>
+ 664 <span class="c">#   FC&lt;+n/-n&gt; = Formal charge assigned to atom</span>
+ 665 <span class="c">#   MN&lt;n&gt; = Mass number indicating isotope other than most abundant isotope</span>
+ 666 <span class="c">#   SM&lt;n&gt; = Spin multiplicity of atom. Possible values: 1 (singlet), 2 (doublet) or 3 (triplet)</span>
+ 667 <span class="c">#</span>
+ 668 <span class="c"># Then:</span>
+ 669 <span class="c">#</span>
+ 670 <span class="c">#   Atom type generated by AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</span>
+ 671 <span class="c">#</span>
+ 672 <span class="c">#     AS.X&lt;n&gt;.BO&lt;n&gt;.LBO&lt;n&gt;.&lt;SB&gt;&lt;n&gt;.&lt;DB&gt;&lt;n&gt;.&lt;TB&gt;&lt;n&gt;.H&lt;n&gt;.Ar.RA.FC&lt;+n/-n&gt;.MN&lt;n&gt;.SM&lt;n&gt;</span>
+ 673 <span class="c">#</span>
+ 674 <span class="c"># Except for AS which is a required atomic invariant in atom types, all other atomic invariants are</span>
+ 675 <span class="c"># optional. Default atomic invariants used for AtomID are: AS, X&lt;n&gt;, BO&lt;n&gt;, H&lt;n&gt;, FC&lt;+n/-n&gt;.</span>
+ 676 <span class="c"># AtomID specification doesn&#39;t include atomic invariants with zero or undefined values.</span>
+ 677 <span class="c">#</span>
+<a name="_InitializeAtomicInvariantsAtomTypesInformation-"></a> 678 <span class="k">sub </span><span class="m">_InitializeAtomicInvariantsAtomTypesInformation</span> <span class="s">{</span>
+ 679   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 680 
+ 681   <span class="c"># Default atomic invariants to use for generating atom neighborhood atom IDs: AS, X, BO, H, FC</span>
+ 682   <span class="c">#</span>
+ 683   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 684   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}} = <span class="s">(</span><span class="q">&#39;AS&#39;</span><span class="cm">,</span> <span class="q">&#39;X&#39;</span><span class="cm">,</span> <span class="q">&#39;BO&#39;</span><span class="cm">,</span> <span class="q">&#39;H&#39;</span><span class="cm">,</span> <span class="q">&#39;FC&#39;</span><span class="s">)</span><span class="sc">;</span>
+ 685 
+ 686   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 687 <span class="s">}</span>
+ 688 
+ 689 <span class="c"># Initialize functional class atom types, generated by AtomTypes::FunctionalClassAtomTypes</span>
+ 690 <span class="c"># class, to use for generating atom identifiers...</span>
+ 691 <span class="c">#</span>
+ 692 <span class="c"># Let:</span>
+ 693 <span class="c">#   HBD: HydrogenBondDonor</span>
+ 694 <span class="c">#   HBA: HydrogenBondAcceptor</span>
+ 695 <span class="c">#   PI :  PositivelyIonizable</span>
+ 696 <span class="c">#   NI : NegativelyIonizable</span>
+ 697 <span class="c">#   Ar : Aromatic</span>
+ 698 <span class="c">#   Hal : Halogen</span>
+ 699 <span class="c">#   H : Hydrophobic</span>
+ 700 <span class="c">#   RA : RingAtom</span>
+ 701 <span class="c">#   CA : ChainAtom</span>
+ 702 <span class="c">#</span>
+ 703 <span class="c"># Then:</span>
+ 704 <span class="c">#</span>
+ 705 <span class="c">#   Functiononal class atom type specification for an atom corresponds to:</span>
+ 706 <span class="c">#</span>
+ 707 <span class="c">#     Ar.CA.H.HBA.HBD.Hal.NI.PI.RA</span>
+ 708 <span class="c">#</span>
+ 709 <span class="c">#   Default functional classes used are: HBD, HBA, PI, NI, Ar, Hal</span>
+ 710 <span class="c">#</span>
+ 711 <span class="c">#   FunctionalAtomTypes are assigned using the following definitions [ Ref 60-61, Ref 65-66 ]:</span>
+ 712 <span class="c">#</span>
+ 713 <span class="c">#     HydrogenBondDonor: NH, NH2, OH</span>
+ 714 <span class="c">#     HydrogenBondAcceptor: N[!H], O</span>
+ 715 <span class="c">#     PositivelyIonizable: +, NH2</span>
+ 716 <span class="c">#     NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</span>
+ 717 <span class="c">#</span>
+<a name="_InitializeFunctionalClassAtomTypesInformation-"></a> 718 <span class="k">sub </span><span class="m">_InitializeFunctionalClassAtomTypesInformation</span> <span class="s">{</span>
+ 719   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 720 
+ 721   <span class="c"># Default functional class atom typess to use for generating atom identifiers</span>
+ 722   <span class="c"># are: HBD, HBA, PI, NI, Ar, Hal</span>
+ 723   <span class="c">#</span>
+ 724   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 725   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}} = <span class="s">(</span><span class="q">&#39;HBD&#39;</span><span class="cm">,</span> <span class="q">&#39;HBA&#39;</span><span class="cm">,</span> <span class="q">&#39;PI&#39;</span><span class="cm">,</span> <span class="q">&#39;NI&#39;</span><span class="cm">,</span> <span class="q">&#39;Ar&#39;</span><span class="cm">,</span> <span class="q">&#39;Hal&#39;</span><span class="s">)</span><span class="sc">;</span>
+ 726 
+ 727   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 728 <span class="s">}</span>
+ 729 
+ 730 <span class="c"># Return a string containg data for AtomNeighborhoodsFingerprints object...</span>
+ 731 <span class="c">#</span>
+<a name="StringifyAtomNeighborhoodsFingerprints-"></a> 732 <span class="k">sub </span><span class="m">StringifyAtomNeighborhoodsFingerprints</span> <span class="s">{</span>
+ 733   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 734   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsString</span><span class="s">)</span><span class="sc">;</span>
+ 735 
+ 736   <span class="c"># Type of fingerprint...</span>
+ 737   <span class="i">$FingerprintsString</span> = <span class="q">&quot;Fingerprint type: $This-&gt;{Type}; AtomIdentifierType: $This-&gt;{AtomIdentifierType}; MinNeighborhoodRadius: $This-&gt;{MinNeighborhoodRadius}; MaxNeighborhoodRadius: $This-&gt;{MaxNeighborhoodRadius}&quot;</span><span class="sc">;</span>
+ 738 
+ 739   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^AtomicInvariantsAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 740     <span class="k">my</span><span class="s">(</span><span class="i">$AtomicInvariant</span><span class="cm">,</span> <span class="i">@AtomicInvariants</span><span class="cm">,</span> <span class="i">@AtomicInvariantsOrder</span><span class="cm">,</span> <span class="i">%AvailableAtomicInvariants</span><span class="s">)</span><span class="sc">;</span>
+ 741 
+ 742     <span class="i">@AtomicInvariantsOrder</span> = <span class="i">AtomTypes::AtomicInvariantsAtomTypes::GetAtomicInvariantsOrder</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 743     <span class="i">%AvailableAtomicInvariants</span> = <span class="i">AtomTypes::AtomicInvariantsAtomTypes::GetAvailableAtomicInvariants</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 744 
+ 745     <span class="k">for</span> <span class="i">$AtomicInvariant</span> <span class="s">(</span><span class="i">@AtomicInvariantsOrder</span><span class="s">)</span> <span class="s">{</span>
+ 746       <span class="k">push</span> <span class="i">@AtomicInvariants</span><span class="cm">,</span> <span class="q">&quot;$AtomicInvariant: $AvailableAtomicInvariants{$AtomicInvariant}&quot;</span><span class="sc">;</span>
+ 747     <span class="s">}</span>
+ 748 
+ 749     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AtomicInvariantsToUse: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomicInvariantsToUse</span>}}<span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 750     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AtomicInvariantsOrder: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@AtomicInvariantsOrder</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 751     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AvailableAtomicInvariants: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@AtomicInvariants</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 752   <span class="s">}</span>
+ 753   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomIdentifierType</span>} =~ <span class="q">/^FunctionalClassAtomTypes$/i</span><span class="s">)</span> <span class="s">{</span>
+ 754     <span class="k">my</span><span class="s">(</span><span class="i">$FunctionalClass</span><span class="cm">,</span> <span class="i">@FunctionalClasses</span><span class="cm">,</span> <span class="i">@FunctionalClassesOrder</span><span class="cm">,</span> <span class="i">%AvailableFunctionalClasses</span><span class="s">)</span><span class="sc">;</span>
+ 755 
+ 756     <span class="i">@FunctionalClassesOrder</span> = <span class="i">AtomTypes::FunctionalClassAtomTypes::GetFunctionalClassesOrder</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 757     <span class="i">%AvailableFunctionalClasses</span> = <span class="i">AtomTypes::FunctionalClassAtomTypes::GetAvailableFunctionalClasses</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 758 
+ 759     <span class="k">for</span> <span class="i">$FunctionalClass</span> <span class="s">(</span><span class="i">@FunctionalClassesOrder</span><span class="s">)</span> <span class="s">{</span>
+ 760       <span class="k">push</span> <span class="i">@FunctionalClasses</span><span class="cm">,</span> <span class="q">&quot;$FunctionalClass: $AvailableFunctionalClasses{$FunctionalClass}&quot;</span><span class="sc">;</span>
+ 761     <span class="s">}</span>
+ 762 
+ 763     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; FunctionalClassesToUse: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">FunctionalClassesToUse</span>}}<span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 764     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; FunctionalClassesOrder: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@FunctionalClassesOrder</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 765     <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AvailableFunctionalClasses: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@FunctionalClasses</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 766   <span class="s">}</span>
+ 767 
+ 768   <span class="c"># Total number of atom neighborhood atom IDs...</span>
+ 769   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; NumOfAtomNeighborhoodAtomIdentifiers: &quot;</span> . <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;GetNumOfValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 770 
+ 771   <span class="c"># FingerprintsVector...</span>
+ 772   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; FingerprintsVector: &lt; $This-&gt;{FingerprintsVector} &gt;&quot;</span><span class="sc">;</span>
+ 773 
+ 774   <span class="k">return</span> <span class="i">$FingerprintsString</span><span class="sc">;</span>
+ 775 <span class="s">}</span>
+ 776 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

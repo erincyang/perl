@@ -1,0 +1,166 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ElementalAnalysisSDFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ElementalAnalysis.html" title="ElementalAnalysis.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ElementalAnalysisTextFiles.html" title="ElementalAnalysisTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>ElementalAnalysisSDFiles.pl</strong></td><td width="33%" align="right"><a href="././code/ElementalAnalysisSDFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ElementalAnalysisSDFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ElementalAnalysisSDFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ElementalAnalysisSDFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ElementalAnalysisSDFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ElementalAnalysisSDFiles.pl - Perform elemental analysis using formula data field in SDFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>ElementalAnalysisSDFiles.pl SDFile(s)...</p>
+<p>ElementalAnalysisSDFiles.pl [<strong>-d, --detail</strong> infolevel] [<strong>--fast</strong>]
+[<strong>--formulafield</strong> SD data field name] [<strong>-f, --formulamode</strong> <em>DataField | StructureData</em>]
+[<strong>--formulaout</strong> yes or no] [<strong>-m, --mode</strong> All | &quot;ElementalAnalysis, [MolecularWeight, ExactMass]&quot;]
+[<strong>-h, --help</strong>] [<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> rootname]
+[<strong>-v --valuefieldnames</strong> Name, Label, [Name, Label,...]] [<strong>-w, --workingdir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Perform elemental analysis using molecular formula specified by a data field name or generated
+from structure data in <em>SDFile(s)</em>.</p>
+<p>In addition to straightforward molecular formulas - H2O, HCl, C3H7O2N -
+other supported variations are: Ca3(PO4)2, [PCl4]+, [Fe(CN)6]4-, C37H42N2O6+2, Na2CO3.10H2O,
+8H2S.46H2O, and so on. Charges are simply ignored. Isotope symbols in formulas specification, including
+D and T, are not supported.</p>
+<p>The file names are separated by space.The valid file extensions are <em>.sdf</em> and <em>.sd</em>.
+All other file names are ignored. All the SD files in a current directory can be specified
+either by <em>*.sdf</em> or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-d, --detail</strong> <em>infolevel</em></strong></dt>
+<dd>
+<p>Level of information to print about compound records being ignored. Default: <em>1</em>. Possible
+values: <em>1, 2 or 3</em>.</p>
+</dd>
+<dt><strong><strong>--fast</strong></strong></dt>
+<dd>
+<p>In this mode, the formula data field specified using <strong>-f, --formulafield</strong> option is assumed
+to contain valid molecular formula data and initial formula validation check is skipped.</p>
+</dd>
+<dt><strong><strong>--formulafield</strong> <em>SD data field name</em></strong></dt>
+<dd>
+<p><em>SDFile(s)</em> data field name containing molecular formulas used for performing
+elemental analysis during <em>DataField</em> value of <strong>-f, --formulamode</strong> option.
+Default value: <em>SD data field containing the word formula in its name</em>.</p>
+<p>This option is ignore during <em>StructureData</em> value of <strong>-f, --formulamode</strong> option.</p>
+</dd>
+<dt><strong><strong>-f, --formulamode</strong> <em>DataField | StructureData</em></strong></dt>
+<dd>
+<p>Specify source of molecular formula used for performing elemental analysis: retrieve
+formula using <em>SDFile(s)</em> data field name or generate formula from structure. Possible
+values: <em>DataField or StructureData</em>. Default value: <em>DataField</em>.</p>
+</dd>
+<dt><strong><strong>--formulaout</strong> <em>yes or no</em></strong></dt>
+<dd>
+<p>Specify whether to write out formula to SD file during <em>StructureData</em> value of
+<strong>-f, --formulamode</strong> option. Possible values: <em>Yes or No</em>. Default: <em>No</em>.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>All | &quot;ElementalAnalysis,[MolecularWeight,ExactMass]&quot;</em></strong></dt>
+<dd>
+<p>Specify what values to calculate using molecular formula data field or structure data from
+<em>SDFile(s)</em>: calculate all supported values or specify a comma delimited list of values.
+Possible values: <em>All | &quot;ElementalAnalysis, [MolecularWeight, ExactMass]&quot;</em>. Default: <em>All</em></p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-p, --precision</strong> <em>number</em></strong></dt>
+<dd>
+<p>Precision of calculated values in the output file. Default: up to <em>2</em> decimal places.
+Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New SD file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default new file
+name: &lt;InitialSDFileName&gt;ElementalAnalysis.&lt;Ext&gt;. This option is ignored for multiple
+input files.</p>
+</dd>
+<dt><strong><strong>-v --valuefieldnames</strong> <em>Name,Label,[Name,Label,...]</em></strong></dt>
+<dd>
+<p>Specify SD data field names to use for calculated values. In general, it's a comma delimited
+list of value name and SD field name  pairs. Supported value names: <em>ElementalAnalysis,
+MolecularWeight, ExactMass, and MolecularFormula</em>. Default labels: <em>ElementalAnalysis,
+MolecularWeight, ExactMass, and MolecularFormula</em>.</p>
+<p><em>MolecularFormula</em> label is only used during <em>StructureData</em> value of
+<strong>-f, --formulamode</strong> option.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To perform elemental analysis, calculate molecular weight and exact mass using SD
+field name value with the word Formula in its name and generate a new SD file
+NewSample1.sdf, type:</p>
+<div class="ExampleBox">
+    % ElementalAnalysisSDFiles.pl -o -r NewSample1 Sample1.sdf</div>
+<p>To perform elemental analysis, calculate molecular weight and exact mass using
+structure data in SD file and generate a new SD file NewSample1.sdf, type:</p>
+<div class="ExampleBox">
+    % ElementalAnalysisSDFiles.pl --formulamode StructureData -o
+      -r NewSample1 Sample1.sdf</div>
+<p>To perform elemental analysis using formulas in SD field name Formula, use field name
+Analysis for calculated data, and generate a new SD file NewSample1.sdf, type:</p>
+<div class="ExampleBox">
+    % ElementalAnalysisSDFiles.pl --m ElementalAnalysis --formulafield
+      Formula --valuefieldnames &quot;ElementalAnalysis,Analysis&quot; -o
+      -r NewSample1 Sample1.sdf</div>
+<p>To calculate molecular weight, using formulas in SD field name Formula, with four decimal
+precision and generate a new SD file NewSample1.sdf, type</p>
+<div class="ExampleBox">
+    % ElementalAnalysisSDFiles.pl --m MolecularWeight --formulafield
+      Formula --precision 4 -o -r NewSample1 Sample1.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AnalyzeSDFilesData.html">AnalyzeSDFilesData.pl</a>,&nbsp<a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./ExtractFromSDFiles.html">ExtractFromSDFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ElementalAnalysis.html" title="ElementalAnalysis.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ElementalAnalysisTextFiles.html" title="ElementalAnalysisTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ElementalAnalysisSDFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

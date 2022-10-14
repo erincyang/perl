@@ -1,0 +1,1752 @@
+
+aarex.pl,1682
+sub usage usage9,196
+my %par=par53,1663
+my %defpar defpar54,1675
+my $condfile;condfile61,1771
+my $nwindows;nwindows62,1785
+my $mintemp;mintemp63,1799
+my $maxtemp;maxtemp64,1812
+my $nruns=nruns66,1826
+my $listfile;listfile68,1842
+my @initfile;initfile69,1856
+my $srec=srec71,1871
+my $from;from73,1885
+my $to;to74,1895
+my $cpus;cpus75,1903
+my $hostfile;hostfile77,1914
+my $mp=mp78,1928
+my $keepmpdir=keepmpdir79,1938
+my $prun=prun81,1956
+my $saveid;saveid83,1969
+my $elogfile;elogfile85,1982
+my $clogfile;clogfile86,1996
+my $cons;cons88,2011
+my %mdopt=mdopt90,2022
+my %defmdopt defmdopt91,2036
+my %mdpar=mdpar99,2142
+my %defmdpar defmdpar100,2156
+my $serverlog;serverlog111,2328
+my $dir=dir113,2344
+my $optfile;optfile115,2358
+my $prunnodes;prunnodes117,2372
+my %customfile;customfile119,2388
+my $rservfile=rservfile156,3248
+my $line=line159,3338
+my $ctag=ctag232,4957
+my $line=line247,5236
+my $mpClient;mpClient264,5589
+my $rex=rex274,5836
+my $consstr=consstr286,6144
+my $custom=custom308,6675
+my $lfile=lfile323,7122
+my $server=server332,7282
+my $ens=ens335,7392
+my $tlist=tlist348,7796
+my $out=out349,7860
+my @joblist;joblist382,8392
+my @pidlist;pidlist396,8661
+my $hostlist=hostlist399,8700
+my $jobsdone=jobsdone400,8748
+my $workdir=workdir401,8764
+my $xtrajobs;xtrajobs404,8804
+my $xtra=xtra405,8818
+my $maxcpus=maxcpus412,8998
+my $jfrom=jfrom413,9049
+my $jto=jto414,9072
+my $topt=topt421,9209
+my ($pid,$cpusleft)434,9514
+my $hostid=hostid442,9713
+my $pid=pid456,10150
+my $rexClient=rexClient458,10179
+my $lasttemp=lasttemp462,10294
+sub doJob doJob495,11082
+
+aarexAmber.pl,989
+sub usage usage9,201
+my %par=par54,1710
+my %defpar defpar55,1722
+my $condfile;condfile63,1855
+my $nwindows;nwindows64,1869
+my $mintemp;mintemp65,1883
+my $maxtemp;maxtemp66,1896
+my $nruns=nruns68,1910
+my $listfile;listfile70,1926
+my @initfile;initfile71,1940
+my $srec=srec73,1955
+my $from;from75,1969
+my $to;to76,1979
+my $cpus;cpus77,1987
+my $hostfile;hostfile79,1998
+my $mp=mp80,2012
+my $keepmpdir=keepmpdir81,2022
+my $prun=prun83,2040
+my $saveid;saveid85,2053
+my $elogfile;elogfile87,2066
+my $clogfile;clogfile88,2080
+my $cons;cons90,2095
+my %mdopt=mdopt92,2106
+my %defmdopt defmdopt93,2120
+my %mdpar=mdpar102,2248
+my %defmdpar defmdpar103,2262
+my $serverlog;serverlog111,2381
+my $dir=dir113,2397
+my $optfile;optfile115,2411
+my %customfile;customfile117,2425
+my $mpClient;mpClient255,5932
+my $rex=rex265,6189
+my $custom=custom299,7073
+my @joblist;joblist373,8979
+my @pidlist;pidlist402,9570
+sub doJob doJob475,11409
+
+bestcluster.pl,391
+sub usage usage9,139
+my $tag;tag36,846
+my $dir=dir37,855
+my $ctag;ctag39,869
+my $level=level41,880
+my $proptag=proptag43,895
+my $size=size45,916
+my $crit=crit47,929
+my $limstd=limstd48,945
+my $lowest=lowest50,962
+my $ens=ens91,1842
+my $cluster=cluster95,1917
+my $clist=clist102,2067
+my $res=res107,2174
+my @slist;slist117,2449
+sub _getScore _getScore142,3182
+
+calcprop.pl,375
+sub usage usage9,160
+my $tag;tag36,729
+my $dir=dir37,738
+my $mp=mp38,751
+my $keepmpdir=keepmpdir39,761
+my $srec=srec41,779
+my $cpus=cpus42,792
+my $natpdb;natpdb43,804
+my $hostfile;hostfile45,817
+my $fraglist;fraglist46,831
+my $chain;chain47,845
+my $jobrank;jobrank49,857
+my $saveid;saveid50,870
+my $mpClient;mpClient122,2542
+my $ens=ens130,2759
+
+charmm_mini.pl,181
+sub usage usage7,126
+my $inarg;inarg29,520
+my $sc_only=sc_only30,531
+my $interface=interface31,546
+my %par;par49,883
+my $charmm=charmm72,1686
+my $inlist=inlist75,1745
+
+checkchain.pl,103
+sub usage usage9,170
+my $verbose=verbose28,532
+my $chain=chain34,612
+my $violate=violate36,668
+
+checkin.pl,336
+sub usage usage9,183
+my $tag;tag34,812
+my $at=at35,821
+my $filelist=filelist36,832
+my $dir=dir37,849
+my $sicho=sicho39,863
+my $listfile;listfile41,877
+my $dcd;dcd43,892
+my $pdbtemplate;pdbtemplate44,901
+my $dcdskip=dcdskip45,918
+my $seqfile;seqfile47,934
+my $ens=ens97,2037
+sub readFortran readFortran167,3759
+
+cluster.pl,569
+sub usage usage9,183
+my $maxnum=maxnum39,1103
+my $minsize=minsize40,1117
+my $maxlevel=maxlevel41,1136
+my $clmode=clmode42,1154
+my $inpmode=inpmode43,1173
+my $method=method44,1192
+my $radius=radius45,1213
+my $mixfactor=mixfactor46,1229
+my $selmode=selmode47,1248
+my $contmaxdist;contmaxdist49,1268
+my $filelist=filelist51,1286
+my $fraglist;fraglist53,1304
+my $fitfraglist;fitfraglist54,1318
+my $centroid=centroid56,1336
+my $centout=centout57,1352
+my $logfile;logfile58,1372
+my $numfiles=numfiles140,3413
+my $cluster=cluster145,3608
+
+complete.pl,280
+sub usage usage9,157
+my %par par30,617
+my $fname;fname37,689
+my $logfile;logfile39,701
+my $cmdfile;cmdfile40,714
+my $fraglist;fraglist42,728
+my $mol=mol70,1330
+my $ss=ss73,1379
+my $charmm=charmm82,1566
+my $chmoutpdb=chmoutpdb86,1676
+my $outmol=outmol88,1736
+
+contact.pl,259
+sub usage usage9,217
+my $list=list31,678
+my $fraglist;fraglist33,691
+my ($pdb1,$pdb2)34,705
+my $readfile;readfile35,723
+my $done=done37,738
+my $analyze;analyze60,1254
+my $mol;mol61,1267
+my ($natcont, $natcontfrac, $rnatcont, $contlist)83,1867
+
+convpdb.pl,863
+sub usage usage8,147
+my $renumber;renumber41,1374
+my $add;add42,1388
+my $fname=fname43,1397
+my $inmode=inmode44,1412
+my $outmode=outmode45,1427
+my $center=center46,1450
+my $sellist;sellist47,1464
+my $chain;chain48,1477
+my $segnames;segnames49,1488
+my $matchpdb;matchpdb50,1502
+my $mergepdb;mergepdb51,1516
+my $setchain;setchain52,1530
+my $ignoreseg=ignoreseg53,1544
+my $chainfromseg=chainfromseg54,1561
+my $fixcoo=fixcoo55,1581
+my $dx=dx56,1595
+my $dy=dy57,1607
+my $dz=dz58,1619
+my $selmodel=selmodel59,1631
+my $selseq;selseq60,1651
+my $solvate;solvate61,1663
+my $shape;shape62,1676
+my $cutoff=cutoff63,1687
+my $excllist;excllist64,1703
+my $ignorehet=ignorehet65,1717
+my $ssbonds=ssbonds66,1734
+my $findssbonds=findssbonds67,1750
+my $nossbond=nossbond68,1769
+my $mol=mol172,4451
+my $tseq=tseq180,4699
+
+countIntCont.pl,205
+sub usage usage8,189
+my $fname=fname25,574
+my $distcut=distcut26,589
+my $chainA;chainA27,604
+my $chainB;chainB28,616
+my $SConly=SConly29,628
+my $mol=mol51,1090
+my $contacts=contacts52,1121
+
+dihed.pl,153
+sub usage usage10,205
+my %list list31,642
+my $fraglist;fraglist36,725
+my $refpdb;refpdb37,739
+my $done=done39,752
+my $analyze;analyze60,1228
+
+enerAmber.pl,497
+sub usage usage8,161
+my %par;par35,794
+my $oneline=oneline37,804
+my @olist;olist38,819
+my $translate=translate41,853
+my $logFile;logFile43,871
+my $inpfile=inpfile45,885
+my $base=base46,902
+my $done=done48,916
+my $ambpartop=ambpartop78,1631
+my $ambinpcoor=ambinpcoor79,1658
+my $ambinpcmd=ambinpcmd80,1688
+my $amboutcoor=amboutcoor81,1719
+my $amboutlog=amboutlog82,1749
+my $mol=mol84,1781
+my $amber=amber93,1946
+my $amberinp=amberinp99,2066
+my $ener=ener113,2395
+
+enerCHARMM.pl,415
+sub usage usage9,152
+my %par;par36,918
+my $logFile;logFile38,928
+my $cmdlog;cmdlog39,941
+my $oneline=oneline41,954
+my $inpfile=inpfile43,970
+my $needsasa=needsasa44,987
+my @olist;olist46,1004
+my $sellist;sellist49,1038
+my $selfe=selfe50,1051
+my $psffile;psffile52,1065
+my $crdfile;crdfile53,1078
+my $all=all54,1091
+my $done=done56,1103
+my $charmm=charmm97,2114
+my $ener=ener109,2330
+
+enscluster.pl,301
+sub usage usage9,159
+my %defpar defpar38,966
+my %par;par48,1193
+my $fraglist;fraglist50,1203
+my $contmaxdist;contmaxdist52,1218
+my $workdir=workdir54,1236
+my $tag;tag55,1253
+my $optfile;optfile57,1263
+my $ens=ens108,2570
+my $filelist=filelist137,3287
+my $cluster=cluster140,3410
+
+enscut.pl,538
+sub usage usage10,195
+my $intag;intag39,862
+my $outtag;outtag40,873
+my $dir=dir41,885
+my ($from,$to)42,898
+my $fraglist;fraglist44,915
+my %par;par46,930
+my %defpar defpar48,940
+my $optfile;optfile55,1071
+my $ens=ens93,1966
+my $farcutoff=farcutoff112,2313
+my $filelist=filelist113,2333
+my $jlist=jlist115,2351
+my $flist;flist117,2395
+my $clist;clist118,2406
+my $havereslist=havereslist186,4049
+my $havecons3list=havecons3list187,4069
+my $havecons1list=havecons1list188,4091
+my $consstr;consstr244,5584
+
+enseval.pl,595
+sub usage usage9,160
+my $intag;intag44,945
+my $dir=dir45,956
+my $srec=srec46,969
+my $cpus=cpus47,982
+my $hostfile;hostfile48,994
+my $overwrite=overwrite50,1009
+my ($from,$to)51,1026
+my $logfile;logfile53,1043
+my %par=par54,1056
+my $update=update56,1069
+my $mp=mp58,1085
+my $keepmpdir=keepmpdir59,1095
+my $jobrank;jobrank61,1113
+my $saveid;saveid62,1126
+my @slist;slist64,1139
+my $setstr=setstr66,1151
+my $parstr=parstr67,1166
+my $setlist=setlist141,2956
+my $mpClient;mpClient164,3408
+my $ens=ens171,3563
+my $jtag=jtag173,3600
+sub dojob dojob289,6236
+
+ensfiles.pl,231
+sub usage usage9,167
+my $workdir=workdir35,727
+my $tag;tag36,744
+my $cluster;cluster38,754
+my $ctag;ctag40,768
+my $listfile;listfile42,779
+my $proptag;proptag44,794
+my $ens=ens74,1437
+my $filelist=filelist76,1476
+
+enslatsim.pl,707
+sub usage usage10,192
+my $tag=tag53,1416
+my $dir=dir54,1431
+my $srec=srec55,1444
+my $cpus=cpus56,1457
+my $hostfile;hostfile57,1469
+my $natpdb;natpdb59,1484
+my $seq;seq60,1496
+my ($from,$to)61,1505
+my ($chainfile, $pdbfile, $rndchain)62,1521
+my $gridsize;gridsize63,1559
+my ($fraglist,$fragref,$limforce)64,1573
+my ($drestforce, $drestlist)65,1608
+my %simpar=simpar66,1638
+my $keeptra;keeptra67,1653
+my $optfile;optfile69,1667
+my $mp=mp71,1681
+my $keepmpdir=keepmpdir72,1691
+my $jobrank;jobrank74,1709
+my $saveid;saveid75,1722
+my $mpClient;mpClient193,4613
+my $ens=ens201,4830
+my $inpchain;inpchain218,5231
+my $monsster;monsster219,5245
+sub dojob dojob392,10014
+
+ensmin.pl,659
+sub usage usage9,160
+my ($intag,$outtag)48,1225
+my $dir=dir49,1246
+my $srec=srec50,1259
+my $cpus=cpus51,1272
+my $hostfile;hostfile52,1284
+my $natpdb;natpdb54,1299
+my ($from,$to)55,1311
+my ($fraglist,$fragref)57,1328
+my $logfile;logfile59,1354
+my %par=par60,1367
+my $cons;cons61,1379
+my %paropt=paropt63,1390
+my %defopt defopt65,1406
+my %defpar defpar71,1481
+my $optfile;optfile73,1500
+my $mp=mp75,1514
+my $keepmpdir=keepmpdir76,1524
+my $jobrank;jobrank78,1542
+my $saveid;saveid79,1555
+my $update=update81,1568
+my $mpClient;mpClient205,4609
+my $ens=ens213,4829
+my $allcons=allcons251,5696
+sub dojob dojob410,9509
+
+ensrun.pl,719
+sub usage usage9,157
+my $intag;intag46,1070
+my $dir=dir47,1081
+my $srec=srec48,1094
+my $cpus=cpus49,1107
+my $hostfile;hostfile50,1119
+my $logfile;logfile51,1133
+my $update=update53,1147
+my $useinp=useinp55,1163
+my ($from,$to)57,1178
+my $natpdb;natpdb59,1195
+my $newtag;newtag60,1207
+my $setprop=setprop61,1219
+my $setarg;setarg63,1236
+my $cmdfile;cmdfile65,1249
+my $cmd;cmd66,1262
+my $mp=mp68,1272
+my $keepmpdir=keepmpdir69,1282
+my $overwrite=overwrite71,1300
+my $jobrank;jobrank73,1318
+my $saveid;saveid74,1331
+my @cmdlist;cmdlist172,3599
+my $tag=tag174,3613
+my $mpClient;mpClient176,3656
+my $ens=ens184,3873
+my $lookuptag=lookuptag206,4365
+sub dojob dojob354,7727
+
+evaluate.pl,645
+sub usage usage9,147
+my %defminpar defminpar49,1635
+my %defopt defopt51,1657
+my $tag=tag69,2117
+my $dir=dir70,2133
+my $listfile;listfile72,2150
+my $cpus=cpus74,2165
+my $hostfile;hostfile75,2177
+my $mp=mp77,2192
+my $keepmpdir=keepmpdir78,2202
+my %minpar=minpar80,2220
+my ($fraglist,$fragref)81,2235
+my $cutout;cutout82,2260
+my $cluster;cluster83,2272
+my %par=par84,2285
+my $filelist=filelist86,2298
+my $optfile;optfile88,2316
+my $minopt=minopt90,2330
+my $verbose=verbose92,2346
+my $prop=prop94,2362
+my $ens=ens170,4103
+my $at=at203,4743
+my $resens=resens234,5405
+sub _showResult _showResult256,6001
+
+follow_Rosetta_sched.pl,556
+sub usage usage6,132
+my $customFunc=customFunc38,801
+my $inPDB;inPDB46,1005
+my $Rmol=Rmol82,1974
+my $prefix=prefix83,2011
+my $sched;sched86,2070
+my $schedFile=schedFile87,2081
+my $firstrun;firstrun96,2301
+my $bestFile=bestFile97,2315
+my $sArr;sArr104,2494
+sub readSchedFile readSchedFile159,3860
+sub restart_from_PDBs restart_from_PDBs188,4496
+sub restart_from_scores restart_from_scores206,4873
+sub write_scores write_scores226,5266
+sub write_origins write_origins256,6010
+sub processInstruction processInstruction280,6573
+
+genchain.pl,482
+sub usage usage9,139
+my $resolution=resolution35,841
+my $gridsize=gridsize36,862
+my $offsetx=offsetx37,880
+my $offsety=offsety38,898
+my $offsetz=offsetz39,916
+my $fraglist;fraglist40,934
+my $mode=mode41,948
+my $filename=filename42,969
+my $randomnum=randomnum43,986
+my $center;center44,1004
+my $wantca=wantca45,1016
+my $intflag=intflag46,1030
+my $newresnames;newresnames47,1045
+my $seqfile;seqfile48,1062
+my $sicho=sicho119,2781
+my $mol;mol126,2981
+
+geninput.pl,134
+sub usage usage9,147
+my ($force, $fraglist)36,994
+my %par=par37,1018
+my $seqfile;seqfile39,1031
+my $monsster;monsster62,1527
+
+genrestr.pl,166
+sub usage usage9,177
+my $restlist;restlist31,649
+my $seqfile;seqfile32,663
+my $exclmode;exclmode33,676
+my $force;force34,690
+my $monsster;monsster63,1345
+
+genseq.pl,268
+sub usage usage9,148
+my $inpfile;inpfile36,816
+my $input=input37,829
+my $output=output38,846
+my @predfiles=predfiles39,869
+my $secondary=secondary40,887
+my $slist=slist41,905
+my $secfile;secfile42,919
+my $fraglist;fraglist43,932
+my $seq;seq86,2022
+
+getprop.pl,304
+sub usage usage9,159
+my $tag;tag34,792
+my $dir=dir35,801
+my $show=show37,815
+my @proplist;proplist38,827
+my $score;score40,842
+my $limstd=limstd41,853
+my $cluster;cluster43,870
+my $ctag;ctag44,883
+my $ens=ens82,1737
+sub _showData _showData145,3241
+sub _getScore _getScore157,3433
+
+hlamc.pl,757
+sub usage usage8,166
+my %aapar;aapar43,1202
+my %defaapar defaapar44,1213
+my %evalpar;evalpar52,1336
+my %defevalpar=defevalpar53,1349
+my %latpar;latpar55,1371
+my %deflatpar deflatpar56,1383
+my %genpar;genpar62,1455
+my %defgenpar defgenpar63,1467
+my $dir=dir73,1629
+my $pdbfile;pdbfile75,1643
+my $evallog;evallog77,1657
+my $aalog;aalog78,1670
+my $enstag=enstag80,1682
+my $seqfile;seqfile82,1701
+my $latens=latens130,2913
+my $ens=ens132,2962
+my $at=at133,2999
+my $mcharmm=mcharmm152,3323
+my $echarmm;echarmm156,3467
+my $first=first170,3845
+my $outmol=outmol171,3858
+my $monsster=monsster173,3887
+my $inpchain=inpchain178,4048
+my $initmol=initmol179,4075
+my $cons=cons183,4178
+my $lastener=lastener200,4733
+
+hlamcrex.pl,1178
+sub usage usage8,162
+my %par=par59,1798
+my %defpar defpar60,1810
+my %mcpar=mcpar67,1917
+my %defmcpar defmcpar68,1931
+my $condfile;condfile77,2072
+my $nwindows;nwindows78,2086
+my $mintemp;mintemp79,2100
+my $maxtemp;maxtemp80,2113
+my $nruns=nruns82,2127
+my $listfile;listfile84,2143
+my @initfile;initfile85,2157
+my $srec=srec87,2172
+my $from;from89,2186
+my $to;to90,2196
+my $cpus;cpus91,2204
+my $hostfile;hostfile93,2215
+my $mp=mp94,2229
+my $keepmpdir=keepmpdir95,2239
+my $prun=prun97,2257
+my $saveid;saveid99,2270
+my $elogfile;elogfile101,2283
+my $alogfile;alogfile102,2297
+my %aapar=aapar104,2312
+my %defaapar defaapar105,2326
+my %evalpar=evalpar113,2447
+my %defevalpar defevalpar114,2463
+my %latopt=latopt116,2486
+my %deflatopt deflatopt117,2501
+my %latpar=latpar121,2541
+my %deflatpar deflatpar122,2556
+my $serverlog;serverlog127,2611
+my $dir=dir129,2627
+my $lmint;lmint131,2641
+my $lmaxt;lmaxt132,2652
+my $mpClient;mpClient252,5676
+my $aarex=aarex265,6088
+my $latrex=latrex272,6314
+my $evalrex=evalrex279,6546
+my @joblist;joblist353,8371
+my @pidlist;pidlist367,8658
+sub doJob doJob445,10694
+
+jobserver.pl,214
+sub usage usage8,136
+my $from;from35,698
+my $to;to36,708
+my $dir=dir37,716
+my $proptag=proptag38,729
+my $tag;tag39,749
+my $ens=ens75,1464
+my $jobServer=jobServer77,1499
+my ($port,$sid,$pid)78,1572
+
+latrex.pl,959
+sub usage usage8,151
+my %par=par55,1649
+my %defpar defpar56,1661
+my $nwindows;nwindows64,1794
+my $mintemp;mintemp65,1808
+my $maxtemp;maxtemp66,1821
+my $nruns=nruns68,1835
+my $condfile;condfile69,1850
+my $listfile;listfile71,1865
+my @initfile;initfile72,1879
+my $srec=srec74,1894
+my $inputmode=inputmode76,1908
+my $sport;sport78,1930
+my $sname;sname79,1941
+my $sid;sid80,1952
+my $from;from82,1962
+my $to;to83,1972
+my $cpus;cpus84,1980
+my $hostfile;hostfile86,1991
+my $mp=mp87,2005
+my $keepmpdir=keepmpdir88,2015
+my %simopt=simopt90,2033
+my %defsimopt defsimopt91,2048
+my %simpar=simpar96,2107
+my %defsimpar defsimpar97,2122
+my ($drestforce, $drestlist)102,2177
+my $serverlog;serverlog104,2208
+my $saveid;saveid106,2224
+my $prun=prun108,2237
+my $dir=dir110,2250
+my $mpClient;mpClient248,5526
+my $rex=rex257,5736
+my @joblist;joblist340,7896
+my @pidlist;pidlist355,8186
+sub doJob doJob428,9852
+
+latticeener.pl,312
+sub usage usage9,177
+my %simpar=simpar35,813
+my $run=run36,828
+my $file1;file137,839
+my $file2;file238,850
+my $seq;seq63,1418
+my $inpchain=inpchain64,1427
+my $nres=nres78,1753
+my $nchain=nchain79,1786
+my $monsster=monsster81,1828
+my ($energy,$eshort,$epair,$eburial,$ecorrect,$ecent)83,1897
+
+latticesim.pl,405
+sub usage usage10,189
+my ($chainfile, $pdbfile)40,1009
+my $rndchain=rndchain41,1036
+my $gridsize;gridsize42,1052
+my ($fraglist,$limforce)43,1066
+my ($drestforce, $drestlist)44,1092
+my %simpar;simpar45,1122
+my $seqfile;seqfile46,1134
+my $run=run47,1147
+my $seq=seq100,2464
+my $nres=nres102,2519
+my $inpchain=inpchain104,2553
+my $nchain=nchain114,2880
+my $monsster=monsster119,3025
+
+lsqfit.pl,324
+sub usage usage9,173
+my $fraglist;fraglist34,800
+my $exclmode;exclmode35,814
+my $selmode=selmode36,828
+my ($refpdb,$cmppdb)38,848
+my $warn=warn40,871
+my $resnumonly=resnumonly41,883
+my $slist=slist43,906
+my $done=done45,921
+my $refmol=refmol83,1896
+my $cmpmol=cmpmol84,1931
+my $analyze=analyze87,1987
+
+mdAmber.pl,790
+sub usage usage8,159
+my %par;par39,1062
+my $translate=translate41,1072
+my $cons=cons43,1090
+my $logFile;logFile45,1107
+my $energyFile;energyFile46,1120
+my $inpfile=inpfile48,1137
+my $base=base49,1154
+my $inpmode=inpmode51,1168
+my $restfile;restfile52,1189
+my $trajout;trajout54,1204
+my $enerout;enerout55,1217
+my $restout;restout56,1230
+my $finalpdb;finalpdb57,1243
+my $partop;partop58,1257
+my $done=done60,1270
+my $ambpartop=ambpartop139,3171
+my $ambinpcoor=ambinpcoor140,3198
+my $ambinpcmd=ambinpcmd141,3228
+my $amboutcoor=amboutcoor142,3259
+my $amboutlog=amboutlog143,3289
+my $ambrefcoor=ambrefcoor144,3320
+my $ambtrjout=ambtrjout145,3350
+my $mol=mol147,3380
+my @map;map151,3472
+my $amber=amber160,3611
+my $amberinp=amberinp171,3913
+
+mdCHARMM.pl,478
+sub usage usage8,147
+my %par par39,1189
+my $pdbfile;pdbfile48,1331
+my $inpmode=inpmode49,1344
+my $restfile;restfile50,1365
+my $elog;elog52,1380
+my $charmmlog;charmmlog53,1390
+my $cmdlog;cmdlog54,1405
+my $trajout;trajout56,1418
+my $enerout;enerout57,1431
+my $restout;restout58,1444
+my $finalpdb;finalpdb59,1457
+my $cons=cons61,1472
+my $psffile;psffile63,1486
+my $crdfile;crdfile64,1499
+my $customfile;customfile66,1513
+my $charmm=charmm170,4009
+
+minAmber.pl,571
+sub usage usage8,160
+my %par;par35,842
+my $translate=translate36,851
+my $cons=cons38,869
+my $logFile;logFile40,886
+my $energyFile;energyFile41,899
+my $inpfile=inpfile43,916
+my $base=base44,933
+my $done=done46,947
+my $ambpartop=ambpartop110,2450
+my $ambinpcoor=ambinpcoor111,2477
+my $ambinpcmd=ambinpcmd112,2507
+my $amboutcoor=amboutcoor113,2538
+my $amboutlog=amboutlog114,2568
+my $ambrefcoor=ambrefcoor115,2599
+my $mol=mol117,2630
+my @map;map121,2722
+my $amber=amber130,2861
+my $amberinp=amberinp135,2982
+my $outmol=outmol172,4053
+
+minCHARMM.pl,416
+sub usage usage8,188
+my $cons=cons35,1020
+my $logFile;logFile37,1034
+my $cmdlog;cmdlog38,1047
+my $energyFile;energyFile39,1059
+my $inpfile=inpfile41,1076
+my $base=base42,1093
+my %par;par44,1107
+my $psffile;psffile46,1117
+my $crdfile;crdfile47,1130
+my $customfile;customfile49,1144
+my $done=done51,1161
+my $charmm=charmm129,2996
+my $chmoutpdb=chmoutpdb164,3737
+my $outmol=outmol167,3799
+
+mindist.pl,210
+sub usage usage10,200
+my $fname;fname28,517
+my $res1;res129,528
+my $res2;res230,538
+my $done=done32,549
+my $mol=mol47,838
+my ($c1,$r1)49,870
+my ($c2,$r2)50,915
+my $ir=ir52,961
+my $jr=jr53,995
+
+mutate.pl,347
+sub usage usage8,151
+my $mutlist;mutlist31,611
+my $template;template32,624
+my $fname=fname33,638
+my $minimize;minimize34,653
+my $mol=mol57,1165
+my $seq=seq71,1417
+my $keeparr=keeparr73,1456
+my $fraglist=fraglist80,1601
+my $fragoption=fragoption81,1653
+my $sicho=sicho84,1791
+my $refpdb=refpdb87,1917
+my $rmol=rmol90,1978
+
+pbCHARMM.pl,373
+sub usage usage9,161
+my %par;par37,917
+my $logFile;logFile39,927
+my $cmdlog;cmdlog40,940
+my $inpfile=inpfile42,953
+my $base=base43,970
+my $single;single45,984
+my $double;double46,996
+my $keepcharge;keepcharge47,1008
+my $threads=threads48,1024
+my $partial;partial50,1040
+my $psffile;psffile52,1054
+my $crdfile;crdfile53,1067
+my $done=done55,1081
+
+predict.pl,1120
+sub usage usage9,153
+my $hostfile;hostfile58,1963
+my $cpus=cpus59,1977
+my $seqfile;seqfile60,1989
+my %latrexpar latrexpar62,2003
+my %aarexpar aarexpar72,2162
+my %minpar minpar85,2383
+my %fminpar fminpar95,2542
+my $latrex;latrex105,2702
+my $aarex;aarex106,2714
+my $finalmin;finalmin107,2725
+my $fragrefpdb;fragrefpdb109,2740
+my $fraglistoption;fraglistoption110,2756
+my $listfile;listfile112,2777
+my $inpfilelist=inpfilelist113,2791
+my $slist=slist115,2812
+my $seqabbrev;seqabbrev116,2826
+my $pred2ndfiles=pred2ndfiles117,2841
+my $cons=cons119,2863
+my $mp=mp121,2877
+my $keepmpdir=keepmpdir122,2887
+my $sortedfiles;sortedfiles231,5678
+my $optfile;optfile232,5695
+sub genListFile genListFile339,8780
+sub autoSeqFile autoSeqFile362,9210
+sub runlatrex runlatrex398,10137
+sub runaarex runaarex461,12261
+sub runensmin runensmin525,14309
+sub runenscut runenscut567,15559
+sub runcluster runcluster596,16265
+sub bestcluster bestcluster619,16788
+sub checkin checkin691,18369
+sub ensfiles ensfiles710,18684
+sub merge merge720,18851
+sub ensruns ensruns753,19604
+
+qscore.pl,190
+sub usage usage9,189
+my ($pdb1,$pdb2)29,557
+my $all=all31,576
+my $done=done32,587
+my $refmol=refmol49,918
+my $analyze=analyze50,951
+my $cmpmol=cmpmol52,987
+my $qsc=qsc54,1040
+
+readArchive.pl,484
+sub usage usage9,143
+my $from=from37,928
+my $to=to38,940
+my $step=step39,950
+my $pdbtemplate;pdbtemplate40,962
+my $showheader=showheader41,979
+my $arfile;arfile42,997
+my $xtract=xtract43,1009
+my $listfiles=listfiles44,1023
+my $prefix=prefix45,1040
+my $apply;apply46,1058
+my $rmsmode;rmsmode47,1069
+my $ref;ref48,1082
+my $ensdir=ensdir49,1091
+my $enstag;enstag50,1107
+my $ensat;ensat51,1119
+my $qscore;qscore52,1130
+my ($len,$count,$ft,$aux)106,2404
+
+rebuild.pl,368
+sub usage usage9,155
+my $resolution=resolution31,656
+my $offsetx=offsetx32,677
+my $offsety=offsety33,695
+my $offsetz=offsetz34,713
+my ($fraglist, $refpdb)35,731
+my ($inpchain, $inpseq)36,756
+my $chainpdb;chainpdb37,781
+my $havepdb=havepdb38,795
+my $fixca;fixca39,810
+my $chain=chain80,1794
+my $sequence;sequence82,1906
+my $rebmol=rebmol96,2219
+
+rexinfo.pl,449
+sub usage usage10,273
+my $showclients;showclients39,1147
+my $showconds;showconds40,1164
+my $clientid;clientid41,1179
+my $condinx;condinx42,1193
+my $dir=dir43,1206
+my $condfile;condfile44,1219
+my $temp;temp45,1233
+my $sellist;sellist46,1243
+my $files=files47,1256
+my $rank=rank48,1269
+my $rankfrom;rankfrom49,1281
+my $rankto;rankto50,1295
+my $ranklast=ranklast51,1307
+my $rex=rex110,2709
+sub showdata showdata245,6546
+
+rexserver.pl,420
+sub usage usage10,197
+my $presetid;presetid46,1257
+my $monsster=monsster48,1272
+my %par=par50,1289
+my %defpar defpar51,1301
+my $nwindows;nwindows58,1414
+my $mintemp;mintemp59,1428
+my $maxtemp;maxtemp60,1441
+my $nruns=nruns62,1455
+my $dir=dir64,1471
+my @initfile;initfile66,1485
+my $listfile;listfile67,1499
+my $condfile;condfile69,1514
+my $server=server142,3203
+my ($port,$sid,$pid)175,4153
+
+rgyr.pl,115
+sub usage usage8,169
+my $fname;fname27,488
+my $caonly=caonly29,500
+my $done=done30,514
+my $mol=mol46,827
+
+rms.pl,640
+sub usage usage8,157
+my @outmode;outmode35,908
+my $fitflag=fitflag37,922
+my $fitxlflag=fitxlflag38,937
+my $fraglist;fraglist40,955
+my $fitfraglist;fitfraglist42,970
+my $fitexclmode;fitexclmode43,987
+my $fitselmode=fitselmode45,1005
+my ($refpdb,$cmppdb)47,1028
+my $warn=warn49,1051
+my $chains=chains50,1063
+my $detailed=detailed51,1077
+my $resnumonly;resnumonly53,1094
+my $done=done55,1111
+my $refmol=refmol111,2466
+my $cmpmol=cmpmol112,2501
+my $analyze=analyze115,2557
+my $rmsd=rmsd133,2989
+my @keys=keys135,3048
+my @aksel=aksel137,3078
+my @allkeys=allkeys138,3117
+my $lastchain;lastchain149,3244
+
+setprop.pl,251
+sub usage usage9,159
+my $tag;tag32,692
+my $proptag;proptag33,701
+my $dir=dir34,714
+my $inpfile;inpfile35,727
+my $start=start36,740
+my $value;value37,753
+my $inx=inx38,764
+my $remove=remove39,775
+my $ens=ens75,1562
+my $n=n77,1597
+
+showcluster.pl,142
+sub usage usage9,170
+my $workdir=workdir31,555
+my $tag;tag32,572
+my $ens=ens50,902
+my $cluster=cluster52,941
+my $list=list59,1101
+
+vicinity.pl,397
+sub usage usage9,167
+my $fraglist;fraglist31,686
+my $cutoff=cutoff32,700
+my $soft=soft33,717
+my $filelist=filelist34,732
+my $forcesoft=forcesoft35,749
+my $forcehard=forcehard36,768
+my $listfile;listfile37,788
+my $flist;flist77,1733
+my $clist;clist78,1744
+my $havereslist=havereslist145,3254
+my $havecons3list=havecons3list146,3274
+my $havecons1list=havecons1list147,3296
+
+writeArchive.pl,119
+sub usage usage9,143
+my $inx=inx28,529
+my $pdbflag=pdbflag29,549
+my $arfile;arfile30,564
+my $file;file31,576
+
+xtracttra.pl,133
+sub usage usage9,166
+my @f=f29,568
+my $tstp=tstp30,598
+my $cyc=cyc31,614
+my $trafile=trafile33,630
+my $sicho=sicho35,656
+
+Amber.pm,380
+sub new new44,832
+sub generateTopCoor generateTopCoor91,2708
+sub runSander runSander157,4805
+sub genInputDynamics genInputDynamics206,6290
+sub genInputMinimize genInputMinimize283,8881
+sub genInputRestraints genInputRestraints326,10348
+sub getEnergy getEnergy351,10918
+sub logEnergy logEnergy413,12538
+sub _getSel _getSel468,14047
+sub _getpar _getpar486,14519
+
+AmberReXServer.pm,66
+sub setupPar setupPar30,509
+sub postProcess postProcess41,729
+
+Analyze.pm,1029
+sub new new37,738
+sub gdt gdt55,1222
+sub gdtts gdtts72,1739
+sub _rungdt _rungdt79,1829
+sub lsqfit lsqfit129,2959
+sub rmsd rmsd162,3977
+sub pairwiseList pairwiseList312,7943
+sub qscore qscore373,9405
+sub _getKey _getKey468,11365
+sub _getRefAtom _getRefAtom488,11890
+sub _getCmpAtom _getCmpAtom510,12379
+sub _translateRotate _translateRotate585,15172
+sub _frotu _frotu695,17740
+sub _diagq _diagq845,20624
+sub contactList contactList1261,28250
+sub contacts contacts1304,29535
+sub readContacts readContacts1351,30634
+sub writeContacts writeContacts1377,31172
+sub radiusOfGyration radiusOfGyration1398,31760
+sub chi1 chi11443,32658
+sub phipsi phipsi1487,33919
+sub chi1RMSD chi1RMSD1536,35287
+sub phipsiRMSD phipsiRMSD1557,35869
+sub _angleRMSD _angleRMSD1576,36320
+sub radialDistribution radialDistribution1613,37478
+sub radialRMSD radialRMSD1666,38706
+sub _matchSelection _matchSelection1698,39231
+sub _matchResidue _matchResidue1715,39526
+sub _matchAtom _matchAtom1742,40301
+
+AnkyrinRepeat.pm,318
+sub new new76,1857
+sub readPDB readPDB98,2164
+sub removeChain removeChain113,2358
+sub evaluateModuleScore evaluateModuleScore127,2661
+sub listWellConserved listWellConserved159,3498
+sub listSemiConserved listSemiConserved200,4744
+sub moduleName moduleName237,5849
+sub repeatLength repeatLength246,6001
+
+CHARMM.pm,3289
+sub new new64,1422
+sub setEnergyLogFile setEnergyLogFile415,17082
+sub logEnergy logEnergy433,17604
+sub logMDEnergy logMDEnergy453,18171
+sub finish finish477,18942
+sub closeEnergy closeEnergy492,19154
+sub loadParameters loadParameters507,19643
+sub clearEnergy clearEnergy628,23361
+sub setupEnergy setupEnergy640,23585
+sub setupFromPSF setupFromPSF715,26007
+sub setupFromPDB setupFromPDB749,26942
+sub setupFromMolecule setupFromMolecule777,27672
+sub OldreadFromPDB OldreadFromPDB975,34462
+sub readFromPDB readFromPDB1014,35911
+sub loadReference loadReference1035,36481
+sub initCoordinates initCoordinates1062,37351
+sub setupNonBonded setupNonBonded1081,37956
+sub setupEEF1 setupEEF11096,38466
+sub setupSASA setupSASA1121,39222
+sub setupHBond setupHBond1136,39841
+sub setupOG setupOG1148,40166
+sub setupACE setupACE1161,40398
+sub setupASP setupASP1180,41228
+sub clearASP clearASP1267,43710
+sub _scaleRadii _scaleRadii1279,43880
+sub setupGB setupGB1615,61194
+sub _setupGBSW _setupGBSW1647,62202
+sub _setupOrigGB _setupOrigGB1666,62890
+sub _setupGBMVG _setupGBMVG1695,63995
+sub _setupGBMVA _setupGBMVA1745,65837
+sub clearGB clearGB1916,74881
+sub noeRestraints noeRestraints1932,75265
+sub getNOEAnalysis getNOEAnalysis1990,76780
+sub minimizeSD minimizeSD2035,77990
+sub minimize minimize2053,78697
+sub clearShake clearShake2059,78969
+sub shake shake2074,79458
+sub periodicBoundaries periodicBoundaries2095,79882
+sub ewald ewald2135,81471
+sub runDynamics runDynamics2157,82734
+sub _closeDynIO _closeDynIO2212,84610
+sub _getDynIO _getDynIO2230,84979
+sub _getStartDynOptions _getStartDynOptions2271,85886
+sub _getRestartDynOptions _getRestartDynOptions2298,86676
+sub _getGenDynOptions _getGenDynOptions2312,86923
+sub _getNPTDynOptions _getNPTDynOptions2337,87879
+sub setupRestraints setupRestraints2349,88263
+sub harmonicRestraint harmonicRestraint2410,90351
+sub simpleRestraint simpleRestraint2488,92824
+sub hmcmRestraint hmcmRestraint2508,93385
+sub clearRestraints clearRestraints2550,94738
+sub applyBias applyBias2566,95221
+sub clearBias clearBias2636,97370
+sub getBiasVal getBiasVal2665,98189
+sub verbose verbose2688,98683
+sub stream stream2698,98899
+sub writePDB writePDB2709,99137
+sub writeCRD writeCRD2722,99502
+sub orient orient2736,99923
+sub coorStats coorStats2751,100399
+sub poissonBoltzmann poissonBoltzmann2786,101419
+sub atomPoissonBoltzmann atomPoissonBoltzmann2837,103543
+sub _processPBOutput _processPBOutput2865,104250
+sub getScalar getScalar2883,104666
+sub reportVariable reportVariable2905,105114
+sub solvAccessSurf solvAccessSurf2929,105616
+sub getSASAOutput getSASAOutput2952,106323
+sub logSASA logSASA2973,106869
+sub getEnergy getEnergy2986,107221
+sub getRg getRg3057,109152
+sub getRho getRho3078,109614
+sub getConvType getConvType3092,109891
+sub readEnergy readEnergy3115,110468
+sub _processMDEneOutput _processMDEneOutput3146,111022
+sub _processEneOutput _processEneOutput3206,112652
+sub _getCHARMMOutput _getCHARMMOutput3268,114510
+sub _sendCommand _sendCommand3304,115529
+sub setParameter setParameter3325,116033
+sub _getpar _getpar3332,116115
+sub _getSel _getSel3349,116476
+sub _closeAll _closeAll3367,116794
+
+Client.pm,271
+sub new new27,632
+sub initialize initialize53,1255
+sub establishConnection establishConnection73,1918
+sub nextJob nextJob95,2678
+sub terminateServer terminateServer141,3922
+sub finish finish152,4182
+sub getFile getFile168,4575
+sub getInfo getInfo198,5331
+
+Cluster.pm,492
+sub new new38,902
+sub setPar setPar72,1642
+sub setFileList setFileList87,1963
+sub runCluster runCluster114,2622
+sub clusterHierarchy clusterHierarchy227,6111
+sub top top255,6843
+sub readFile readFile263,6967
+sub _readCluster _readCluster276,7169
+sub writeFile writeFile314,8034
+sub _writeCluster _writeCluster333,8570
+sub _addClusterRef _addClusterRef371,9711
+sub allClusters allClusters384,9941
+sub clusterList clusterList400,10234
+sub fileList fileList418,10558
+
+Ensemble.pm,1175
+sub new new63,1698
+sub save save91,2252
+sub saveProp saveProp103,2461
+sub saveOptions saveOptions114,2680
+sub saveFileList saveFileList124,2868
+sub readProp readProp135,3114
+sub writeProp writeProp181,4006
+sub readOptions readOptions225,4979
+sub writeOptions writeOptions255,5591
+sub readFileList readFileList289,6422
+sub writeFileList writeFileList313,6874
+sub setPar setPar339,7674
+sub setDefPar setDefPar353,7974
+sub getPar getPar369,8340
+sub setOption setOption378,8533
+sub setDefOption setDefOption392,8825
+sub setFileList setFileList409,9304
+sub getEnergy getEnergy426,9745
+sub getStructInfo getStructInfo459,10715
+sub cleanUp cleanUp565,14136
+sub checkinPDB checkinPDB585,14723
+sub update update613,15502
+sub jobList jobList637,16163
+sub fileList fileList662,16705
+sub _addFile _addFile688,17179
+sub getAnalyze getAnalyze707,17611
+sub getPropTags getPropTags720,17908
+sub getPropString getPropString732,18298
+sub setPropsFromString setPropsFromString750,18770
+sub removeProp removeProp770,19145
+sub setProp setProp783,19401
+sub getSortedList getSortedList802,19816
+sub getPropList getPropList822,20306
+
+GenUtil.pm,2124
+sub findExecutable findExecutable39,667
+sub findDataDir findDataDir73,1411
+sub setLogFile setLogFile89,1722
+sub log log99,1995
+sub makeDir makeDir124,2489
+sub getInputFile getInputFile148,3194
+sub getOutputFile getOutputFile182,4028
+sub getAppendFile getAppendFile208,4566
+sub fragListFromOption fragListFromOption232,5050
+sub fragOptionFromList fragOptionFromList269,6060
+sub gradForceList gradForceList303,6844
+sub fragListFromArray fragListFromArray351,7924
+sub readFormat readFormat378,8489
+sub readData readData402,9020
+sub validGzip validGzip420,9364
+sub checkFile checkFile439,9775
+sub exists exists450,10067
+sub zexists zexists464,10399
+sub remove remove478,10717
+sub rename rename496,11011
+sub link link520,11420
+sub copy copy542,11758
+sub compress compress567,12205
+sub dihedral dihedral578,12451
+sub dataDir dataDir637,13724
+sub average average648,13943
+sub limRange limRange680,14556
+sub limCore limCore711,15535
+sub spRank spRank765,16681
+sub linearFit linearFit795,17343
+sub dataAvailable dataAvailable843,18260
+sub safeToSend safeToSend862,18676
+sub HTMLFont HTMLFont878,19019
+sub getServerPort getServerPort887,19238
+sub getServerSocket getServerSocket904,19640
+sub getServerID getServerID917,19952
+sub alive alive925,20112
+sub connectToServer connectToServer942,20477
+sub waitForData waitForData958,20757
+sub readyToWrite readyToWrite969,20972
+sub readFromSocket readFromSocket980,21189
+sub recvFixedData recvFixedData1003,21740
+sub writeToSocket writeToSocket1013,22020
+sub sendFixedData sendFixedData1031,22429
+sub sendCommand sendCommand1047,22885
+sub readHostFile readHostFile1081,23696
+sub remoteCPUs remoteCPUs1118,24376
+sub submitRemote submitRemote1135,25102
+sub readCustomFile readCustomFile1190,26580
+sub writeCustomFile writeCustomFile1214,26995
+sub writeArchiveFile writeArchiveFile1232,27312
+sub archiveFile archiveFile1315,29201
+sub readArchiveFile readArchiveFile1331,29538
+sub readArchiveHeader readArchiveHeader1360,30096
+sub parsePar parsePar1386,30623
+sub zPad zPad1408,31026
+
+InterfaceAssessment.pm,1143
+sub new new30,460
+sub setupPDBset setupPDBset56,928
+sub cleanPDBset cleanPDBset116,2246
+sub cleanPDB cleanPDB149,2941
+sub collectAllInterfaceData collectAllInterfaceData208,4206
+sub _byres_setup _byres_setup276,6277
+sub collectInterfaceDataType collectInterfaceDataType295,6667
+sub _test_par _test_par343,7825
+sub _read_existing _read_existing353,8035
+sub _find_missing_inputs _find_missing_inputs396,8958
+sub dumpIntOutput dumpIntOutput427,9636
+sub writeHtml writeHtml459,10258
+sub writeHtmlTable writeHtmlTable759,18914
+sub _print_header _print_header787,19452
+sub _setup_Ros_fields _setup_Ros_fields805,19813
+sub _setup_Wat_fields _setup_Wat_fields908,23711
+sub _call_mutlist _call_mutlist926,24192
+sub _call_Cha _call_Cha979,25711
+sub _call_Ros _call_Ros1085,28810
+sub _call_Wat _call_Wat1157,30766
+sub _call_Mon _call_Mon1336,36135
+sub _call_ResMinMax _call_ResMinMax1393,37795
+sub _call_ddG _call_ddG1447,39339
+sub _call_free_dG _call_free_dG1493,40496
+sub _call_WT_dG _call_WT_dG1555,42075
+sub _call_consensus_seq _call_consensus_seq1596,43116
+sub _computeEne _computeEne1701,45880
+
+JobClient.pm,48
+sub new new32,576
+sub makeDir makeDir43,809
+
+JobServer.pm,334
+sub new new34,662
+sub serverSetup serverSetup67,1436
+sub serverTask serverTask74,1563
+sub serverFinish serverFinish80,1723
+sub processCommand processCommand91,1904
+sub initClient initClient114,2367
+sub exitClient exitClient135,2693
+sub processClientResponse processClientResponse155,3115
+sub getInfo getInfo218,4723
+
+LMCReXServer.pm,64
+sub setup setup24,381
+sub giveClearance giveClearance43,814
+
+LatEnsemble.pm,121
+sub new new33,574
+sub getEnergy getEnergy45,857
+sub checkinSICHO checkinSICHO74,1691
+sub cleanUp cleanUp107,2677
+
+LatSimReXServer.pm,110
+sub setupPar setupPar27,462
+sub ensembleCheckin ensembleCheckin41,707
+sub postProcess postProcess51,976
+
+MONSSTER.pm,773
+sub new new67,1618
+sub setDirectory setDirectory110,2398
+sub complete complete129,2906
+sub setParameters setParameters146,3357
+sub setPositionalRestraints setPositionalRestraints160,3608
+sub setDistanceRestraints setDistanceRestraints172,3845
+sub _translateList _translateList183,4044
+sub setup setup203,4468
+sub energy energy233,5390
+sub run run284,6667
+sub initChain initChain302,7026
+sub finalChain finalChain313,7260
+sub trajFrame trajFrame325,7558
+sub finalEnergy finalEnergy338,7841
+sub nSteps nSteps349,8063
+sub nCycle nCycle361,8299
+sub stepInfo stepInfo373,8565
+sub cycleInfo cycleInfo389,8928
+sub writeInput writeInput407,9399
+sub writePosRestraints writePosRestraints459,10943
+sub _processOutput _processOutput477,11341
+
+Molecule.pm,3347
+sub new new53,1277
+sub newInherit newInherit77,1743
+sub readPDB readPDB105,2379
+sub readCRD readCRD429,13592
+sub writePDB writePDB536,16560
+sub readAmberPre6 readAmberPre6793,30859
+sub readAmber6 readAmber6883,32992
+sub readAmber readAmber961,35012
+sub writeAmber writeAmber1060,37334
+sub generateSegNames generateSegNames1082,37899
+sub generateSplitSegNames generateSplitSegNames1146,39451
+sub getSegNames getSegNames1238,41841
+sub copySegNames copySegNames1276,42610
+sub getChain getChain1303,43226
+sub activeChains activeChains1316,43478
+sub selectChain selectChain1336,43871
+sub removeChain removeChain1345,43988
+sub removeHetero removeHetero1362,44308
+sub numchains numchains1373,44471
+sub numres numres1392,44829
+sub lastResInx lastResInx1410,45114
+sub addInfoLine addInfoLine1420,45282
+sub countInterfaceContacts countInterfaceContacts1439,45906
+sub interfaceRes interfaceRes1509,47724
+sub interfaceAtom interfaceAtom1545,48630
+sub checkCloseHetatm checkCloseHetatm1584,49494
+sub setValidSequence setValidSequence1637,50958
+sub setValidChain setValidChain1669,51729
+sub setValidResidues setValidResidues1694,52286
+sub setValidSegment setValidSegment1727,53112
+sub resetValidResidues resetValidResidues1749,53601
+sub listFromValid listFromValid1766,53967
+sub zapCoordinates zapCoordinates1794,54628
+sub enantiomer enantiomer1817,55143
+sub fillCoorFromPDB fillCoorFromPDB1831,55404
+sub merge merge1866,56189
+sub clone clone1948,58100
+sub translate translate1996,59157
+sub renumber renumber2221,72243
+sub numberReset numberReset2301,73738
+sub shiftResNumber shiftResNumber2352,74867
+sub centerOfMass centerOfMass2395,75715
+sub center center2424,76253
+sub move move2444,76696
+sub matrixOperation matrixOperation2467,77146
+sub resetResidueName resetResidueName2497,77837
+sub resetResidueNameAll resetResidueNameAll2514,78267
+sub fromSICHO fromSICHO2535,78700
+sub rebuildFromSICHO rebuildFromSICHO2588,80257
+sub completeResidue completeResidue2650,81786
+sub _cside _cside2875,88419
+sub fixCOO fixCOO2891,88699
+sub solvate solvate2967,90670
+sub changeResName changeResName2999,91429
+sub fixHistidine fixHistidine3016,91894
+sub setChain setChain3048,92639
+sub match match3092,93593
+sub getResidue getResidue3148,94926
+sub getResidueInChain getResidueInChain3162,95300
+sub minDistance minDistance3188,95984
+sub firstResNum firstResNum3235,97093
+sub lastResNum lastResNum3252,97478
+sub empty empty3268,97774
+sub _coorCache _coorCache3273,97867
+sub _pdbLine _pdbLine3290,98249
+sub _newChain _newChain3349,100290
+sub _cmpResName _cmpResName3370,100723
+sub _correctHisType _correctHisType3378,100932
+sub setBfactorsFromAux3 setBfactorsFromAux33421,101752
+sub setAux3fromBfactors setAux3fromBfactors3438,102052
+sub operateOnAllAtoms operateOnAllAtoms3456,102451
+sub zapAux3 zapAux33480,102969
+sub operateOnAllAtomsVsRef operateOnAllAtomsVsRef3498,103309
+sub substituteAla substituteAla3537,104548
+sub getSSBonds getSSBonds3595,105880
+sub setSSBonds setSSBonds3609,106098
+sub findSSBonds findSSBonds3623,106332
+sub generateMutlist generateMutlist3697,108033
+sub generateMutStr generateMutStr3743,109293
+sub mutStrToMutlist mutStrToMutlist3760,109652
+sub rasmolDisplay rasmolDisplay3784,110214
+
+PDButil.pm,171
+sub prefix prefix22,304
+sub isaPDB isaPDB33,536
+sub print_header print_header44,743
+sub shortenRasmolList shortenRasmolList69,1273
+sub cleanCat cleanCat118,2301
+
+ReXClient.pm,114
+sub new new29,477
+sub initFile initFile39,679
+sub biasInfo biasInfo55,1066
+sub nextCycle nextCycle82,1765
+
+ReXServer.pm,1856
+sub new new98,2248
+sub setup setup132,2880
+sub setupPar setupPar142,3037
+sub setupStruct setupStruct161,3519
+sub writeCondFile writeCondFile173,3796
+sub readCondFile readCondFile204,4643
+sub setupCond setupCond247,5585
+sub getNeighbours getNeighbours273,6183
+sub setEnsemble setEnsemble347,7947
+sub nWindows nWindows358,8146
+sub nUmbrellas nUmbrellas366,8316
+sub getClientData getClientData371,8388
+sub getMode getMode386,8682
+sub getRun getRun401,8967
+sub getInitialStructure getInitialStructure416,9322
+sub getInitialCond getInitialCond438,9858
+sub writeData writeData454,10178
+sub readData readData498,11891
+sub writeNeighbourData writeNeighbourData558,13432
+sub readNeighbourData readNeighbourData600,14525
+sub serverSetup serverSetup634,15180
+sub maxClients maxClients644,15409
+sub renderImages renderImages649,15475
+sub serverTask serverTask658,15778
+sub serverFinish serverFinish670,16019
+sub processCommand processCommand677,16114
+sub processClientResponse processClientResponse703,16876
+sub getInfo getInfo750,18013
+sub initClient initClient765,18330
+sub giveClearance giveClearance792,18994
+sub prepareNew prepareNew805,19386
+sub testLimits testLimits836,20057
+sub exchange exchange864,21153
+sub backupClientFiles backupClientFiles913,22222
+sub postProcess postProcess923,22497
+sub save save990,24586
+sub saveBest saveBest997,24669
+sub saveReplica saveReplica1004,24795
+sub ensembleCheckin ensembleCheckin1017,25154
+sub xchangeStep xchangeStep1026,25373
+sub xchangePairs xchangePairs1126,28488
+sub getRMSD getRMSD1186,29822
+sub getSummary getSummary1205,30375
+sub getClientInfo getClientInfo1214,30623
+sub getIDInfo getIDInfo1242,31439
+sub getHostInfo getHostInfo1248,31523
+sub getHTMLPage getHTMLPage1262,31825
+sub expTempList expTempList1400,37195
+
+RepeatProtein.pm,1399
+sub new new74,1943
+sub resetRepeat resetRepeat103,2508
+sub readPDB readPDB119,2783
+sub clone clone133,2975
+sub removeChain removeChain149,3211
+sub setChain setChain162,3425
+sub numModules numModules177,3724
+sub defineRepeat defineRepeat188,3975
+sub defineRepeatChain defineRepeatChain202,4219
+sub getRepeatChain getRepeatChain213,4402
+sub getModule getModule222,4574
+sub defineResBounds defineResBounds232,4782
+sub printRepeats printRepeats280,5966
+sub detectRepeats detectRepeats331,7488
+sub detectModuleInChain detectModuleInChain359,8096
+sub writePDBrepeat writePDBrepeat399,9013
+sub writePDBmodule writePDBmodule420,9521
+sub restrictToRepeat restrictToRepeat442,10035
+sub restrictToModule restrictToModule467,10549
+sub replaceModule replaceModule512,11734
+sub transferModule transferModule597,14815
+sub designSwapModules designSwapModules629,15725
+sub _setupOutfiles _setupOutfiles646,16152
+sub computeRepeatContacts computeRepeatContacts796,21277
+sub computeModuleContacts computeModuleContacts811,21633
+sub printWellConservedPositions printWellConservedPositions877,23393
+sub printSemiConservedPositions printSemiConservedPositions911,24333
+sub repeatLength repeatLength944,25217
+sub evaluateModuleScore evaluateModuleScore955,25448
+sub listWellConserved listWellConserved965,25678
+sub listSemiConserved listSemiConserved975,25916
+
+RosettaMolecule.pm,4572
+sub new new96,2215
+sub readPDB readPDB231,7232
+sub clone clone304,9009
+sub renumberAcrossChains renumberAcrossChains328,9492
+sub renumber renumber347,9895
+sub numberReset numberReset365,10211
+sub shiftResNumber shiftResNumber383,10651
+sub updateScore updateScore402,11023
+sub updateBfactors updateBfactors562,15726
+sub writePDB writePDB598,16599
+sub setRosettaExec setRosettaExec663,18353
+sub useSvnRosettaExec useSvnRosettaExec672,18554
+sub setRosettaData setRosettaData687,18928
+sub setBfactorsResScore setBfactorsResScore695,19075
+sub setBfactorsRadii setBfactorsRadii759,20818
+sub setBfactorsFromAux3 setBfactorsFromAux3875,23410
+sub operateOnAllAtoms operateOnAllAtoms887,23600
+sub operateOnAllAtomsVsRef operateOnAllAtomsVsRef900,23832
+sub residueSASA residueSASA915,24171
+sub numDesRes numDesRes943,24813
+sub getScore getScore968,25313
+sub getScoreHash getScoreHash980,25544
+sub getRegionScore getRegionScore992,25792
+sub getChainScore getChainScore1020,26460
+sub need_Rosetta need_Rosetta1041,26896
+sub computeScore computeScore1055,27151
+sub idealize idealize1134,29366
+sub design design1208,31373
+sub alaScan alaScan1304,34077
+sub dock dock1322,34538
+sub resetDockFlags resetDockFlags1430,37456
+sub minimize minimize1445,37791
+sub relax relax1463,38246
+sub abinitFrag abinitFrag1538,40327
+sub loopCenRlx loopCenRlx1644,43604
+sub loopFaRlx loopFaRlx1662,44059
+sub loopFrag loopFrag1680,44523
+sub loopRefine loopRefine1698,44988
+sub loops loops1721,45656
+sub charmm_mini charmm_mini1818,48519
+sub writePathFile writePathFile1894,50864
+sub writeResfile writeResfile1950,53177
+sub readResfile readResfile1987,54070
+sub setupDockingCst setupDockingCst2029,55127
+sub setRepackNearby setRepackNearby2112,57369
+sub setDesignInterface setDesignInterface2152,58544
+sub limitDesBuried limitDesBuried2198,60013
+sub SASAatomicInterface SASAatomicInterface2223,60684
+sub limitDesBuriedVsRef limitDesBuriedVsRef2276,62362
+sub limitDesInterfaceContacts limitDesInterfaceContacts2305,63169
+sub _convertWater _convertWater2369,65174
+sub collectUnsSet collectUnsSet2445,67016
+sub writeUns writeUns2463,67385
+sub readUns readUns2483,67864
+sub findExtraUns findExtraUns2516,68702
+sub countFunctionalContacts countFunctionalContacts2545,69434
+sub countInterfaceDesignContacts countInterfaceDesignContacts2588,70760
+sub setDesignLoops setDesignLoops2686,73796
+sub setAllDesType setAllDesType2707,74273
+sub changeDesType changeDesType2731,74864
+sub setResDesType setResDesType2757,75481
+sub setResnameDesType setResnameDesType2780,76000
+sub clearDesignRes clearDesignRes2805,76546
+sub removeChain removeChain2825,76937
+sub addInfoLine addInfoLine2839,77185
+sub enantiomer enantiomer2850,77362
+sub fillCoorFromPDB fillCoorFromPDB2861,77542
+sub merge merge2872,77722
+sub move move2883,77893
+sub matrixOperation matrixOperation2894,78073
+sub center center2905,78254
+sub setChain setChain2916,78419
+sub substituteAla substituteAla2927,78593
+sub setSSbonds setSSbonds2938,78774
+sub findSSbonds findSSbonds2949,78950
+sub getLoopScore getLoopScore2960,79156
+sub getDesScore getDesScore2981,79594
+sub donateLoopResidues donateLoopResidues3036,81570
+sub countLoopScontacts countLoopScontacts3097,83277
+sub minLoopDistToRegion minLoopDistToRegion3165,85450
+sub setLoop setLoop3206,86497
+sub zapCoordinates zapCoordinates3229,86930
+sub _rosettaSetup _rosettaSetup3259,87647
+sub _setupOutfiles _setupOutfiles3338,89951
+sub _setupFromStartArr _setupFromStartArr3379,91233
+sub _makeFragLib _makeFragLib3396,91638
+sub buildRandFragLib buildRandFragLib3423,92260
+sub buildDirectedRandFragLib buildDirectedRandFragLib3539,95970
+sub writeFasta writeFasta3649,99583
+sub writeLoopFile writeLoopFile3672,99994
+sub readLoopFile readLoopFile3711,100992
+sub writeRegionFile writeRegionFile3757,102248
+sub readRegionFile readRegionFile3798,103299
+sub _readOutputDir _readOutputDir3831,104173
+sub _processRosettaOutput _processRosettaOutput3853,104643
+sub _cleanOutput _cleanOutput3905,106159
+sub _fitToTemplate _fitToTemplate3941,107234
+sub genRandAA genRandAA4050,110566
+sub reportParameter reportParameter4063,110927
+sub setParameter setParameter4069,111018
+sub _getpar _getpar4075,111092
+sub robustDonateNatroResidues robustDonateNatroResidues4102,111785
+sub donateNatroResidues donateNatroResidues4164,113619
+sub mergeChains mergeChains4206,114742
+sub writeMutlistFile writeMutlistFile4261,116185
+
+SICHO.pm,638
+sub new new44,922
+sub copy copy64,1590
+sub readChain readChain78,1966
+sub writeChain writeChain102,2391
+sub convert convert132,3363
+sub genSimpleFromAllAtom genSimpleFromAllAtom170,4552
+sub genRandomMONSSTER genRandomMONSSTER233,6283
+sub genMONSSTERFromAllAtom genMONSSTERFromAllAtom270,7533
+sub readMONSSTERTraj readMONSSTERTraj311,8833
+sub nextMONSSTERTraj nextMONSSTERTraj357,9756
+sub checkMONSSTER checkMONSSTER397,10558
+sub fromMolecule fromMolecule451,11784
+sub _idiff _idiff493,13008
+sub _colinear _colinear504,13291
+sub toProjection toProjection523,13853
+sub fromProjection fromProjection548,14402
+
+Sequence.pm,695
+sub new new60,1774
+sub readMONSSTER readMONSSTER122,3262
+sub writeMONSSTER writeMONSSTER152,3897
+sub abbrevSeq abbrevSeq174,4529
+sub abbrevSec abbrevSec194,5044
+sub modifyResidueName modifyResidueName211,5422
+sub setSecondary setSecondary233,5946
+sub secFromOneFile secFromOneFile253,6436
+sub secFromPredict secFromPredict279,7030
+sub secFromDSSP secFromDSSP320,7965
+sub firstResNum firstResNum367,9060
+sub lastResNum lastResNum375,9201
+sub setValidResidues setValidResidues385,9460
+sub resetValidResidues resetValidResidues418,10274
+sub listFromValid listFromValid433,10591
+sub getResidue getResidue460,11226
+sub _readPredictOutput _readPredictOutput476,11549
+
+Server.pm,597
+sub new new55,970
+sub run run77,1537
+sub processCommand processCommand170,3849
+sub serviceClient serviceClient303,8669
+sub serverTask serverTask363,10870
+sub serverSetup serverSetup368,10920
+sub serverFinish serverFinish372,10959
+sub maxClients maxClients385,11310
+sub initClient initClient390,11363
+sub exitClient exitClient396,11443
+sub getInfo getInfo402,11515
+sub processClientResponse processClientResponse408,11584
+sub sendHTML sendHTML414,11673
+sub getHTMLPage getHTMLPage429,12056
+sub pushHTML pushHTML434,12112
+sub respondToClient respondToClient444,12284
+
+SimData.pm,274
+sub new new37,823
+sub set set64,1291
+sub save save89,1952
+sub readConfig readConfig100,2177
+sub writeConfig writeConfig127,2700
+sub getFragList getFragList156,3336
+sub getFragRef getFragRef174,3811
+sub getSeq getSeq192,4302
+sub getNatPDB getNatPDB208,4721
+
+UWutil.pm,285
+sub runCmd runCmd34,615
+sub runCmdCondor runCmdCondor50,918
+sub reportCondorCpus reportCondorCpus97,2234
+sub setCondorCpus setCondorCpus106,2386
+sub waitForCondorCompletion waitForCondorCompletion118,2623
+sub PDBfname PDBfname188,4247
+sub ScopClaName ScopClaName232,5547

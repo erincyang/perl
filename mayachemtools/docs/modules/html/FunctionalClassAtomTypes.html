@@ -1,0 +1,180 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AtomTypes::FunctionalClassAtomTypes.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./EStateAtomTypes.html" title="EStateAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MMFF94AtomTypes.html" title="MMFF94AtomTypes.html">Next</a></td><td width="34%" align="middle"><strong>AtomTypes::FunctionalClassAtomTypes.pm</strong></td><td width="33%" align="right"><a href="././code/FunctionalClassAtomTypes.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/FunctionalClassAtomTypes.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/FunctionalClassAtomTypes.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/FunctionalClassAtomTypes.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/FunctionalClassAtomTypes.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>FunctionalClassAtomTypes</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use AtomTypes::FunctionalClassAtomTypes;</p>
+<p>use AtomTypes::FunctionalClassAtomTypes qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>FunctionalClassAtomTypes</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#assignatomtypes">AssignAtomTypes</a>, <a href="#getavailablefunctionalclasses">GetAvailableFunctionalClasses</a>, <a href="#getfunctionalclassesorder">GetFunctionalClassesOrder</a>
+, <a href="#isfunctionalclassavailable">IsFunctionalClassAvailable</a>, <a href="#setfunctionalclassestouse">SetFunctionalClassesToUse</a>, <a href="#stringifyfunctionalclassatomtypes">StringifyFunctionalClassAtomTypes</a>
+</p><p><strong>FunctionalClassAtomTypes</strong> is derived from <strong>AtomTypes</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>FunctionalClassAtomTypes</strong>, <strong>AtomTypes</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>Possible values for functional clas atom types are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.
+Default value: <em>HBD, HBA, PI, NI, Ar, Hal</em>.</p>
+<p>The functional calss atom types abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<p>FunctionalAtomTypes are assigned using the following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+<p>Notes:</p>
+<div class="OptionsBox">
+    o Final functional class atom type shows only those functional
+      classes to which an atom belongs; others are not shown.
+<br/>    o A null string is assigned as final atom type to those atom which
+      don't belong to any of the specified functional classes.</div>
+<div class="OptionsBox">
+ Examples of functional class atom types:</div>
+<div class="OptionsBox">
+    HBD.HBA - Hydrogen bond donor and acceptor
+<br/>    HBD.RA - Hydrogen bond donor in a ring</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewFunctionalClassAtomTypes = new AtomTypes::FunctionalClassAtomTypes(
+                                                   %NamesAndValues);</div>
+<p>Using specified <em>FunctionalClassAtomTypes</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>FunctionalClassAtomTypes</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'FunctionalClass'
+<br/>    IgnoreHydrogens = 0
+<br/>    FunctionalClassesToUse = HBD, HBA, PI, NI, Ar, Hal</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $FunctionalClassAtomTypes = new AtomTypes::FunctionalClassAtomTypes(
+                              'Molecule' =&gt; $Molecule,
+                              'IgnoreHydrogens' =&gt; 0,
+                              'FunctionalClassesToUse' =&gt;
+                                         ['HBD', 'HBA', 'PI', 'NI', 'Ar', 'Hal']);</div>
+</dd>
+<dt><strong><a name="assignatomtypes" class="item"><strong>AssignAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FunctionalClassAtomTypes-&gt;AssignAtomTypes();</div>
+<p>Assigns functional class atom types to all the atoms in a molecule and returns
+<em>FunctionalClassAtomTypes</em>.</p>
+</dd>
+<dt><strong><a name="getavailablefunctionalclasses" class="item"><strong>GetAvailableFunctionalClasses</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %AvailableFunctionalClasses = $FunctionalClassAtomTypes-&gt;
+                                 GetAvailableFunctionalClasses();</div>
+<p>Returns available functional classes as a hash containing available functional classes
+and their description as key/value pairs.</p>
+</dd>
+<dt><strong><a name="getfunctionalclassesorder" class="item"><strong>GetFunctionalClassesOrder</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @FunctionalClassesOrder = $FunctionalClassAtomTypes-&gt;
+                             GetFunctionalClassesOrder();</div>
+<p>Returns an array obtaining order of functional classes used to generate atom types.</p>
+</dd>
+<dt><strong><a name="isatomtypesassignmentsuccessful" class="item"><strong>IsAtomTypesAssignmentSuccessful</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $AtomTypes-&gt;IsAtomTypesAssignmentSuccessful();</div>
+<p>Returns 1 or 0 based on whether atom types assignment was successfully performed.
+This method overrides the same method available in the base class AtomTypes.pm used
+to derived this class.</p>
+</dd>
+<dt><strong><a name="isfunctionalclassavailable" class="item"><strong>IsFunctionalClassAvailable</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $FunctionalClassAtomTypes-&gt;
+              IsFunctionalClassAvailable($FunctionalClass);
+<br/>    $Status = AtomTypes::FunctionalClassAtomTypes::
+              IsFunctionalClassAvailable($FunctionalClass);</div>
+<p>Returns 1 or 0 based on whether <em>FunctionalClass</em> is valid.</p>
+</dd>
+<dt><strong><a name="setfunctionalclassestouse" class="item"><strong>SetFunctionalClassesToUse</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FunctionalClassAtomTypes-&gt;SetFunctionalClassesToUse($ValuesRef);
+<br/>    $FunctionalClassAtomTypes-&gt;SetFunctionalClassesToUse(@Values);</div>
+<p>Set functional classes to use for generating and assigning atom types and returns
+<em>FunctionalClassAtomTypes</em>.</p>
+</dd>
+<dt><strong><a name="stringifyfunctionalclassatomtypes" class="item"><strong>StringifyFunctionalClassAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $FunctionalClassAtomTypes-&gt;StringifyFunctionalClassAtomTypes();</div>
+<p>Returns a string containing information about <em>FunctionalClassAtomTypes</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AtomTypes.html">AtomTypes.pm</a>,&nbsp<a href="./AtomicInvariantsAtomTypes.html">AtomicInvariantsAtomTypes.pm</a>,&nbsp<a href="./DREIDINGAtomTypes.html">DREIDINGAtomTypes.pm</a>,&nbsp
+<a href="./EStateAtomTypes.html">EStateAtomTypes.pm</a>,&nbsp<a href="./MMFF94AtomTypes.html">MMFF94AtomTypes.pm</a>,&nbsp<a href="./SLogPAtomTypes.html">SLogPAtomTypes.pm</a>,&nbsp
+<a href="./SYBYLAtomTypes.html">SYBYLAtomTypes.pm</a>,&nbsp<a href="./TPSAAtomTypes.html">TPSAAtomTypes.pm</a>,&nbsp<a href="./UFFAtomTypes.html">UFFAtomTypes.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./EStateAtomTypes.html" title="EStateAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MMFF94AtomTypes.html" title="MMFF94AtomTypes.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AtomTypes::FunctionalClassAtomTypes.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

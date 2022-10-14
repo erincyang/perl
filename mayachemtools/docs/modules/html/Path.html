@@ -1,0 +1,259 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Graph::Path.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./GraphMatrix.html" title="GraphMatrix.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PathGraph.html" title="PathGraph.html">Next</a></td><td width="34%" align="middle"><strong>Graph::Path.pm</strong></td><td width="33%" align="right"><a href="././code/Path.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Path.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Path.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Path.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Path.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Path - Path class</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Graph::Path;</p>
+<p>use Graph::Path qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Path</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#addvertex">AddVertex</a>, <a href="#addvertices">AddVertices</a>, <a href="#copy">Copy</a>, <a href="#getcommonvertices">GetCommonVertices</a>, <a href="#getedges">GetEdges</a>, <a href="#getendvertex">GetEndVertex</a>
+, <a href="#getlength">GetLength</a>, <a href="#getstartvertex">GetStartVertex</a>, <a href="#getterminalvertices">GetTerminalVertices</a>, <a href="#getvertex">GetVertex</a>, <a href="#getvertices">GetVertices</a>, <a href="#iscycle">IsCycle</a>
+, <a href="#isindependentcyclicpath">IsIndependentCyclicPath</a>, <a href="#isindependentpath">IsIndependentPath</a>, <a href="#ispath">IsPath</a>, <a href="#join">Join</a>, <a href="#joinatvertex">JoinAtVertex</a>, <a href="#popvertex">PopVertex</a>
+, <a href="#pushvertex">PushVertex</a>, <a href="#pushvertices">PushVertices</a>, <a href="#reverse">Reverse</a>, <a href="#shiftvertex">ShiftVertex</a>, <a href="#stringifypath">StringifyPath</a>, <a href="#unshiftvertex">UnshiftVertex</a>
+, <a href="#unshiftvertices">UnshiftVertices</a>
+</p><p>Path is a sequential list of vertices with an edge between two successive vertices. The path
+becomes a cycle when start vertex and end vertex are the same.</p>
+<p>The following operators are overloaded:</p>
+<div class="OptionsBox">
+    &quot;&quot; == eq</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewPath = new Path();
+<br/>    $NewPath = new Path(@VertexIDs);</div>
+<p>Using specified <em>VertexIDs</em>, <strong>new</strong> method creates a new <strong>Path</strong> object and returns
+newly created <strong>Path</strong> object.</p>
+</dd>
+<dt><strong><a name="addvertex" class="item"><strong>AddVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;AddVertex($VertexID);</div>
+<p>Adds <em>VertexID</em> to <em>Path</em> and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="addvertices" class="item"><strong>AddVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;AddVertices(@VertexIDs);</div>
+<p>Adds vertices using <em>VertexIDs</em> to <em>Path</em> and returns <em>Graph</em>.</p>
+</dd>
+<dt><strong><a name="copy" class="item"><strong>Copy</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Return = $Path-&gt;Copy();</div>
+<p>Copies <em>Path</em> and its associated data using <strong>Storable::dclone</strong> and returns a new
+<strong>Path</strong> object.</p>
+</dd>
+<dt><strong><a name="getcommonvertices" class="item"><strong>GetCommonVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @CommonVertices = $Path-&gt;GetCommonVertices($OtherPath);
+<br/>    $NumOfCommonVertices = $Path-&gt;GetCommonVertices($OtherPath);</div>
+<p>Returns an array containing common vertex IDs between two paths. In scalar context, number
+of common vertices is returned.</p>
+</dd>
+<dt><strong><a name="getedges" class="item"><strong>GetEdges</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @EdgesVertexIDs = $Path-&gt;GetEdges();
+<br/>    $NumOfEdges = $Path-&gt;GetEdges();</div>
+<p>Returns an array containg successive paris of vertex IDs corresponding to all edges in <em>Path</em>.
+In scalar context, the number of edges is returned.</p>
+</dd>
+<dt><strong><a name="getendvertex" class="item"><strong>GetEndVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexID = $Path-&gt;GetEndVertex();</div>
+<p>Returns <strong>VertexID</strong> of end vertex in <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="getlength" class="item"><strong>GetLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Length = $Path-&gt;GetLength();</div>
+<p>Returns <strong>Length</strong> of <em>Path</em> corresponding to number of vertices in <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="getstartvertex" class="item"><strong>GetStartVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexID = $Path-&gt;GetStartVertex();</div>
+<p>Returns <strong>VertexID</strong> of start vertex in <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="getterminalvertices" class="item"><strong>GetTerminalVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($StartVertexID, $EndVertexID) = $Path-&gt;GetTerminalVertices();</div>
+<p>Returns vertex IDs of start and end vertices in <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="getvertex" class="item"><strong>GetVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $VertexID = $Path-&gt;GetVertex($Index);</div>
+<p>Returns specific vertex ID from <em>Path</em> corresponding to <em>Index</em> with indicies starting from 0.</p>
+</dd>
+<dt><strong><a name="getvertices" class="item"><strong>GetVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Vertices = $Path-&gt;GetVertices();
+<br/>    $NumOfVertices = $Path-&gt;GetVertices();</div>
+<p>Returns an array containing all vertex IDs in <em>Path</em>. In scalar context, number of vertices
+is returned.</p>
+</dd>
+<dt><strong><a name="iscycle" class="item"><strong>IsCycle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Path-&gt;IsCycle();</div>
+<p>Returns 1 or 0 based on whether <em>Path</em> is a <strong>CyclicPath</strong> which has the same start and
+end vertex IDs.</p>
+</dd>
+<dt><strong><a name="isindependentcyclicpath" class="item"><strong>IsIndependentCyclicPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Path-&gt;IsIndependentCyclicPath();</div>
+<p>Returns 1 or 0 based on whether <em>Path</em> is an independent <strong>CyclicPath</strong>. For a <em>Path</em> to be
+an independent cyclic path, it must be a cyclic path and have unique vertices.</p>
+</dd>
+<dt><strong><a name="isindependentpath" class="item"><strong>IsIndependentPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Path-&gt;IsIndependentPath();</div>
+<p>Returns 1 or 0 based on whether <em>Path</em> is an independent <strong>Path</strong>. For a <em>Path</em> to be
+an independent path, it must have unique vertices.</p>
+</dd>
+<dt><strong><a name="ispath" class="item"><strong>IsPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = Graph::Path::IsPath();</div>
+<p>Returns 1 or 0 based on whether <em>Object</em> is a <strong>Path</strong> object</p>
+</dd>
+<dt><strong><a name="join" class="item"><strong>Join</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewPath = $Path-&gt;Join($OtherPath);
+<br/>    $NewPath = $Path-&gt;Join(@VertexIDs);</div>
+<p>Joins existing <em>Path</em> with a new path specified as a <em>OtherPath</em> object or an array of <em>VertexIDs</em>
+and returns <em>NewPath</em>.</p>
+<p>In order to successfully join two paths, terminal vertices must have a common vertex. Based on the
+common terminal vertex found, additional path vertices are added to the current <em>Path</em> in one of
+the following four ways:</p>
+<div class="OptionsBox">
+    . EndVertex = NewStartVertex: New path at end of current path with
+      same vertices order</div>
+<div class="OptionsBox">
+    . EndVertex = NewEndVertex: New path at end of current path with
+      reversed vertices order</div>
+<div class="OptionsBox">
+    . StartVertex = NewEndVertex: New path at front of current path
+      with same vertices order</div>
+<div class="OptionsBox">
+    . StartVertex = NewStartVertex: New path at front of current path
+      with reversed vertices order</div>
+</dd>
+<dt><strong><a name="joinatvertex" class="item"><strong>JoinAtVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewPath = $Path-&gt;JoinAtVertex($OtherPath, $CenterVertexID);</div>
+<p>Joins existing <em>Path</em> with <em>OtherPath</em> at a specified <em>CeterVertexID</em> and returns a <em>NewPath</em>.</p>
+</dd>
+<dt><strong><a name="popvertex" class="item"><strong>PopVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;PopVertex();</div>
+<p>Removes end vertex from <em>Path</em> and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="pushvertex" class="item"><strong>PushVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;PushVertex($VertexID);</div>
+<p>Adds <em>VertexID</em> to <em>Path</em> after end vertex and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="pushvertices" class="item"><strong>PushVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;PushVertices(@VertexIDs);</div>
+<p>Adds <em>VertexIDs</em> to <em>Path</em> after end vertex and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="reverse" class="item"><strong>Reverse</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;Reverse();</div>
+<p>Reverses order of vertices in <em>Path</em> and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="shiftvertex" class="item"><strong>ShiftVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;ShiftVertex();</div>
+<p>Removes start vertex from <em>Path</em> and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="stringifypath" class="item"><strong>StringifyPath</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $Path-&gt;StringifyPath();</div>
+<p>Returns a string containing information about <em>Path</em> object.</p>
+</dd>
+<dt><strong><a name="unshiftvertex" class="item"><strong>UnshiftVertex</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;UnshiftVertex($VertexID);</div>
+<p>Adds <em>VertexID</em> to <em>Path</em> before start vertex and returns <em>Path</em>.</p>
+</dd>
+<dt><strong><a name="unshiftvertices" class="item"><strong>UnshiftVertices</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Path-&gt;UnshiftVertices(@VertexIDs);</div>
+<p>Adds <em>VertexIDs</em> to <em>Path</em> before start vertex and returns <em>Path</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./PathGraph.html">PathGraph.pm</a>,&nbsp<a href="./PathsTraversal.html">PathsTraversal.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./GraphMatrix.html" title="GraphMatrix.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PathGraph.html" title="PathGraph.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Graph::Path.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

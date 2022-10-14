@@ -1,0 +1,431 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:SDFileUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PseudoHeap.html" title="PseudoHeap.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SequenceFileUtil.html" title="SequenceFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>SDFileUtil.pm</strong></td><td width="33%" align="right"><a href="././code/SDFileUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SDFileUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SDFileUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SDFileUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SDFileUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SDFileUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use SDFileUtil ;</p>
+<p>use SDFileUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>SDFileUtil</strong> module provides the following functions:</p>
+<p> <a href="#generatecmpdatomaliaspropertylines">GenerateCmpdAtomAliasPropertyLines</a>, <a href="#generatecmpdatomline">GenerateCmpdAtomLine</a>, <a href="#generatecmpdbondline">GenerateCmpdBondLine</a>
+, <a href="#generatecmpdchargepropertylines">GenerateCmpdChargePropertyLines</a>, <a href="#generatecmpdcommentsline">GenerateCmpdCommentsLine</a>, <a href="#generatecmpdcountsline">GenerateCmpdCountsLine</a>
+, <a href="#generatecmpddataheaderlabelsandvalueslines">GenerateCmpdDataHeaderLabelsAndValuesLines</a>, <a href="#generatecmpdisotopepropertylines">GenerateCmpdIsotopePropertyLines</a>
+, <a href="#generatecmpdmiscinfoline">GenerateCmpdMiscInfoLine</a>, <a href="#generatecmpdmolnameline">GenerateCmpdMolNameLine</a>
+, <a href="#generatecmpdradicalpropertylines">GenerateCmpdRadicalPropertyLines</a>, <a href="#generateemptyctabblocklines">GenerateEmptyCtabBlockLines</a>
+, <a href="#generatemisclinedatestamp">GenerateMiscLineDateStamp</a>, <a href="#getallandcommoncmpddataheaderlabels">GetAllAndCommonCmpdDataHeaderLabels</a>
+, <a href="#getcmpddataheaderlabels">GetCmpdDataHeaderLabels</a>, <a href="#getcmpddataheaderlabelsandvalues">GetCmpdDataHeaderLabelsAndValues</a>, <a href="#getcmpdfragments">GetCmpdFragments</a>
+, <a href="#getctablinescount">GetCtabLinesCount</a>, <a href="#getinvalidatomnumbers">GetInvalidAtomNumbers</a>, <a href="#getunknownatoms">GetUnknownAtoms</a>
+, <a href="#internalbondordertomdlbondtype">InternalBondOrderToMDLBondType</a>, <a href="#internalbondstereochemistrytomdlbondstereo">InternalBondStereochemistryToMDLBondStereo</a>
+, <a href="#internalchargetomdlcharge">InternalChargeToMDLCharge</a>, <a href="#internalspinmultiplicitytomdlradical">InternalSpinMultiplicityToMDLRadical</a>, <a href="#iscmpd2d">IsCmpd2D</a>
+, <a href="#iscmpd3d">IsCmpd3D</a>, <a href="#mdlbondstereotointernalbondstereochemistry">MDLBondStereoToInternalBondStereochemistry</a>
+, <a href="#mdlbondtypetointernalbondorder">MDLBondTypeToInternalBondOrder</a>, <a href="#mdlchargetointernalcharge">MDLChargeToInternalCharge</a>
+, <a href="#mdlradicaltointernalspinmultiplicity">MDLRadicalToInternalSpinMultiplicity</a>, <a href="#parsecmpdatomaliaspropertyline">ParseCmpdAtomAliasPropertyLine</a>
+, <a href="#parsecmpdatomline">ParseCmpdAtomLine</a>, <a href="#parsecmpdbondline">ParseCmpdBondLine</a>, <a href="#parsecmpdchargepropertyline">ParseCmpdChargePropertyLine</a>
+, <a href="#parsecmpdcommentsline">ParseCmpdCommentsLine</a>, <a href="#parsecmpdcountsline">ParseCmpdCountsLine</a>, <a href="#parsecmpdisotopepropertyline">ParseCmpdIsotopePropertyLine</a>
+, <a href="#parsecmpdmiscinfoline">ParseCmpdMiscInfoLine</a>, <a href="#parsecmpdmolnameline">ParseCmpdMolNameLine</a>, <a href="#parsecmpdradicalpropertyline">ParseCmpdRadicalPropertyLine</a>
+, <a href="#readcmpdstring">ReadCmpdString</a>, <a href="#removecmpddataheaderlabelandvalue">RemoveCmpdDataHeaderLabelAndValue</a>, <a href="#washcmpd">WashCmpd</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="generatecmpdatomaliaspropertylines" class="item"><strong>GenerateCmpdAtomAliasPropertyLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Lines = GenerateCmpdAtomAliasPropertyLines($AliasValuePairsRef);</div>
+<p>Returns a formatted atom alias property lines corresponding to successive pairs
+of atom number and alias values specified by a refernce to an array. Two lines
+are generate for each atom number and alias value pairs: First line - A  &lt;AtomNum&gt;;
+Second line:&lt;AtomAlias&gt;.</p>
+</dd>
+<dt><strong><a name="generatecmpdatomline" class="item"><strong>GenerateCmpdAtomLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdAtomLine($AtomSymbol, $AtomX, $AtomY,
+            $AtomZ, [$MassDifference, $Charge, $StereoParity]);</div>
+<p>Returns a formatted atom data line containing all the input values.</p>
+</dd>
+<dt><strong><a name="generatecmpdbondline" class="item"><strong>GenerateCmpdBondLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdBondLine($FirstAtomNum, $SecondAtomNum,
+            $BondType, [$BondStereo]);</div>
+<p>Returns a formatted bond data line containing all the input values.</p>
+</dd>
+<dt><strong><a name="generatecmpdchargepropertylines" class="item"><strong>GenerateCmpdChargePropertyLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Lines = GenerateCmpdChargePropertyLines($ChargeValuePairsRef);</div>
+<p>Returns a formatted M  CHG property lines corresponding to successive pairs of
+atom number and charge values specified by a refernce to an array.</p>
+</dd>
+<dt><strong><a name="generatecmpdcommentsline" class="item"><strong>GenerateCmpdCommentsLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdCommentsLine($Comments);</div>
+<p>Returns a formatted comments data line.</p>
+</dd>
+<dt><strong><a name="generatecmpdcountsline" class="item"><strong>GenerateCmpdCountsLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdCountsLine($AtomCount, $BondCount,
+            $ChiralFlag, [$PropertyCount, $Version]);</div>
+<p>Returns a formatted line containing all the input values. The default values of 999
+and  V2000 are used for <em>PropertyCount</em> and <em>Version</em>.</p>
+</dd>
+<dt><strong><a name="generatecmpddataheaderlabelsandvalueslines" class="item"><strong>GenerateCmpdDataHeaderLabelsAndValuesLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Lines = GenerateCmpdDataHeaderLabelsAndValuesLines(
+             $DataHeaderLabelsRef, $DataHeaderLabelsAndValuesRef,
+             [$SortDataLabels]);</div>
+<p>Returns formatted data lines containing header label and values lines corresponding to
+all data header labels in array reference <em>DataHeaderLabelsRef</em> with values in hash
+reference <em>DataHeaderLabelsAndValuesRef</em>. By default, data header labels are
+not sorted and correspond to the label order in array reference <em>DataHeaderLabelsRef</em>.</p>
+</dd>
+<dt><strong><a name="generatecmpdisotopepropertylines" class="item"><strong>GenerateCmpdIsotopePropertyLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Lines = GenerateCmpdIsotopePropertyLines($IsotopeValuePairsRef);</div>
+<p>Returns a formatted M ISO property lines corresponding to successive pairs of
+atom number and isotope values specified by a refernce to an array.</p>
+</dd>
+<dt><strong><a name="generatecmpdmiscinfoline" class="item"><strong>GenerateCmpdMiscInfoLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdMiscInfoLine([$ProgramName, $UserInitial,
+            $Code]);</div>
+<p>Returns a formatted line containing specified user initial, program name, date and code.
+Default values are: <em>ProgramName - MayaChem; UserInitial - NULL; Code - 2D</em>.</p>
+</dd>
+<dt><strong><a name="generatecmpdmolnameline" class="item"><strong>GenerateCmpdMolNameLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateCmpdMolNameLine($MolName);</div>
+<p>Returns a formatted molecule name data line.</p>
+</dd>
+<dt><strong><a name="generatecmpdradicalpropertylines" class="item"><strong>GenerateCmpdRadicalPropertyLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Lines = GenerateCmpdRadicalPropertyLines($RadicalValuePairsRef);</div>
+<p>Returns a formatted M  CHG property lines corresponding to successive pairs of
+atom number and multiplicity values specified by a refernce to an array.</p>
+</dd>
+<dt><strong><a name="generateemptyctabblocklines" class="item"><strong>GenerateEmptyCtabBlockLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Lines = GenerateCmpdMiscInfoLine([$Date]);</div>
+<p>Returns formatted lines representing empty CTAB block.</p>
+</dd>
+<dt><strong><a name="generatemisclinedatestamp" class="item"><strong>GenerateMiscLineDateStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Line = GenerateMiscLineDateStamp();</div>
+<p>Returns date stamp for misc line.</p>
+</dd>
+<dt><strong><a name="getallandcommoncmpddataheaderlabels" class="item"><strong>GetAllAndCommonCmpdDataHeaderLabels</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($CmpdCount, $DataFieldLabelsArrayRef,
+       $CommonDataFieldLabelsArrayRef) =
+          GetAllAndCommonCmpdDataHeaderLabels(\*SDFILE);</div>
+<p>Returns number of comopunds, a reference to an array containing all unique data header
+label and a reference to an array containing common data field labels for all compounds
+in SD file.</p>
+</dd>
+<dt><strong><a name="getcmpddataheaderlabels" class="item"><strong>GetCmpdDataHeaderLabels</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    (@Labels) = GetCmpdDataHeaderLabels(\@CmpdLines);</div>
+<p>Returns an array containg data header labels for a compound</p>
+</dd>
+<dt><strong><a name="getcmpddataheaderlabelsandvalues" class="item"><strong>GetCmpdDataHeaderLabelsAndValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    (%DataValues) = GetCmpdDataHeaderLabelsAndValues(\@CmpdLines);</div>
+<p>Returns a hash conating data header labes and values for a compound.</p>
+</dd>
+<dt><strong><a name="getcmpdfragments" class="item"><strong>GetCmpdFragments</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($FragmentCount, $FragmentString) = GetCmpdFragments(\@CmpLines);</div>
+<p>Figures out the number of disconnected fragments and return their values along
+with the atom numbers in a string delimited by new line character. Fragment data
+in <strong>FragmentString</strong> is sorted on based on its size.</p>
+</dd>
+<dt><strong><a name="getctablinescount" class="item"><strong>GetCtabLinesCount</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CtabLinesCount = GetCtabLinesCount(\@CmpdLines);</div>
+<p>Returns number of lines present between the 4th line and the line containg &quot;M END&quot;.</p>
+</dd>
+<dt><strong><a name="getinvalidatomnumbers" class="item"><strong>GetInvalidAtomNumbers</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($InvalidAtomNumbersCount, $InvalidAtomNumbers, $InvalidAtomNumberLines) =
+       GetInvalidAtomNumbers(\@CmpdLines);</div>
+<p>Returns a list of values containing information about invalid atom numbers present
+in block or atom property lines.</p>
+</dd>
+<dt><strong><a name="getunknownatoms" class="item"><strong>GetUnknownAtoms</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($UnknownAtomCount, $UnknownAtoms, $UnknownAtomLines) =
+       GetUnknownAtoms(\@CmpdLines);</div>
+<p>Returns a list of values containing information about atoms which contain special element
+symbols not present in the periodic table.</p>
+</dd>
+<dt><strong><a name="internalbondordertomdlbondtype" class="item"><strong>InternalBondOrderToMDLBondType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MDLBondType = InternalBondOrderToMDLBondType($InternalBondOrder);</div>
+<p>Returns value of <em>MDLBondType</em> corresponding to <em>InternalBondOrder</em>.</p>
+<div class="OptionsBox">
+    InternalBondOrder  MDLBondType</div>
+<div class="OptionsBox">
+&nbsp;     1                  1
+     2                  2
+     3                  3
+     1.5                4</div>
+</dd>
+<dt><strong><a name="internalbondstereochemistrytomdlbondstereo" class="item"><strong>InternalBondStereochemistryToMDLBondStereo</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MDLBondStereo = InternalBondStereochemistryToMDLBondStereo(
+                     $InternalBondStereo);</div>
+<p>Returns value of <em>MDLBondStereo</em> corresponding to <em>InternalBondStereo</em> using following
+mapping:</p>
+<div class="OptionsBox">
+    InternalBondStereo  MDLBondStereo</div>
+<div class="OptionsBox">
+&nbsp;     Up          1
+     UpOrDown    4
+     Down        6
+     CisOrTrans  3
+     Other       0</div>
+</dd>
+<dt><strong><a name="internalchargetomdlcharge" class="item"><strong>InternalChargeToMDLCharge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MDLCharge = InternalChargeToMDLCharge($InternalCharge);</div>
+<p>Returns value of <em>MDLCharge</em> corresponding to <em>InternalCharge</em> using following
+mapping:</p>
+<div class="OptionsBox">
+    InternalCharge  MDLCharge</div>
+<div class="OptionsBox">
+&nbsp;     3               1
+     2               2
+     1               3
+<br/>    -1              5
+<br/>    -2              6
+<br/>    -3              7</div>
+</dd>
+<dt><strong><a name="internalspinmultiplicitytomdlradical" class="item"><strong>InternalSpinMultiplicityToMDLRadical</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MDLRadical = InternalSpinMultiplicityToMDLRadical(
+                  $InternalSpinMultiplicity);</div>
+<p>Returns value of <em>MDLRadical</em> corresponding to <em>InternalSpinMultiplicity</em>. These
+value are equivalent.</p>
+</dd>
+<dt><strong><a name="mdlbondstereotointernalbondtype" class="item"><strong>MDLBondStereoToInternalBondType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $InternalBondType = MDLBondStereoToInternalBondType($MDLBondStereo);</div>
+<p>Returns value of <em>InternalBondType</em> corresponding to <em>MDLBondStereo</em> using
+mapping shown for <strong>InternalBondTypeToMDLBondStereo</strong> function.</p>
+</dd>
+<dt><strong><a name="iscmpd2d" class="item"><strong>IsCmpd2D</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsCmpd2D();</div>
+<p>Returns 1 or 0 based on whether z-coordinate of any atom is non-zero.</p>
+</dd>
+<dt><strong><a name="iscmpd3d" class="item"><strong>IsCmpd3D</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsCmpd3D();</div>
+<p>Returns 1 or 0 based on whether z-coordinate of any atom is non-zero.</p>
+</dd>
+<dt><strong><a name="mdlbondstereotointernalbondstereochemistry" class="item"><strong>MDLBondStereoToInternalBondStereochemistry</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $InternalBondStereo = MDLBondStereoToInternalBondStereochemistry(
+                          $MDLBondStereo);</div>
+<p>Returns value of <em>InternalBondStereo</em> corresponding to <em>MDLBondStereo</em> using
+mapping shown for <strong>InternalBondStereochemistryToMDLBondStereo</strong> function.</p>
+</dd>
+<dt><strong><a name="mdlbondtypetointernalbondorder" class="item"><strong>MDLBondTypeToInternalBondOrder</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $InternalBondOrder = MDLBondTypeToInternalBondOrder($MDLBondType);</div>
+<p>Returns value of <em>InternalBondOrder</em> corresponding to <em>MDLBondType</em> using
+mapping shown for <strong>InternalBondOrderToMDLBondType</strong> function.</p>
+</dd>
+<dt><strong><a name="mdlchargetointernalcharge" class="item"><strong>MDLChargeToInternalCharge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $InternalCharge = MDLChargeToInternalCharge($MDLCharge);</div>
+<p>Returns value of <em>$InternalCharge</em> corresponding to <em>MDLCharge</em> using
+mapping shown for <strong>InternalChargeToMDLCharge</strong> function.</p>
+</dd>
+<dt><strong><a name="mdlradicaltointernalspinmultiplicity" class="item"><strong>MDLRadicalToInternalSpinMultiplicity</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $InternalSpinMultiplicity = MDLRadicalToInternalSpinMultiplicity(
+                                $MDLRadical);</div>
+<p>Returns value of <em>InternalSpinMultiplicity</em> corresponding to <em>MDLRadical</em>. These
+value are equivalent.</p>
+</dd>
+<dt><strong><a name="parsecmpdatomaliaspropertyline" class="item"><strong>ParseCmpdAtomAliasPropertyLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @AtomNumAndValuePairs = ParseCmpdAtomAliasPropertyLine(
+                            $CurrentLine, $NexLine);</div>
+<p>Parses atom alias propery lines in CTAB generic properties block and returns an array
+with successive pairs of values corresponding to atom number and its alias.</p>
+</dd>
+<dt><strong><a name="parsecmpdatomline" class="item"><strong>ParseCmpdAtomLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomSymbol, $AtomX, $AtomY, $AtomZ, $MassDifference, $Charge,
+       $StereoParity) = ParseCmpdAtomLine($AtomDataLine);</div>
+<p>Parses compound data line containing atom information and returns a list
+of values.</p>
+</dd>
+<dt><strong><a name="parsecmpdbondline" class="item"><strong>ParseCmpdBondLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($FirstAtomNum, $SecondAtomNum, $BondType) =
+       ParseCmpdBondLine($BondDataLine);</div>
+<p>Parses compound data line containing bond information and returns a list of
+values.</p>
+</dd>
+<dt><strong><a name="parsecmpdcommentsline" class="item"><strong>ParseCmpdCommentsLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Comments = ParseCmpdCommentsLine($CommentsDataLine);</div>
+<p>Returns the comment string.</p>
+</dd>
+<dt><strong><a name="parsecmpdchargepropertyline" class="item"><strong>ParseCmpdChargePropertyLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @AtomNumAndValuePairs = ParseCmpdChargePropertyLine(
+                            $ChargeDataLine);</div>
+<p>Parses charge propery line in CTAB generic properties block and returns an array
+with successive pairs of values corresponding to atom number and its charge.</p>
+</dd>
+<dt><strong><a name="parsecmpdcountsline" class="item"><strong>ParseCmpdCountsLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomCount, $BondCount, $ChiralFlag, $PropertyCount, $Version) =
+       ParseCmpdCountsLine(\@CountDataLines);</div>
+<p>Returns a list of values containing count information.</p>
+</dd>
+<dt><strong><a name="parsecmpdmiscinfoline" class="item"><strong>ParseCmpdMiscInfoLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($UserInitial, $ProgramName, $Date, $Code, $ScalingFactor1, $ScalingFactor2,
+       $Energy, $RegistryNum) =  ParseCmpdMiscInfoLine($Line);</div>
+<p>Returns a list of values containing miscellaneous information.</p>
+</dd>
+<dt><strong><a name="parsecmpdisotopepropertyline" class="item"><strong>ParseCmpdIsotopePropertyLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @AtomNumAndValuePairs = ParseCmpdIsotopePropertyLine(
+                            $IsotopeDataLine);</div>
+<p>Parses isotopic propery line in CTAB generic properties block and returns an array
+with successive pairs of values corresponding to atom number and absolute mass of
+atom isotope.</p>
+</dd>
+<dt><strong><a name="parsecmpdmolnameline" class="item"><strong>ParseCmpdMolNameLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolName = ParseCmpdMolNameLine($Line);</div>
+<p>Returns a string containing molecule name.</p>
+</dd>
+<dt><strong><a name="parsecmpdradicalpropertyline" class="item"><strong>ParseCmpdRadicalPropertyLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @AtomNumAndValuePairs = ParseCmpdRadicalPropertyLine(
+                            $RadicalDataLine);</div>
+<p>Parses radical propery line in CTAB generic properties block and returns an array
+with successive pairs of values corresponding to atom number and radical number
+value.</p>
+</dd>
+<dt><strong><a name="removecmpddataheaderlabelandvalue" class="item"><strong>RemoveCmpdDataHeaderLabelAndValue</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewCmpdString = RemoveCmpdDataHeaderLabelAndValue($CmpdString,
+                                                       $DataHeaderLabel);</div>
+<p>Returns a <strong>NewCmpdString</strong> after removing  <em>DataHeaderLabel</em> along with its
+value from <em>CmpdString</em>.</p>
+</dd>
+<dt><strong><a name="readcmpdstring" class="item"><strong>ReadCmpdString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CmpdString = ReadCmpdString(\*SDFILEHANDLE);</div>
+<p>Returns a string containing all the data lines for the next available compound
+in an already open file indicated by SDFILEHANDLE. A NULL string is returned
+on EOF.</p>
+</dd>
+<dt><strong><a name="washcmpd" class="item"><strong>WashCmpd</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($FragmentCount, $Fragments, $WashedCmpdString) = 
+       WashCmpd(\@CmpdLines);</div>
+<p>Figures out the number of disconnected fragments and return their values along
+with the atom numbers in a string delimited by new line character. Fragment data
+in <strong>FragmentString</strong> is sorted on based on its size.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./TextUtil.html">TextUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PseudoHeap.html" title="PseudoHeap.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SequenceFileUtil.html" title="SequenceFileUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>SDFileUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

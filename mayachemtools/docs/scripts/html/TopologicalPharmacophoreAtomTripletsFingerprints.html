@@ -1,0 +1,582 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:TopologicalPharmacophoreAtomTripletsFingerprints.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TopologicalPharmacophoreAtomPairsFingerprints.html" title="TopologicalPharmacophoreAtomPairsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./EndPage.html" title="EndPage.html">Next</a></td><td width="34%" align="middle"><strong>TopologicalPharmacophoreAtomTripletsFingerprints.pl</strong></td><td width="33%" align="right"><a href="././code/TopologicalPharmacophoreAtomTripletsFingerprints.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/TopologicalPharmacophoreAtomTripletsFingerprints.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/TopologicalPharmacophoreAtomTripletsFingerprints.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/TopologicalPharmacophoreAtomTripletsFingerprints.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/TopologicalPharmacophoreAtomTripletsFingerprints.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>TopologicalPharmacophoreAtomTripletsFingerprints.pl - Generate topological pharmacophore atom triplets fingerprints for SD files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>TopologicalPharmacophoreAtomTripletsFingerprints.pl SDFile(s)...</p>
+<p>TopologicalPharmacophoreAtomTripletsFingerprints.pl [<strong>--AromaticityModel</strong> <em>AromaticityModelType</em>]
+[<strong>--AtomTripletsSetSizeToUse</strong> <em>ArbitrarySize | FixedSize</em>]
+[<strong>-a, --AtomTypesToUse</strong> <em>&quot;AtomType1, AtomType2...&quot;</em>]
+[<strong>--AtomTypesWeight</strong> <em>&quot;AtomType1, Weight1, AtomType2, Weight2...&quot;</em>]
+[<strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em>] [<strong>--CompoundIDLabel</strong> <em>text</em>]
+[<strong>--CompoundIDMode</strong>] [<strong>--DataFields</strong> <em>&quot;FieldLabel1, FieldLabel2,...&quot;</em>]
+[<strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em>] [<strong>--DistanceBinSize</strong> <em>number</em>] [<strong>-f, --Filter</strong> <em>Yes | No</em>]
+[<strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>] [<strong>--FingerprintsLabel</strong> <em>text</em>]
+[<strong>-h, --help</strong>] [<strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em>] [<strong>--MinDistance</strong> <em>number</em>] [<strong>--MaxDistance</strong> <em>number</em>]
+[<strong>--OutDelim</strong> <em>comma | tab | semicolon</em>] [<strong>--output</strong> <em>SD | FP | text | all</em>] [<strong>-o, --overwrite</strong>]
+[<strong>-q, --quote</strong> <em>Yes | No</em>] [<strong>-r, --root</strong> <em>RootName</em>] [<strong>-u, --UseTriangleInequality</strong> <em>Yes | No</em>]
+[<strong>-v, --VectorStringFormat</strong> <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em>]
+[<strong>-w, --WorkingDir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Generate topological pharmacophore atom triplets fingerprints [ Ref 66, Ref 68-71 ] for
+<em>SDFile(s)</em> and create appropriate SD, FP or CSV/TSV text file(s) containing fingerprints vector
+strings corresponding to molecular fingerprints.</p>
+<p>Multiple SDFile names are separated by spaces. The valid file extensions are <em>.sdf</em>
+and <em>.sd</em>. All other file names are ignored. All the SD files in a current directory
+can be specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>Based on the values specified for <strong>--AtomTypesToUse</strong>, pharmacophore atom types are
+assigned to all non-hydrogen atoms in a molecule and a distance matrix is generated.
+Using <strong>--MinDistance</strong>, <strong>--MaxDistance</strong>, and <strong>--DistanceBinSize</strong> values, a
+binned distance matrix is generated with lower bound on the distance bin as the distance
+in distance matrix; the lower bound on the distance bin is also used as the distance between
+atom pairs for generation of atom triplet identifiers.</p>
+<p>A pharmacophore atom triplets basis set is generated for all unique atom triplets constituting
+atom pairs binned distances between <strong>--MinDistance</strong> and <strong>--MaxDistance</strong>. The value
+of <strong>--UseTriangleInequality</strong> determines whether the triangle inequality test is applied during
+generation of atom triplets basis set. The lower distance bound, along with specified pharmacophore
+types, is used during generation of atom triplet IDs.</p>
+<div class="OptionsBox">
+    Let:</div>
+<div class="OptionsBox">
+    P = Valid pharmacophore atom type</div>
+<div class="OptionsBox">
+    Px = Pharmacophore atom x
+<br/>    Py = Pharmacophore atom y
+<br/>    Pz = Pharmacophore atom z</div>
+<div class="OptionsBox">
+    Dmin = Minimum distance corresponding to number of bonds between two atoms
+<br/>    Dmax = Maximum distance corresponding to number of bonds between two atoms
+<br/>    D = Distance corresponding to number of bonds between two atom</div>
+<div class="OptionsBox">
+    Bsize  = Distance bin size
+<br/>    Nbins = Number of distance bins</div>
+<div class="OptionsBox">
+    Dxy = Distance or lower bound of binned distance between Px and Py
+<br/>    Dxz = Distance or lower bound of binned distance between Px and Pz
+<br/>    Dyz = Distance or lower bound of binned distance between Py and Pz</div>
+<div class="OptionsBox">
+    Then:</div>
+<div class="OptionsBox">
+    PxDyz-PyDxz-PzDxy = Pharmacophore atom triplet IDs for atom types Px,
+                        Py, and Pz</div>
+<div class="OptionsBox">
+    For example: H1-H1-H1, H2-HBA-H2 and so on</div>
+<div class="OptionsBox">
+    For default values of Dmin = 1 , Dmax = 10 and Bsize = 2:</div>
+<div class="OptionsBox">
+    the number of distance bins, Nbins = 5, are:</div>
+<div class="OptionsBox">
+    [1, 2] [3, 4] [5, 6] [7, 8] [9 10]</div>
+<div class="OptionsBox">
+    and atom triplet basis set size is 2692.</div>
+<div class="OptionsBox">
+    Atom triplet basis set size for various values of Dmin, Dmax and Bsize in
+<br/>    conjunction with usage of triangle inequality is:</div>
+<div class="OptionsBox">
+    Dmin    Dmax   Bsize   UseTriangleInequality   TripletBasisSetSize
+<br/>    1       10     2       No                      4960
+<br/>    1       10     2       Yes                     2692 [ Default ]
+<br/>    2       12     2       No                      8436
+<br/>    2       12     2       Yes                     4494</div>
+<p>Using binned distance matrix and pharmacohore atom types, occurrence of unique pharmacohore
+atom triplets is counted.</p>
+<p>The final pharmacophore atom triples count along with atom pair identifiers involving all non-hydrogen
+atoms constitute pharmacophore topological atom triplets fingerprints of the molecule.</p>
+<p>For <em>ArbitrarySize</em> value of <strong>--AtomTripletsSetSizeToUse</strong> option, the fingerprint vector correspond to
+only those topological pharmacophore atom triplets which are present and have non-zero count. However,
+for <em>FixedSize</em> value of <strong>--AtomTripletsSetSizeToUse</strong> option, the fingerprint vector contains all possible
+valid topological pharmacophore atom triplets with both zero and non-zero count values.</p>
+<p>Example of <em>SD</em> file containing topological pharmacophore atom triplets fingerprints string data:</p>
+<div class="OptionsBox">
+    ... ...
+<br/>    ... ...
+<br/>    $$$$
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...
+<br/>    41 44  0  0  0  0  0  0  0  0999 V2000
+     -3.3652    1.4499    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+<br/>    ... ...
+<br/>    2  3  1  0  0  0  0
+<br/>    ... ...
+<br/>    M  END
+<br/>    &gt;  &lt;CmpdID&gt;
+<br/>    Cmpd1</div>
+<div class="OptionsBox">
+    &gt;  &lt;TopologicalPharmacophoreAtomTripletsFingerprints&gt;
+<br/>    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:ArbitrarySize:
+<br/>    MinDistance1:MaxDistance10;696;NumericalValues;IDsAndValuesString;Ar1-
+<br/>    Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-H1-H1 Ar1-H1-HBA1 Ar1
+<br/>    -H1-HBD1 Ar1-HBA1-HBD1 H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-HBA1-HBA1 H1-
+<br/>    HBA1-HBD1 H1-HBA1-NI1 H1-HBD1-NI1 HBA1-HBA1-NI1 HBA1-HBD1-NI1 Ar1-...;
+<br/>    46 106 8 3 83 11 4 1 21 5 3 1 2 2 1 1 1 100 101 18 11 145 132 26 14 23
+<br/>    28 3 3 5 4 61 45 10 4 16 20 7 5 1 3 4 5 3 1 1 1 1 5 4 2 1 2 2 2 1 1 1
+<br/>    119 123 24 15 185 202 41 25 22 17 3 5 85 95 18 11 23 17 3 1 1 6 4 ...</div>
+<div class="OptionsBox">
+    $$$$
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Example of <em>FP</em> file containing topological pharmacophore atom triplets fingerprints string data:</p>
+<div class="OptionsBox">
+    #
+<br/>    # Package = MayaChemTools 7.4
+<br/>    # Release Date = Oct 21, 2010
+<br/>    #
+<br/>    # TimeStamp = Fri Mar 11 15:38:58 2011
+<br/>    #
+<br/>    # FingerprintsStringType = FingerprintsVector
+<br/>    #
+<br/>    # Description = TopologicalPharmacophoreAtomTriplets:ArbitrarySize:M...
+<br/>    # VectorStringFormat = IDsAndValuesString
+<br/>    # VectorValuesType = NumericalValues
+<br/>    #
+<br/>    Cmpd1 696;Ar1-Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1...;;46 106...
+<br/>    Cmpd2 251;H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-H1-NI1...;4 1 3 1 1 2 2...
+<br/>    ... ...
+<br/>    ... ..</div>
+<p>Example of CSV <em>Text</em> file containing topological pharmacophore atom triplets fingerprints string data:</p>
+<div class="OptionsBox">
+    &quot;CompoundID&quot;,&quot;TopologicalPharmacophoreAtomTripletsFingerprints&quot;
+<br/>    &quot;Cmpd1&quot;,&quot;FingerprintsVector;TopologicalPharmacophoreAtomTriplets:Arbitr
+<br/>    arySize:MinDistance1:MaxDistance10;696;NumericalValues;IDsAndValuesStri
+<br/>    ng;Ar1-Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-H1-H1 Ar1-H1-HB
+<br/>    A1 Ar1-H1-HBD1 Ar1-HBA1-HBD1 H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-HBA1-HBA
+<br/>    1 H1-HBA1-HBD1 H1-HBA1-NI1 H1-HBD1-NI1 HBA1-HBA1-NI1 HBA1-HBD1-NI1 A...;
+<br/>    46 106 8 3 83 11 4 1 21 5 3 1 2 2 1 1 1 100 101 18 11 145 132 26 14 23
+<br/>    28 3 3 5 4 61 45 10 4 16 20 7 5 1 3 4 5 3 1 1 1 1 5 4 2 1 2 2 2 1 1 1
+<br/>    119 123 24 15 185 202 41 25 22 17 3 5 85 95 18 11 23 17 3 1 1 6 4 ...
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>The current release of MayaChemTools generates the following types of topological pharmacophore
+atom triplets fingerprints vector strings:</p>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:ArbitrarySize:
+<br/>    MinDistance1:MaxDistance10;696;NumericalValues;IDsAndValuesString;Ar1-
+<br/>    Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-H1-H1 Ar1-H1-HBA1 Ar1
+<br/>    -H1-HBD1 Ar1-HBA1-HBD1 H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-HBA1-HBA1 H1-
+<br/>    HBA1-HBD1 H1-HBA1-NI1 H1-HBD1-NI1 HBA1-HBA1-NI1 HBA1-HBD1-NI1 Ar1-...;
+<br/>    46 106 8 3 83 11 4 1 21 5 3 1 2 2 1 1 1 100 101 18 11 145 132 26 14 23
+<br/>    28 3 3 5 4 61 45 10 4 16 20 7 5 1 3 4 5 3 1 1 1 1 5 4 2 1 2 2 2 1 1 1
+<br/>    119 123 24 15 185 202 41 25 22 17 3 5 85 95 18 11 23 17 3 1 1 6 4 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:FixedSize:MinD
+<br/>    istance1:MaxDistance10;2692;OrderedNumericalValues;ValuesString;46 106
+<br/>    8 3 0 0 83 11 4 0 0 0 1 0 0 0 0 0 0 0 0 21 5 3 0 0 1 2 2 0 0 1 0 0 0
+<br/>    0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 101 18 11 0 0 145 132 26
+<br/>    14 0 0 23 28 3 3 0 0 5 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 61 45 10 4 0
+<br/>    0 16 20 7 5 1 0 3 4 5 3 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 5 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:FixedSize:MinD
+<br/>    istance1:MaxDistance10;2692;OrderedNumericalValues;IDsAndValuesString;
+<br/>    Ar1-Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-Ar1-NI1 Ar1-Ar1-P
+<br/>    I1 Ar1-H1-H1 Ar1-H1-HBA1 Ar1-H1-HBD1 Ar1-H1-NI1 Ar1-H1-PI1 Ar1-HBA1-HB
+<br/>    A1 Ar1-HBA1-HBD1 Ar1-HBA1-NI1 Ar1-HBA1-PI1 Ar1-HBD1-HBD1 Ar1-HBD1-...;
+<br/>    46 106 8 3 0 0 83 11 4 0 0 0 1 0 0 0 0 0 0 0 0 21 5 3 0 0 1 2 2 0 0 1
+<br/>    0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 101 18 11 0 0 145
+<br/>    132 26 14 0 0 23 28 3 3 0 0 5 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 61 ...</div>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>--AromaticityModel</strong> <em>MDLAromaticityModel | TriposAromaticityModel | MMFFAromaticityModel | ChemAxonBasicAromaticityModel | ChemAxonGeneralAromaticityModel | DaylightAromaticityModel | MayaChemToolsAromaticityModel</em></strong></dt>
+<dd>
+<p>Specify aromaticity model to use during detection of aromaticity. Possible values in the current
+release are: <em>MDLAromaticityModel, TriposAromaticityModel, MMFFAromaticityModel,
+ChemAxonBasicAromaticityModel, ChemAxonGeneralAromaticityModel, DaylightAromaticityModel
+or MayaChemToolsAromaticityModel</em>. Default value: <em>MayaChemToolsAromaticityModel</em>.</p>
+<p>The supported aromaticity model names along with model specific control parameters
+are defined in <strong>AromaticityModelsData.csv</strong>, which is distributed with the current release
+and is available under <strong>lib/data</strong> directory. <strong>Molecule.pm</strong> module retrieves data from
+this file during class instantiation and makes it available to method <strong>DetectAromaticity</strong>
+for detecting aromaticity corresponding to a specific model.</p>
+</dd>
+<dt><strong><strong>--AtomTripletsSetSizeToUse</strong> <em>ArbitrarySize | FixedSize</em></strong></dt>
+<dd>
+<p>Atom triplets set size to use during generation of topological pharmacophore atom triplets
+fingerprints.</p>
+<p>Possible values: <em>ArbitrarySize | FixedSize</em>; Default value: <em>ArbitrarySize</em>.</p>
+<p>For <em>ArbitrarySize</em> value of <strong>--AtomTripletsSetSizeToUse</strong> option, the fingerprint vector
+correspond to only those topological pharmacophore atom triplets which are present and
+have non-zero count. However, for <em>FixedSize</em> value of <strong>--AtomTripletsSetSizeToUse</strong>
+option, the fingerprint vector contains all possible valid topological pharmacophore atom
+triplets with both zero and non-zero count values.</p>
+</dd>
+<dt><strong><strong>-a, --AtomTypesToUse</strong> <em>&quot;AtomType1,AtomType2,...&quot;</em></strong></dt>
+<dd>
+<p>Pharmacophore atom types to use during generation of topological phramacophore
+atom triplets. It's a list of comma separated valid pharmacophore atom types.</p>
+<p>Possible values for pharmacophore atom types are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.
+Default value [ Ref 71 ] : <em>HBD,HBA,PI,NI,H,Ar</em>.</p>
+<p>The pharmacophore atom types abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<p><em>AtomTypes::FunctionalClassAtomTypes</em> module is used to assign pharmacophore atom
+types. It uses following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+</dd>
+<dt><strong><strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em></strong></dt>
+<dd>
+<p>This value is <strong>--CompoundIDMode</strong> specific and indicates how compound ID is generated.</p>
+<p>For <em>DataField</em> value of <strong>--CompoundIDMode</strong> option, it corresponds to datafield label name
+whose value is used as compound ID; otherwise, it's a prefix string used for generating compound
+IDs like LabelPrefixString&lt;Number&gt;. Default value, <em>Cmpd</em>, generates compound IDs which
+look like Cmpd&lt;Number&gt;.</p>
+<p>Examples for <em>DataField</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The value specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--CompoundIDLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID column label for CSV/TSV text file(s) used during <em>CompoundID</em> value
+of <strong>--DataFieldsMode</strong> option. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--CompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs and write to FP or CSV/TSV text file(s) along with generated
+fingerprints for <em>FP | text | all</em> values of <strong>--output</strong> option: use a <em>SDFile(s)</em> datafield value;
+use molname line from <em>SDFile(s)</em>; generate a sequential ID with specific prefix; use combination
+of both MolName and LabelPrefix with usage of LabelPrefix values for empty molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default value: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--CompoundIDMode</strong>, molname line in <em>SDFile(s)</em> takes
+precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DataFieldsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,...&quot;</em></strong></dt>
+<dd>
+<p>Comma delimited list of <em>SDFiles(s)</em> data fields to extract and write to CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DataFieldsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    Extreg
+<br/>    MolID,CompoundName</div>
+</dd>
+<dt><strong><strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data fields in <em>SDFile(s)</em> are transferred to output CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option: transfer all SD
+data field; transfer SD data files common to all compounds; extract specified data fields;
+generate a compound ID using molname line, a compound prefix, or a combination of both.
+Possible values: <em>All | Common | specify | CompoundID</em>. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--DistanceBinSize</strong> <em>number</em></strong></dt>
+<dd>
+<p>Distance bin size used to bin distances between atom pairs in atom triplets. Default value: <em>2</em>.
+Valid values: positive integers.</p>
+<p>For default <strong>--MinDistance</strong> and <strong>--MaxDistance</strong> values of 1 and 10 with  <strong>--DistanceBinSize</strong>
+of 2 [ Ref 70 ], the following 5 distance bins are generated:</p>
+<div class="OptionsBox">
+    [1, 2] [3, 4] [5, 6] [7, 8] [9 10]</div>
+<p>The lower distance bound on the distance bin is uses to bin the distance between atom pairs in
+atom triplets. So in the previous example, atom pairs with distances 1 and 2 fall in first distance
+bin, atom pairs with distances 3 and 4  fall in second distance bin and so on.</p>
+<p>In order to distribute distance bins of equal size, the last bin is allowed to go past <strong>--MaxDistance</strong>
+by up to distance bin size. For example, <strong>--MinDistance</strong> and <strong>--MaxDistance</strong> values of 2 and 10
+with <strong>--DistanceBinSize</strong> of 2 generates the following 6 distance bins:</p>
+<div class="OptionsBox">
+    [2, 3] [4, 5] [6, 7] [8, 9] [10 11]</div>
+</dd>
+<dt><strong><strong>-f, --Filter</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to check and filter compound data in SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>Yes</em>.</p>
+<p>By default, compound data is checked before calculating fingerprints and compounds containing
+atom data corresponding to non-element symbols or no atom data are ignored.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em></strong></dt>
+<dd>
+<p>Specify how fingerprints label is generated in conjunction with <strong>--FingerprintsLabel</strong> option value:
+use fingerprints label generated only by <strong>--FingerprintsLabel</strong> option value or append topological
+atom pair count value IDs to <strong>--FingerprintsLabel</strong> option value.</p>
+<p>Possible values: <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>. Default value:
+<em>FingerprintsLabelOnly</em>.</p>
+<p>Topological atom pairs IDs appended to <strong>--FingerprintsLabel</strong> value during <em>FingerprintsLabelWithIDs</em>
+values of <strong>--FingerprintsLabelMode</strong>  correspond to atom pair count values in fingerprint vector string.</p>
+<p><em>FingerprintsLabelWithIDs</em> value of <strong>--FingerprintsLabelMode</strong> is ignored during <em>ArbitrarySize</em> value
+of <strong>--AtomTripletsSetSizeToUse</strong> option and topological atom triplets IDs not appended to the label.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>SD data label or text file column label to use for fingerprints string in output SD or
+CSV/TSV text file(s) specified by <strong>--output</strong>. Default value: <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Generate fingerprints for only the largest component in molecule. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+<p>For molecules containing multiple connected components, fingerprints can be generated
+in two different ways: use all connected components or just the largest connected
+component. By default, all atoms except for the largest connected component are
+deleted before generation of fingerprints.</p>
+</dd>
+<dt><strong><strong>--MinDistance</strong> <em>number</em></strong></dt>
+<dd>
+<p>Minimum bond distance between atom pairs corresponding to atom triplets for generating
+topological pharmacophore atom triplets. Default value: <em>1</em>. Valid values: positive integers and
+less than <strong>--MaxDistance</strong>.</p>
+</dd>
+<dt><strong><strong>--MaxDistance</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum bond distance between atom pairs corresponding to atom triplets for generating
+topological pharmacophore atom triplets. Default value: <em>10</em>. Valid values: positive integers and
+greater than <strong>--MinDistance</strong>.</p>
+</dd>
+<dt><strong><strong>--OutDelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Delimiter for output CSV/TSV text file(s). Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>SD | FP | text | all</em></strong></dt>
+<dd>
+<p>Type of output files to generate. Possible values: <em>SD, FP, text, or all</em>. Default value: <em>text</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Put quote around column values in output CSV/TSV text file(s). Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>RootName</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file names:
+&lt;SDFileName&gt;&lt;TopologicalPharmacophoreAtomTripletsFP&gt;.&lt;Ext&gt;. The file type determines &lt;Ext&gt; value.
+The sdf, fpf, csv, and tsv &lt;Ext&gt; values are used for SD, FP, comma/semicolon, and tab
+delimited text files, respectively.This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-u, --UseTriangleInequality</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to imply triangle distance inequality test to distances between atom pairs in
+atom triplets during generation of atom triplets basis set generation. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+<p>Triangle distance inequality test implies that distance or binned distance between any two atom
+pairs in an atom triplet must be less than the sum of distances or binned distances between other
+two atoms pairs and greater than the difference of their distances.</p>
+<div class="OptionsBox">
+    For atom triplet PxDyz-PyDxz-PzDxy to satisfy triangle inequality:</div>
+<div class="OptionsBox">
+    Dyz &gt; |Dxz - Dxy| and Dyz &lt; Dxz + Dxy
+<br/>    Dxz &gt; |Dyz - Dxy| and Dyz &lt; Dyz + Dxy
+<br/>    Dxy &gt; |Dyz - Dxz| and Dxy &lt; Dyz + Dxz</div>
+</dd>
+<dt><strong><strong>-v, --VectorStringFormat</strong> <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em></strong></dt>
+<dd>
+<p>Format of fingerprints vector string data in output SD, FP or CSV/TSV text file(s) specified by
+<strong>--output</strong> option. Possible values: <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString |
+ValuesAndIDsString | ValuesAndIDsPairsString</em>. Defaultvalue: <em>ValuesString</em>.</p>
+<p>Default value during <em>FixedSize</em> value of <strong>--AtomTripletsSetSizeToUse</strong> option: <em>ValuesString</em>. Default
+value during <em>ArbitrarySize</em> value of <strong>--AtomTripletsSetSizeToUse</strong> option: <em>IDsAndValuesString</em>.</p>
+<p><em>ValuesString</em> option value is not allowed for <em>ArbitrarySize</em> value of <strong>--AtomTripletsSetSizeToUse</strong>
+option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:ArbitrarySize:
+<br/>    MinDistance1:MaxDistance10;696;NumericalValues;IDsAndValuesString;Ar1-
+<br/>    Ar1-Ar1 Ar1-Ar1-H1 Ar1-Ar1-HBA1 Ar1-Ar1-HBD1 Ar1-H1-H1 Ar1-H1-HBA1 Ar1
+<br/>    -H1-HBD1 Ar1-HBA1-HBD1 H1-H1-H1 H1-H1-HBA1 H1-H1-HBD1 H1-HBA1-HBA1 H1-
+<br/>    HBA1-HBD1 H1-HBA1-NI1 H1-HBD1-NI1 HBA1-HBA1-NI1 HBA1-HBD1-NI1 Ar1-...;
+<br/>    46 106 8 3 83 11 4 1 21 5 3 1 2 2 1 1 1 100 101 18 11 145 132 26 14 23
+<br/>    28 3 3 5 4 61 45 10 4 16 20 7 5 1 3 4 5 3 1 1 1 1 5 4 2 1 2 2 2 1 1 1
+<br/>    119 123 24 15 185 202 41 25 22 17 3 5 85 95 18 11 23 17 3 1 1 6 4 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:FixedSize:MinD
+<br/>    istance1:MaxDistance10;2692;OrderedNumericalValues;ValuesString;46 106
+<br/>    8 3 0 0 83 11 4 0 0 0 1 0 0 0 0 0 0 0 0 21 5 3 0 0 1 2 2 0 0 1 0 0 0
+<br/>    0 0 0 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 101 18 11 0 0 145 132 26
+<br/>    14 0 0 23 28 3 3 0 0 5 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 61 45 10 4 0
+<br/>    0 16 20 7 5 1 0 3 4 5 3 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 5 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomTriplets:FixedSize:MinD
+<br/>    istance1:MaxDistance10;2692;OrderedNumericalValues;ValuesAndIDsPairsSt
+<br/>    ring;46 Ar1-Ar1-Ar1 106 Ar1-Ar1-H1 8 Ar1-Ar1-HBA1 3 Ar1-Ar1-HBD1 0 Ar1
+<br/>    -Ar1-NI1 0 Ar1-Ar1-PI1 83 Ar1-H1-H1 11 Ar1-H1-HBA1 4 Ar1-H1-HBD1 0 Ar1
+<br/>    -H1-NI1 0 Ar1-H1-PI1 0 Ar1-HBA1-HBA1 1 Ar1-HBA1-HBD1 0 Ar1-HBA1-NI1 0
+<br/>    Ar1-HBA1-PI1 0 Ar1-HBD1-HBD1 0 Ar1-HBD1-NI1 0 Ar1-HBD1-PI1 0 Ar1-NI...</div>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>DirName</em></strong></dt>
+<dd>
+<p>Location of working directory. Default value: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl -r SampleTPATFP
+      -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of fixed size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl
+      --AtomTripletsSetSizeToUse FixedSize -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create SampleTPATFP.sdf, SampleTPATFP.fpf and SampleTPATFP.csv files with CSV file containing
+sequential compound IDs along with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --output all
+      -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format and atom triplets IDs in the
+fingerprint data column label starting with Fingerprints, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl
+      --FingerprintsLabelMode FingerprintsLabelWithIDs --FingerprintsLabel
+      Fingerprints -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances not satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl
+      --UseTriangleInequality No -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 6
+distance bins spanning distances from 1 through 12 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl
+      --UseTriangleInequality Yes --MinDistance 1 --MaxDistance 12
+      --DistanceBinSIze 2 -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 6
+distance bins spanning distances from 1 through 12 using &quot;HBD,HBA,PI, NI, H, Ar&quot; atoms with distances
+satisfying triangle inequality and create a SampleTPATFP.csv file containing sequential compound
+IDs along with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl
+      --AtomTypesToUse &quot;HBD,HBA,PI,NI,H,Ar&quot; --UseTriangleInequality Yes
+      --MinDistance 1 --MaxDistance 12 --DistanceBinSIze 2
+      --VectorStringFormat ValuesString -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs from
+molecule name line along with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode MolName  -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs using
+specified data field along with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode DataField --CompoundID Mol_ID
+      -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing sequential compound IDs using
+combination of molecule name line and an explicit compound prefix along with fingerprints vector
+strings data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode MolnameOrLabelPrefix
+      --CompoundID Cmpd --CompoundIDLabel MolID -r SampleSampleTPATFP
+      -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing specific data fields columns along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      Specify --DataFields Mol_ID -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create a SampleTPATFP.csv file containing common data fields columns along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      Common -r SampleTPATFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom triplets fingerprints  of arbitrary size corresponding to 5
+distance bins spanning distances from 1 through 10 using default atoms with distances satisfying triangle
+inequality and create SampleTPATFP.sdf, SampleTPATFP.fpf and SampleTPATFP.csv files containing all
+data fields columns in CSV file along with fingerprints data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomTripletsFingerprints.pl --DataFieldsMode
+      All  --output all -r SampleTPATFP -o Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoFingerprintsFiles.html">InfoFingerprintsFiles.pl</a>,&nbsp<a href="./SimilarityMatricesFingerprints.html">SimilarityMatricesFingerprints.pl</a>,&nbsp<a href="./AtomNeighborhoodsFingerprints.html">AtomNeighborhoodsFingerprints.pl</a>,&nbsp
+<a href="./ExtendedConnectivityFingerprints.html">ExtendedConnectivityFingerprints.pl</a>,&nbsp<a href="./MACCSKeysFingerprints.html">MACCSKeysFingerprints.pl</a>,&nbsp<a href="./PathLengthFingerprints.html">PathLengthFingerprints.pl</a>,&nbsp
+<a href="./TopologicalAtomPairsFingerprints.html">TopologicalAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalAtomTorsionsFingerprints.html">TopologicalAtomTorsionsFingerprints.pl</a>,&nbsp
+<a href="./TopologicalPharmacophoreAtomPairsFingerprints.html">TopologicalPharmacophoreAtomPairsFingerprints.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TopologicalPharmacophoreAtomPairsFingerprints.html" title="TopologicalPharmacophoreAtomPairsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./EndPage.html" title="EndPage.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>TopologicalPharmacophoreAtomTripletsFingerprints.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:BitVector.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./UFFAtomTypes.html" title="UFFAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Bond.html" title="Bond.html">Next</a></td><td width="34%" align="middle"><strong>BitVector.pm</strong></td><td width="33%" align="right"><a href="././code/BitVector.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/BitVector.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/BitVector.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/BitVector.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/BitVector.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>BitVector</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use BitVector;</p>
+<p>use BitVector ();</p>
+<p>use BitVector qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>BitVector</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#clearallbits">ClearAllBits</a>, <a href="#clearbit">ClearBit</a>, <a href="#clearbits">ClearBits</a>, <a href="#clearbitsrange">ClearBitsRange</a>, <a href="#copy">Copy</a>, <a href="#flipallbits">FlipAllBits</a>
+, <a href="#flipbit">FlipBit</a>, <a href="#flipbits">FlipBits</a>, <a href="#flipbitsrange">FlipBitsRange</a>, <a href="#getbit">GetBit</a>, <a href="#getbitsasbinarystring">GetBitsAsBinaryString</a>
+, <a href="#getbitsasdecimalstring">GetBitsAsDecimalString</a>, <a href="#getbitsashexadecimalstring">GetBitsAsHexadecimalString</a>, <a href="#getbitsasoctalstring">GetBitsAsOctalString</a>
+, <a href="#getbitsasrawbinarystring">GetBitsAsRawBinaryString</a>, <a href="#getdensityofclearbits">GetDensityOfClearBits</a>, <a href="#getdensityofsetbits">GetDensityOfSetBits</a>
+, <a href="#getnumofclearbits">GetNumOfClearBits</a>, <a href="#getnumofsetbits">GetNumOfSetBits</a>, <a href="#getsize">GetSize</a>, <a href="#isbitclear">IsBitClear</a>, <a href="#isbitset">IsBitSet</a>, <a href="#isbitvector">IsBitVector</a>
+, <a href="#newfrombinarystring">NewFromBinaryString</a>, <a href="#newfromdecimalstring">NewFromDecimalString</a>, <a href="#newfromhexadecimalstring">NewFromHexadecimalString</a>
+, <a href="#newfromoctalstring">NewFromOctalString</a>, <a href="#newfromrawbinarystring">NewFromRawBinaryString</a>, <a href="#reverse">Reverse</a>, <a href="#setallbits">SetAllBits</a>, <a href="#setbit">SetBit</a>
+, <a href="#setbitvalue">SetBitValue</a>, <a href="#setbitvaluebitorder">SetBitValueBitOrder</a>, <a href="#setbitvalueprintformat">SetBitValuePrintFormat</a>, <a href="#setbits">SetBits</a>
+, <a href="#setbitsasbinarystring">SetBitsAsBinaryString</a>, <a href="#setbitsasdecimalstring">SetBitsAsDecimalString</a>, <a href="#setbitsashexadecimalstring">SetBitsAsHexadecimalString</a>
+, <a href="#setbitsasoctalstring">SetBitsAsOctalString</a>, <a href="#setbitsasrawbinarystring">SetBitsAsRawBinaryString</a>, <a href="#setbitsrange">SetBitsRange</a>, <a href="#stringifybitvector">StringifyBitVector</a>
+</p><p>The following methods can also be used as functions:</p>
+<p>IsBitVector, NewFromBinaryString, NewFromDecimalString, NewFromHexadecimalString,
+NewFromOctalString, NewFromRawBinaryString</p>
+<p>The following operators are overloaded:</p>
+<div class="OptionsBox">
+    &quot;&quot; &amp; | ^ ~ == !=</div>
+<p>Internally, bits are stored in ascending order using Perl vec function. Regardless
+of machine order, big-endian or little-endian, vec function always considers first
+string byte as the lowest byte and first bit within each byte as the lowest bit.</p>
+<p>Things to keep in mind:</p>
+<div class="OptionsBox">
+    o Bit numbers range from 0 to (Size - 1).
+<br/>    o Bit data retieval methods provide options to data in ascending or
+      descending bit order. Default is ascending bit order.
+<br/>    o Stringyfy method provides an option to print data in ascending or
+      descending bit order. Default is ascending bit order.</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = new BitVector($Size);</div>
+<p>Create a new <em>BitVector</em> object of size <em>Size</em> and return  newly created
+<strong>BitVector</strong>. Bit numbers range from 0 to 1 less than <em>Size</em>.</p>
+</dd>
+<dt><strong><a name="clearallbits" class="item"><strong>ClearAllBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;ClearAllBits();</div>
+<p>Set all bit values to 0 in <em>BitVector</em> object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="clearbit" class="item"><strong>ClearBit</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;ClearBit($BitNum);</div>
+<p>Set specified bit number <em>BitNum</em> to 0 in <em>BitVector</em> object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="clearbits" class="item"><strong>ClearBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;ClearBits(@BitNums);</div>
+<p>Set specified bit numbers <em>BitNums</em> to 0 in <em>BitVector</em> object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="clearbitsrange" class="item"><strong>ClearBitsRange</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;ClearBitsRange($MinBitNum, $MaxBitNum);</div>
+<p>Set specified bit numbers between <em>MinBitNum</em> and <em>MaxBitNum</em> to 0 in <em>BitVector</em>
+object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="copy" class="item"><strong>Copy</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = $BitVector-&gt;Copy();</div>
+<p>Copy <em>BitVector</em> and its associated data to a new <strong>BitVector</strong> and return a new
+<strong>BitVector</strong>.</p>
+</dd>
+<dt><strong><a name="flipallbits" class="item"><strong>FlipAllBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;FlipAllBits();</div>
+<p>Flip values of all bits in <em>BitVector</em> and its associated data to a new <strong>BitVector</strong> and return
+<em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="flipbit" class="item"><strong>FlipBit</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;FlipBit($BitNum);</div>
+<p>Flip value of specified <em>BitNum</em> of in <em>BitVector</em> and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="flipbits" class="item"><strong>FlipBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;FlipBits(@BitNums);</div>
+<p>Flip values of specified bit numbers <em>BitNums</em> in <em>BitVector</em> object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="flipbitsrange" class="item"><strong>FlipBitsRange</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;FlipBitsRange($MinBitNum, $MaxBitNum);</div>
+<p>Flip values of specified bit numbers between <em>MinBitNum</em> and <em>MaxBitNum</em> in <em>BitVector</em>
+object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="getbit" class="item"><strong>GetBit</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitValue = $BitVector-&gt;GetBit($BitNum);</div>
+<p>Returns value of bit number <em>BitNum</em> in <em>BitVector</em> object.</p>
+</dd>
+<dt><strong><a name="getbitsasbinarystring" class="item"><strong>GetBitsAsBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitString = $BitVector-&gt;GetBitsAsBinaryString([$BitOrder]);</div>
+<p>Returns values of bits in <em>BitVector</em> as an ascii bit string containing 0s and 1s.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="getbitsasdecimalstring" class="item"><strong>GetBitsAsDecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitString = $BitVector-&gt;GetBitsAsDecimalString([$BitOrder]);</div>
+<p>Returns values of bits in <em>BitVector</em> as a decimal bit string containing values from 0 to
+9.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="getbitsashexadecimalstring" class="item"><strong>GetBitsAsHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitString = $BitVector-&gt;GetBitsAsHexadecimalString([$BitOrder]);</div>
+<p>Returns values of bits in <em>BitVector</em> as a hexadecimal bit string containing values from 0 to 9
+and a to f.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="getbitsasoctalstring" class="item"><strong>GetBitsAsOctalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitString = $BitVector-&gt;GetBitsAsOctalString([$BitOrder]);</div>
+<p>Returns values of bits in <em>BitVector</em> as an octal bit string containing values form 0 to
+7.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="getbitsasrawbinarystring" class="item"><strong>GetBitsAsRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitString = $BitVector-&gt;GetBitsAsRawBinaryString();</div>
+<p>Returns values of bits in <em>BitVector</em> as an string corresponding to packed bit values
+used by Perl vec function without perfoming any unpacking.</p>
+</dd>
+<dt><strong><a name="getdensityofclearbits" class="item"><strong>GetDensityOfClearBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ClearBitsDensity = $BitVector-&gt;GetDensityOfClearBits();</div>
+<p>Returns density of clear bits in <em>BitVector</em> which corresponds to number of bits set to 0
+<em>BitVector</em> divided by its size.</p>
+</dd>
+<dt><strong><a name="getdensityofsetbits" class="item"><strong>GetDensityOfSetBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SetBitsDensity = $BitVector-&gt;GetDensityOfSetBits();</div>
+<p>Returns density of set bits in <em>BitVector</em> which corresponds to number of bits set to 1 in
+<em>BitVector</em> divided by its size.</p>
+</dd>
+<dt><strong><a name="getnumofclearbits" class="item"><strong>GetNumOfClearBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfClearBits = $BitVector-&gt;GetNumOfClearBits();</div>
+<p>Returns number of bits set to 0 in <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="getnumofsetbits" class="item"><strong>GetNumOfSetBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfSetBits = $BitVector-&gt;GetNumOfSetBits();</div>
+<p>Returns number of bits set to 1 in <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="getsize" class="item"><strong>GetSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $BitVector-&gt;GetSize();</div>
+<p>Returns size of <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="isbitclear" class="item"><strong>IsBitClear</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $BitVector-&gt;IsBitClear();</div>
+<p>Returns 1 or 0 based on whether <em>BitNum</em> is set to 0 in <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="isbitset" class="item"><strong>IsBitSet</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $BitVector-&gt;IsBitSet($BitNum);</div>
+<p>Returns 1 or 0 based on whether <em>BitNum</em> is set to 1 in <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="isbitvector" class="item"><strong>IsBitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = BitVector::IsBitVector($Object);</div>
+<p>Returns 1 or 0 based on whether <em>Object</em> is a <strong>BitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="newfrombinarystring" class="item"><strong>NewFromBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = BitVector::NewFromBinaryString($BinaryString,
+                    [$BitOrder]);
+<br/>    $NewBitVector = $BitVector-&gt;NewFromBinaryString($BinaryString,
+                    [$BitOrder]);</div>
+<p>Creates a new <em>BitVector</em> using <em>BinaryString</em> and returns new <strong>BitVector</strong> object.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="newfromdecimalstring" class="item"><strong>NewFromDecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = BitVector::NewFromDecimalString($DecimalString,
+                    [$BitOrder]);
+<br/>    $NewBitVector = $BitVector-&gt;NewFromDecimalString($DecimalString,
+                    [$BitOrder]);</div>
+<p>Creates a new <em>BitVector</em> using <em>DecimalString</em> and returns new <strong>BitVector</strong> object.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="newfromhexadecimalstring" class="item"><strong>NewFromHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = BitVector::NewFromHexadecimalString(
+                    $HexadecimalString, [$BitOrder]);
+<br/>    $NewBitVector = $BitVector-&gt;NewFromHexadecimalString(
+                    $HexadecimalString, [$BitOrder]);</div>
+<p>Creates a new <em>BitVector</em> using <em>HexadecimalString</em> and returns new <strong>BitVector</strong> object.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="newfromoctalstring" class="item"><strong>NewFromOctalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = BitVector::NewFromOctalString($OctalString, [$BitOrder]);
+<br/>    $NewBitVector = $BitVector-&gt;NewFromOctalString($OctalString, [$BitOrder]);</div>
+<p>Creates a new <em>BitVector</em> using <em>OctalString</em> and returns new <strong>BitVector</strong> object.</p>
+<p>Default <em>BitOrder</em> is <em>Ascending</em> bit order which corresponds to first bit in each
+byte as the loweset bit as opposed to the higest bit.</p>
+</dd>
+<dt><strong><a name="newfromrawbinarystring" class="item"><strong>NewFromRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBitVector = BitVector::NewFromRawBinaryString(
+                    $RawBinaryString);
+<br/>    $NewBitVector = $BitVector-&gt;NewFromRawBinaryString(
+                    $RawBinaryString);</div>
+<p>Creates a new <em>BitVector</em> using <em>RawBinaryString</em> and returns new <strong>BitVector</strong> object.</p>
+</dd>
+<dt><strong><a name="reverse" class="item"><strong>Reverse</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;Reverse();</div>
+<p>Reverses values of bits in <em>BitVector</em> and returns <em>BitVector</em>. First bit number ends up with
+value of last bit number.</p>
+</dd>
+<dt><strong><a name="setallbits" class="item"><strong>SetAllBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetAllBits();</div>
+<p>Sets values of all bits in <em>BitVector</em> to 1 and returns <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="setbit" class="item"><strong>SetBit</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBit($BitNum);</div>
+<p>Sets value of <em>BitNum</em> to 1 in <em>BitVector</em> and returns <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="setbitvalue" class="item"><strong>SetBitValue</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitValue($BitNum, $BitValue);</div>
+<p>Sets value of <em>BitNum</em> to <em>BitValue</em> in <em>BitVector</em> and returns <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="setbitvaluebitorder" class="item"><strong>SetBitValueBitOrder</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    BitVector::SetBitValueBitOrder($BitOrder);
+<br/>    $BitVector-&gt;SetBitValueBitOrder($BitOrder);</div>
+<p>Set bit order for printing <strong>BitVector</strong> values during stringification of <strong>BitVector</strong> object.
+Possible bit order values: <em>Ascending or Descending</em>.</p>
+<p>Bit order can be set for either an individual <strong>BitVector</strong> object or the class. Default is
+to print bits in each byte in <em>Asscending</em> bit order.</p>
+<p>Internally, bits are stored in <em>Ascending</em> bit order using Perl vec function. Regardless
+of machine order, big-endian or little-endian, vec function always considers first
+string byte as the lowest byte and first bit within each byte as the lowest bit.</p>
+</dd>
+<dt><strong><a name="setbitvalueprintformat" class="item"><strong>SetBitValuePrintFormat</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    BitVector::SetBitValuePrintFormat($PrintValueFormat);
+<br/>    $BitVector-&gt;SetBitValuePrintFormat($PrintValueFormat);</div>
+<p>Set bit values print format for printing <strong>BitVector</strong> values during stringification of <strong>BitVector</strong>
+object. Possible print format values: <em>Binary, Bin, Hexadecimal, Hex, Decimal, Dec, Octal,
+Oct, RawBinary, RawBin</em>. Default: <em>Binary</em>.</p>
+<p>Bit values print format can be set for either an individual <strong>BitVector</strong> object or the class.</p>
+</dd>
+<dt><strong><a name="setbits" class="item"><strong>SetBits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBits(@BitNums);</div>
+<p>Set specified bit numbers <em>BitNums</em> to 1 in <em>BitVector</em> object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="setbitsasbinarystring" class="item"><strong>SetBitsAsBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsAsBinaryString($BinaryString);</div>
+<p>Set bit values in <em>BitVector</em> using specified <em>BinaryString</em> and return <em>BitVector</em>. The
+size of <em>BitVector</em> is not changed.</p>
+</dd>
+<dt><strong><a name="setbitsasdecimalstring" class="item"><strong>SetBitsAsDecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsAsDecimalString($DecimalString, [$BitOrder]);</div>
+<p>Set bit values in <em>BitVector</em> using specified <em>DecimalString</em> and return <em>BitVector</em>. The
+size of <em>BitVector</em> is not changed.</p>
+</dd>
+<dt><strong><a name="setbitsashexadecimalstring" class="item"><strong>SetBitsAsHexadecimalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsAsHexadecimalString($HexadecimalString, [$BitOrder]);</div>
+<p>Set bit values in <em>BitVector</em> using specified <em>HexadecimalString</em> and return <em>BitVector</em>. The
+size of <em>BitVector</em> is not changed.</p>
+</dd>
+<dt><strong><a name="setbitsasoctalstring" class="item"><strong>SetBitsAsOctalString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsAsOctalString($OctalString, [$BitOrder]);</div>
+<p>Set bit values in <em>BitVector</em> using specified <em>OctalString</em> and return <em>BitVector</em>. The
+size of <em>BitVector</em> is not changed.</p>
+</dd>
+<dt><strong><a name="setbitsasrawbinarystring" class="item"><strong>SetBitsAsRawBinaryString</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsAsRawBinaryString($RawBinaryString);</div>
+<p>Set bit values in <em>BitVector</em> using specified <em>RawBinaryString</em> and return <em>BitVector</em>. The
+size of <em>BitVector</em> is not changed.</p>
+</dd>
+<dt><strong><a name="setbitsrange" class="item"><strong>SetBitsRange</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BitVector-&gt;SetBitsRange($MinBitNum, $MaxBitNum);</div>
+<p>Set specified bit numbers between <em>MinBitNum</em> and <em>MaxBitNum</em> to 1 in <em>BitVector</em>
+object and return <em>BitVector</em>.</p>
+</dd>
+<dt><strong><a name="stringifybitvector" class="item"><strong>StringifyBitVector</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $BitVector-&gt;StringifyBitVector();</div>
+<p>Returns a string containing information about <em>BitVector</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./Vector.html">Vector.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./UFFAtomTypes.html" title="UFFAtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Bond.html" title="Bond.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>BitVector.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

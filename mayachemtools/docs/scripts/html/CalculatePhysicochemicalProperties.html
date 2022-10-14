@@ -1,0 +1,593 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:CalculatePhysicochemicalProperties.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AtomTypesFingerprints.html" title="AtomTypesFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./DBSchemaTablesToTextFiles.html" title="DBSchemaTablesToTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>CalculatePhysicochemicalProperties.pl</strong></td><td width="33%" align="right"><a href="././code/CalculatePhysicochemicalProperties.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/CalculatePhysicochemicalProperties.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/CalculatePhysicochemicalProperties.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/CalculatePhysicochemicalProperties.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/CalculatePhysicochemicalProperties.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>CalculatePhysicochemicalProperties.pl - Calculate physicochemical properties for SD files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>CalculatePhysicochemicalProperties.pl SDFile(s)...</p>
+<p>PhysicochemicalProperties.pl  [<strong>--AromaticityModel</strong> <em>AromaticityModelType</em>]
+[<strong>--CompoundID</strong> DataFieldName or LabelPrefixString]
+[<strong>--CompoundIDLabel</strong> text] [<strong>--CompoundIDMode</strong>] [<strong>--DataFields</strong> &quot;FieldLabel1, FieldLabel2,...&quot;]
+[<strong>-d, --DataFieldsMode</strong> All | Common | Specify | CompoundID] [<strong>-f, --Filter</strong> Yes | No] [<strong>-h, --help</strong>]
+[<strong>--HydrogenBonds</strong> HBondsType1 | HBondsType2] [<strong>-k, --KeepLargestComponent</strong> Yes | No]
+[<strong>-m, --mode</strong> All | RuleOf5 | RuleOf3 | &quot;name1, [name2,...]&quot;]
+[<strong>--MolecularComplexity</strong> <em>Name,Value, [Name,Value,...]</em>]
+[<strong>--OutDelim</strong> comma | tab | semicolon] [<strong>--output</strong> SD | text | both] [<strong>-o, --overwrite</strong>]
+[<strong>--Precision</strong> Name,Number,[Name,Number,..]] [<strong>--RotatableBonds</strong> Name,Value, [Name,Value,...]]
+[<strong>--RuleOf3Violations</strong> Yes | No] [<strong>--RuleOf5Violations</strong> Yes | No]
+[<strong>-q, --quote</strong> Yes | No] [<strong>-r, --root</strong> RootName]
+[<strong>-w, --WorkingDir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Calculate physicochemical properties for <em>SDFile(s)</em> and create appropriate SD or CSV/TSV
+text file(s) containing calculated properties.</p>
+<p>The current release of MayaChemTools supports the calculation of these physicochemical
+properties:</p>
+<div class="OptionsBox">
+    MolecularWeight, ExactMass, HeavyAtoms, Rings, AromaticRings,
+<br/>    van der Waals MolecularVolume [ Ref 93 ], RotatableBonds,
+<br/>    HydrogenBondDonors, HydrogenBondAcceptors, LogP and
+<br/>    Molar Refractivity (SLogP and SMR) [ Ref 89 ], Topological Polar
+<br/>    Surface Area (TPSA) [ Ref 90 ], Fraction of SP3 carbons (Fsp3Carbons)
+<br/>    and SP3 carbons (Sp3Carbons) [ Ref 115-116, Ref 119 ],
+<br/>    MolecularComplexity [ Ref 117-119 ]</div>
+<p>Multiple SDFile names are separated by spaces. The valid file extensions are <em>.sdf</em>
+and <em>.sd</em>. All other file names are ignored. All the SD files in a current directory
+can be specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>The calculation of molecular complexity using <em>MolecularComplexityType</em> parameter
+corresponds to the number of bits-set or unique keys [ Ref 117-119 ] in molecular  fingerprints.
+Default value for <em>MolecularComplexityType</em>: <em>MACCSKeys</em> of size 166. The calculation
+of MACCSKeys is relatively expensive and can take rather substantial amount of time.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>--AromaticityModel</strong> <em>MDLAromaticityModel | TriposAromaticityModel | MMFFAromaticityModel | ChemAxonBasicAromaticityModel | ChemAxonGeneralAromaticityModel | DaylightAromaticityModel | MayaChemToolsAromaticityModel</em></strong></dt>
+<dd>
+<p>Specify aromaticity model to use during detection of aromaticity. Possible values in the current
+release are: <em>MDLAromaticityModel, TriposAromaticityModel, MMFFAromaticityModel,
+ChemAxonBasicAromaticityModel, ChemAxonGeneralAromaticityModel, DaylightAromaticityModel
+or MayaChemToolsAromaticityModel</em>. Default value: <em>MayaChemToolsAromaticityModel</em>.</p>
+<p>The supported aromaticity model names along with model specific control parameters
+are defined in <strong>AromaticityModelsData.csv</strong>, which is distributed with the current release
+and is available under <strong>lib/data</strong> directory. <strong>Molecule.pm</strong> module retrieves data from
+this file during class instantiation and makes it available to method <strong>DetectAromaticity</strong>
+for detecting aromaticity corresponding to a specific model.</p>
+</dd>
+<dt><strong><strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em></strong></dt>
+<dd>
+<p>This value is <strong>--CompoundIDMode</strong> specific and indicates how compound ID is generated.</p>
+<p>For <em>DataField</em> value of <strong>--CompoundIDMode</strong> option, it corresponds to datafield label name
+whose value is used as compound ID; otherwise, it's a prefix string used for generating compound
+IDs like LabelPrefixString&lt;Number&gt;. Default value, <em>Cmpd</em>, generates compound IDs which
+look like Cmpd&lt;Number&gt;.</p>
+<p>Examples for <em>DataField</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The value specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--CompoundIDLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID column label for CSV/TSV text file(s) used during <em>CompoundID</em> value
+of <strong>--DataFieldsMode</strong> option. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--CompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs and write to CSV/TSV text file(s) along with calculated
+physicochemical properties for <em>text | both</em> values of <strong>--output</strong> option: use a <em>SDFile(s)</em>
+datafield value; use molname line from <em>SDFile(s)</em>; generate a sequential ID with specific prefix;
+use combination of both MolName and LabelPrefix with usage of LabelPrefix values for empty
+molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default value: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--CompoundIDMode</strong>, molname line in <em>SDFile(s)</em> takes
+precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DataFieldsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,...&quot;</em></strong></dt>
+<dd>
+<p>Comma delimited list of <em>SDFiles(s)</em> data fields to extract and write to CSV/TSV text file(s) along
+with calculated physicochemical properties for <em>text | both</em> values of <strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DataFieldsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    Extreg
+<br/>    MolID,CompoundName</div>
+</dd>
+<dt><strong><strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data fields in <em>SDFile(s)</em> are transferred to output CSV/TSV text file(s) along
+with calculated physicochemical properties for <em>text | both</em> values of <strong>--output</strong> option:
+transfer all SD data field; transfer SD data files common to all compounds; extract specified
+data fields; generate a compound ID using molname line, a compound prefix, or a combination
+of both. Possible values: <em>All | Common | specify | CompoundID</em>. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>-f, --Filter</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to check and filter compound data in SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>Yes</em>.</p>
+<p>By default, compound data is checked before calculating physiochemical properties and compounds
+containing atom data corresponding to non-element symbols or no atom data are ignored.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--HydrogenBonds</strong> <em>HBondsType1 | HBondsType2</em></strong></dt>
+<dd>
+<p>Parameters to control calculation of hydrogen bond donors and acceptors. Possible values:
+<em>HBondsType1, HydrogenBondsType1, HBondsType2, HydrogenBondsType2</em>. Default value:
+<em>HBondsType2</em> which corresponds to <strong>RuleOf5</strong> definition for number of hydrogen bond
+donors and acceptors.</p>
+<p>The current release of MayaChemTools supports identification of two types of hydrogen bond
+donor and acceptor atoms with these names:</p>
+<div class="OptionsBox">
+    HBondsType1 or HydrogenBondsType1
+<br/>    HBondsType2 or HydrogenBondsType2</div>
+<p>The names of these hydrogen bond types are rather arbitrary. However, their definitions have
+specific meaning and are as follows:</p>
+<div class="OptionsBox">
+    HydrogenBondsType1 [ Ref 60-61, Ref 65-66 ]:</div>
+<div class="OptionsBox">
+&nbsp;&nbsp;&nbsp;&nbsp;        Donor: NH, NH2, OH - Any N and O with available H
+        Acceptor: N[!H], O - Any N without available H and any O</div>
+<div class="OptionsBox">
+    HydrogenBondsType2 [ Ref 91 ]:</div>
+<div class="OptionsBox">
+&nbsp;&nbsp;&nbsp;&nbsp;        Donor: NH, NH2, OH - N and O with available H
+        Acceptor: N, O - And N and O</div>
+</dd>
+<dt><strong><strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Calculate physicochemical properties for only the largest component in molecule. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+<p>For molecules containing multiple connected components, physicochemical properties can be
+calculated in two different ways: use all connected components or just the largest connected
+component. By default, all atoms except for the largest connected component are
+deleted before calculation of physicochemical properties.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>All | RuleOf5 | RuleOf3 | &quot;name1, [name2,...]&quot;</em></strong></dt>
+<dd>
+<p>Specify physicochemical properties to calculate for SDFile(s): calculate all available physical
+chemical properties; calculate properties corresponding to Rule of 5; or use a comma delimited
+list of supported physicochemical properties. Possible values: <em>All | RuleOf5 | RuleOf3 |
+&quot;name1, [name2,...]&quot;</em>.</p>
+<p>Default value: <em>MolecularWeight, HeavyAtoms, MolecularVolume, RotatableBonds, HydrogenBondDonors,
+HydrogenBondAcceptors, SLogP, TPSA</em>. These properties are calculated by default.</p>
+<p><em>RuleOf5</em> [ Ref 91 ] includes these properties: <em>MolecularWeight, HydrogenBondDonors, HydrogenBondAcceptors,
+SLogP</em>. <em>RuleOf5</em> states: MolecularWeight &lt;= 500, HydrogenBondDonors &lt;= 5, HydrogenBondAcceptors &lt;= 10, and
+logP &lt;= 5.</p>
+<p><em>RuleOf3</em> [ Ref 92 ] includes these properties: <em>MolecularWeight, RotatableBonds, HydrogenBondDonors,
+HydrogenBondAcceptors, SLogP, TPSA</em>. <em>RuleOf3</em> states: MolecularWeight &lt;= 300, RotatableBonds &lt;= 3,
+HydrogenBondDonors &lt;= 3, HydrogenBondAcceptors &lt;= 3, logP &lt;= 3, and TPSA &lt;= 60.</p>
+<p><em>All</em> calculates all supported physicochemical properties: <em>MolecularWeight, ExactMass,
+HeavyAtoms, Rings, AromaticRings, MolecularVolume, RotatableBonds, HydrogenBondDonors,
+HydrogenBondAcceptors, SLogP, SMR, TPSA, Fsp3Carbons, Sp3Carbons, MolecularComplexity</em>.</p>
+</dd>
+<dt><strong><strong>--MolecularComplexity</strong> <em>Name,Value, [Name,Value,...]</em></strong></dt>
+<dd>
+<p>Parameters to control calculation of molecular complexity: it's a comma delimited list of parameter
+name and value pairs.</p>
+<p>Possible parameter names: <em>MolecularComplexityType, AtomIdentifierType,
+AtomicInvariantsToUse, FunctionalClassesToUse, MACCSKeysSize, NeighborhoodRadius,
+MinPathLength, MaxPathLength, UseBondSymbols, MinDistance, MaxDistance,
+UseTriangleInequality, DistanceBinSize, NormalizationMethodology</em>.</p>
+<p>The valid paramater valuse for each parameter name are described in the following sections.</p>
+<p>The current release of MayaChemTools supports calculation of molecular complexity using
+<em>MolecularComplexityType</em> parameter corresponding to the number of bits-set or unique
+keys [ Ref 117-119 ] in molecular  fingerprints. The valid values for <em>MolecularComplexityType</em>
+are:</p>
+<div class="OptionsBox">
+    AtomTypesFingerprints
+<br/>    ExtendedConnectivityFingerprints
+<br/>    MACCSKeys
+<br/>    PathLengthFingerprints
+<br/>    TopologicalAtomPairsFingerprints
+<br/>    TopologicalAtomTripletsFingerprints
+<br/>    TopologicalAtomTorsionsFingerprints
+<br/>    TopologicalPharmacophoreAtomPairsFingerprints
+<br/>    TopologicalPharmacophoreAtomTripletsFingerprints</div>
+<p>Default value for <em>MolecularComplexityType</em>: <em>MACCSKeys</em>.</p>
+<p><em>AtomIdentifierType</em> parameter name correspods to atom types used during generation of
+fingerprints. The valid values for <em>AtomIdentifierType</em> are: <em>AtomicInvariantsAtomTypes,
+DREIDINGAtomTypes, EStateAtomTypes, FunctionalClassAtomTypes, MMFF94AtomTypes,
+SLogPAtomTypes, SYBYLAtomTypes, TPSAAtomTypes, UFFAtomTypes</em>. <em>AtomicInvariantsAtomTypes</em>
+is not supported for during the following values of <em>MolecularComplexityType</em>: <em>MACCSKeys,
+TopologicalPharmacophoreAtomPairsFingerprints, TopologicalPharmacophoreAtomTripletsFingerprints</em>.
+<em>FunctionalClassAtomTypes</em> is the only valid value for <em>AtomIdentifierType</em> for topological
+pharmacophore fingerprints.</p>
+<p>Default value for <em>AtomIdentifierType</em>: <em>AtomicInvariantsAtomTypes</em>
+for all except topological pharmacophore fingerprints where it is <em>FunctionalClassAtomTypes</em>.</p>
+<p><em>AtomicInvariantsToUse</em> parameter name and values are used during <em>AtomicInvariantsAtomTypes</em>
+value of parameter <em>AtomIdentifierType</em>. It's a list of space separated valid atomic invariant atom types.</p>
+<p>Possible values for atomic invariants are: <em>AS, X, BO,  LBO, SB, DB, TB, H, Ar, RA, FC, MN, SM</em>.
+Default value for <em>AtomicInvariantsToUse</em> parameter are set differently for different fingerprints
+using <em>MolecularComplexityType</em> parameter as shown below:</p>
+<div class="OptionsBox">
+    MolecularComplexityType              AtomicInvariantsToUse</div>
+<div class="OptionsBox">
+    AtomTypesFingerprints                AS X BO H FC
+<br/>    TopologicalAtomPairsFingerprints     AS X BO H FC
+<br/>    TopologicalAtomTripletsFingerprints  AS X BO H FC
+<br/>    TopologicalAtomTorsionsFingerprints  AS X BO H FC</div>
+<div class="OptionsBox">
+    ExtendedConnectivityFingerprints     AS X  BO H FC MN
+<br/>    PathLengthFingerprints               AS</div>
+<p>The atomic invariants abbreviations correspond to:</p>
+<div class="OptionsBox">
+    AS = Atom symbol corresponding to element symbol</div>
+<div class="OptionsBox">
+    X&lt;n&gt;   = Number of non-hydrogen atom neighbors or heavy atoms
+<br/>    BO&lt;n&gt; = Sum of bond orders to non-hydrogen atom neighbors or heavy atoms
+<br/>    LBO&lt;n&gt; = Largest bond order of non-hydrogen atom neighbors or heavy atoms
+<br/>    SB&lt;n&gt; = Number of single bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    DB&lt;n&gt; = Number of double bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    TB&lt;n&gt; = Number of triple bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    H&lt;n&gt;   = Number of implicit and explicit hydrogens for atom
+<br/>    Ar     = Aromatic annotation indicating whether atom is aromatic
+<br/>    RA     = Ring atom annotation indicating whether atom is a ring
+<br/>    FC&lt;+n/-n&gt; = Formal charge assigned to atom
+<br/>    MN&lt;n&gt; = Mass number indicating isotope other than most abundant isotope
+<br/>    SM&lt;n&gt; = Spin multiplicity of atom. Possible values: 1 (singlet), 2 (doublet) or
+            3 (triplet)</div>
+<p>Atom type generated by AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</p>
+<div class="OptionsBox">
+    AS.X&lt;n&gt;.BO&lt;n&gt;.LBO&lt;n&gt;.&lt;SB&gt;&lt;n&gt;.&lt;DB&gt;&lt;n&gt;.&lt;TB&gt;&lt;n&gt;.H&lt;n&gt;.Ar.RA.FC&lt;+n/-n&gt;.MN&lt;n&gt;.SM&lt;n&gt;</div>
+<p>Except for AS which is a required atomic invariant in atom types, all other atomic invariants are
+optional. Atom type specification doesn't include atomic invariants with zero or undefined values.</p>
+<p>In addition to usage of abbreviations for specifying atomic invariants, the following descriptive words
+are also allowed:</p>
+<div class="OptionsBox">
+    X : NumOfNonHydrogenAtomNeighbors or NumOfHeavyAtomNeighbors
+<br/>    BO : SumOfBondOrdersToNonHydrogenAtoms or SumOfBondOrdersToHeavyAtoms
+<br/>    LBO : LargestBondOrderToNonHydrogenAtoms or LargestBondOrderToHeavyAtoms
+<br/>    SB :  NumOfSingleBondsToNonHydrogenAtoms or NumOfSingleBondsToHeavyAtoms
+<br/>    DB : NumOfDoubleBondsToNonHydrogenAtoms or NumOfDoubleBondsToHeavyAtoms
+<br/>    TB : NumOfTripleBondsToNonHydrogenAtoms or NumOfTripleBondsToHeavyAtoms
+<br/>    H :  NumOfImplicitAndExplicitHydrogens
+<br/>    Ar : Aromatic
+<br/>    RA : RingAtom
+<br/>    FC : FormalCharge
+<br/>    MN : MassNumber
+<br/>    SM : SpinMultiplicity</div>
+<p><em>AtomTypes::AtomicInvariantsAtomTypes</em> module is used to assign atomic invariant
+atom types.</p>
+<p><em>FunctionalClassesToUse</em> parameter name and values are used during <em>FunctionalClassAtomTypes</em>
+value of parameter <em>AtomIdentifierType</em>. It's a list of space separated valid atomic invariant atom types.</p>
+<p>Possible values for atom functional classes are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.</p>
+<p>Default value for <em>FunctionalClassesToUse</em> parameter is set to:</p>
+<div class="OptionsBox">
+    HBD HBA PI NI Ar Hal</div>
+<p>for all fingerprints except for the following two <em>MolecularComplexityType</em> fingerints:</p>
+<div class="OptionsBox">
+    MolecularComplexityType                           FunctionalClassesToUse</div>
+<div class="OptionsBox">
+    TopologicalPharmacophoreAtomPairsFingerprints     HBD HBA P, NI H
+<br/>    TopologicalPharmacophoreAtomTripletsFingerprints  HBD HBA PI NI H Ar</div>
+<p>The functional class abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<div class="OptionsBox">
+ Functional class atom type specification for an atom corresponds to:</div>
+<div class="OptionsBox">
+    Ar.CA.H.HBA.HBD.Hal.NI.PI.RA</div>
+<p><em>AtomTypes::FunctionalClassAtomTypes</em> module is used to assign functional class atom
+types. It uses following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+<p><em>MACCSKeysSize</em> parameter name is only used during <em>MACCSKeys</em> value of
+<em>MolecularComplexityType</em> and corresponds to the size of MACCS key set. Possible
+values: <em>166 or 322</em>. Default value: <em>166</em>.</p>
+<p><em>NeighborhoodRadius</em> parameter name is only used during <em>ExtendedConnectivityFingerprints</em>
+value of <em>MolecularComplexityType</em> and corresponds to atomic neighborhoods radius for
+generating extended connectivity fingerprints. Possible values: positive integer. Default value:
+<em>2</em>.</p>
+<p><em>MinPathLength</em> and <em>MaxPathLength</em> parameters are only used during <em>PathLengthFingerprints</em>
+value of <em>MolecularComplexityType</em> and correspond to minimum and maximum path lengths to use
+for generating path length fingerprints. Possible values: positive integers. Default value: <em>MinPathLength - 1</em>;
+<em>MaxPathLength - 8</em>.</p>
+<p><em>UseBondSymbols</em> parameter is only used during <em>PathLengthFingerprints</em> value of
+<em>MolecularComplexityType</em> and indicates whether bond symbols are included in atom path
+strings used to generate path length fingerprints. Possible value: <em>Yes or No</em>. Default value:
+<em>Yes</em>.</p>
+<p><em>MinDistance</em> and <em>MaxDistance</em> parameters are only used during <em>TopologicalAtomPairsFingerprints</em>
+and <em>TopologicalAtomTripletsFingerprints</em> values of <em>MolecularComplexityType</em> and correspond to
+minimum and maximum bond distance between atom pairs during topological pharmacophore fingerprints.
+Possible values: positive integers. Default value: <em>MinDistance - 1</em>; <em>MaxDistance - 10</em>.</p>
+<p><em>UseTriangleInequality</em> parameter is used during these values for <em>MolecularComplexityType</em>:
+<em>TopologicalAtomTripletsFingerprints</em> and <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>.
+Possible values: <em>Yes or No</em>. It determines wheter to apply triangle inequality to distance triplets.
+Default value: <em>TopologicalAtomTripletsFingerprints - No</em>;
+<em>TopologicalPharmacophoreAtomTripletsFingerprints - Yes</em>.</p>
+<p><em>DistanceBinSize</em> parameter is used during <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>
+value of <em>MolecularComplexityType</em> and correspons to distance bin size used for binning
+distances during generation of topological pharmacophore atom triplets fingerprints. Possible
+value: positive integer. Default value: <em>2</em>.</p>
+<p><em>NormalizationMethodology</em> is only used for these values for <em>MolecularComplexityType</em>:
+<em>ExtendedConnectivityFingerprints</em>, <em>TopologicalPharmacophoreAtomPairsFingerprints</em>
+and <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>. It corresponds to normalization
+methodology to use for scaling the number of bits-set or unique keys during generation of
+fingerprints. Possible values during <em>ExtendedConnectivityFingerprints</em>: <em>None or
+ByHeavyAtomsCount</em>; Default value: <em>None</em>. Possible values during topological
+pharmacophore atom pairs and tripletes fingerprints: <em>None or ByPossibleKeysCount</em>;
+Default value: <em>None</em>. <em>ByPossibleKeysCount</em> corresponds to total number of
+possible topological pharmacophore atom pairs or triplets in a molecule.</p>
+<p>Examples of <em>MolecularComplexity</em> name and value parameters:</p>
+<div class="OptionsBox">
+    MolecularComplexityType,AtomTypesFingerprints,AtomIdentifierType,
+<br/>    AtomicInvariantsAtomTypes,AtomicInvariantsToUse,AS X BO H FC</div>
+<div class="OptionsBox">
+    MolecularComplexityType,ExtendedConnectivityFingerprints,
+<br/>    AtomIdentifierType,AtomicInvariantsAtomTypes,
+<br/>    AtomicInvariantsToUse,AS X BO H FC MN,NeighborhoodRadius,2,
+<br/>    NormalizationMethodology,None</div>
+<div class="OptionsBox">
+    MolecularComplexityType,MACCSKeys,MACCSKeysSize,166</div>
+<div class="OptionsBox">
+    MolecularComplexityType,PathLengthFingerprints,AtomIdentifierType,
+<br/>    AtomicInvariantsAtomTypes,AtomicInvariantsToUse,AS,MinPathLength,
+<br/>    1,MaxPathLength,8,UseBondSymbols,Yes</div>
+<div class="OptionsBox">
+    MolecularComplexityType,TopologicalAtomPairsFingerprints,
+<br/>    AtomIdentifierType,AtomicInvariantsAtomTypes,AtomicInvariantsToUse,
+<br/>    AS X BO H FC,MinDistance,1,MaxDistance,10</div>
+<div class="OptionsBox">
+    MolecularComplexityType,TopologicalAtomTripletsFingerprints,
+<br/>    AtomIdentifierType,AtomicInvariantsAtomTypes,AtomicInvariantsToUse,
+<br/>    AS X BO H FC,MinDistance,1,MaxDistance,10,UseTriangleInequality,No</div>
+<div class="OptionsBox">
+    MolecularComplexityType,TopologicalAtomTorsionsFingerprints,
+<br/>    AtomIdentifierType,AtomicInvariantsAtomTypes,AtomicInvariantsToUse,
+<br/>    AS X BO H FC</div>
+<div class="OptionsBox">
+    MolecularComplexityType,TopologicalPharmacophoreAtomPairsFingerprints,
+<br/>    AtomIdentifierType,FunctionalClassAtomTypes,FunctionalClassesToUse,
+<br/>    HBD HBA PI NI H,MinDistance,1,MaxDistance,10,NormalizationMethodology,
+<br/>    None</div>
+<div class="OptionsBox">
+    MolecularComplexityType,TopologicalPharmacophoreAtomTripletsFingerprints,
+<br/>    AtomIdentifierType,FunctionalClassAtomTypes,FunctionalClassesToUse,
+<br/>    HBD HBA PI NI H Ar,MinDistance,1,MaxDistance,10,NormalizationMethodology,
+<br/>    None,UseTriangleInequality,Yes,NormalizationMethodology,None,
+<br/>    DistanceBinSize,2</div>
+</dd>
+<dt><strong><strong>--OutDelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Delimiter for output CSV/TSV text file(s). Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>SD | text | both</em></strong></dt>
+<dd>
+<p>Type of output files to generate. Possible values: <em>SD, text, or both</em>. Default value: <em>text</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>--Precision</strong> <em>Name,Number,[Name,Number,..]</em></strong></dt>
+<dd>
+<p>Precision of calculated property values in the output file: it's a comma delimited list of
+property name and precision value pairs. Possible property names: <em>MolecularWeight,
+ExactMass</em>. Possible values: positive intergers. Default value: <em>MolecularWeight,2,
+ExactMass,4</em>.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    ExactMass,3
+<br/>    MolecularWeight,1,ExactMass,2</div>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Put quote around column values in output CSV/TSV text file(s). Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>RootName</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file names:
+&lt;SDFileName&gt;&lt;PhysicochemicalProperties&gt;.&lt;Ext&gt;. The file type determines &lt;Ext&gt; value.
+The sdf, csv, and tsv &lt;Ext&gt; values are used for SD, comma/semicolon, and tab
+delimited text files, respectively.This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>--RotatableBonds</strong> <em>Name,Value, [Name,Value,...]</em></strong></dt>
+<dd>
+<p>Parameters to control calculation of rotatable bonds [ Ref 92 ]: it's a comma delimited list of parameter
+name and value pairs. Possible parameter names: <em>IgnoreTerminalBonds, IgnoreBondsToTripleBonds,
+IgnoreAmideBonds, IgnoreThioamideBonds, IgnoreSulfonamideBonds</em>. Possible parameter values:
+<em>Yes or No</em>. By default, value of all parameters is set to <em>Yes</em>.</p>
+</dd>
+<dt><strong><strong>--RuleOf3Violations</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to calculate <strong>RuleOf3Violations</strong> for SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>No</em>.</p>
+<p>For <em>Yes</em> value of <strong>RuleOf3Violations</strong>, in addition to calculating total number of <strong>RuleOf3</strong> violations,
+individual violations for compounds are also written to output files.</p>
+<p><strong>RuleOf3</strong> [ Ref 92 ] states: MolecularWeight &lt;= 300, RotatableBonds &lt;= 3, HydrogenBondDonors &lt;= 3,
+HydrogenBondAcceptors &lt;= 3, logP &lt;= 3, and TPSA &lt;= 60.</p>
+</dd>
+<dt><strong><strong>--RuleOf5Violations</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to calculate <strong>RuleOf5Violations</strong> for SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>No</em>.</p>
+<p>For <em>Yes</em> value of <strong>RuleOf5Violations</strong>, in addition to calculating total number of <strong>RuleOf5</strong> violations,
+individual violations for compounds are also written to output files.</p>
+<p><strong>RuleOf5</strong> [ Ref 91 ] states: MolecularWeight &lt;= 500, HydrogenBondDonors &lt;= 5, HydrogenBondAcceptors &lt;= 10,
+and logP &lt;= 5.</p>
+</dd>
+<dt><strong><strong>--TPSA</strong> <em>Name,Value, [Name,Value,...]</em></strong></dt>
+<dd>
+<p>Parameters to control calculation of TPSA: it's a comma delimited list of parameter name and value
+pairs. Possible parameter names: <em>IgnorePhosphorus, IgnoreSulfur</em>. Possible parameter values:
+<em>Yes or No</em>. By default, value of all parameters is set to <em>Yes</em>.</p>
+<p>By default, TPSA atom contributions from Phosphorus and Sulfur atoms are not included during
+TPSA calculations. [ Ref 91 ]</p>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>DirName</em></strong></dt>
+<dd>
+<p>Location of working directory. Default value: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To calculate default set of physicochemical properties - MolecularWeight, HeavyAtoms,
+MolecularVolume, RotatableBonds, HydrogenBondDonor, HydrogenBondAcceptors, SLogP,
+TPSA - and generate a SamplePhysicochemicalProperties.csv file containing sequential
+compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate both SampleAllProperties.csv
+and SampleAllProperties.sdf files containing sequential compound IDs in CSV file along with
+properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All --output both
+      -r SampleAllProperties -o Sample.sdf</div>
+<p>To calculate RuleOf5 physicochemical properties and generate a SampleRuleOf5Properties.csv file
+containing sequential compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m RuleOf5
+      -r SampleRuleOf5Properties -o Sample.sdf</div>
+<p>To calculate RuleOf5 physicochemical properties along with counting RuleOf5 violations and generate
+a SampleRuleOf5Properties.csv file containing sequential compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m RuleOf5 --RuleOf5Violations Yes
+      -r SampleRuleOf5Properties -o Sample.sdf</div>
+<p>To calculate RuleOf3 physicochemical properties and generate a SampleRuleOf3Properties.csv file
+containing sequential compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m RuleOf3
+      -r SampleRuleOf3Properties -o Sample.sdf</div>
+<p>To calculate RuleOf3 physicochemical properties along with counting RuleOf3 violations and generate
+a SampleRuleOf3Properties.csv file containing sequential compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m RuleOf3 --RuleOf3Violations Yes
+      -r SampleRuleOf3Properties -o Sample.sdf</div>
+<p>To calculate a specific set of physicochemical properties and generate a SampleProperties.csv file
+containing sequential compound IDs along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m &quot;Rings,AromaticRings&quot;
+      -r SampleProperties -o Sample.sdf</div>
+<p>To calculate HydrogenBondDonors and HydrogenBondAcceptors using HydrogenBondsType1 definition
+and generate a SampleProperties.csv file containing sequential compound IDs along with properties
+data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m &quot;HydrogenBondDonors,HydrogenBondAcceptors&quot;
+      --HydrogenBonds HBondsType1 -r SampleProperties -o Sample.sdf</div>
+<p>To calculate TPSA using sulfur and phosphorus atoms along with nitrogen and oxygen atoms and
+generate a SampleProperties.csv file containing sequential compound IDs along with properties
+data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m &quot;TPSA&quot; --TPSA &quot;IgnorePhosphorus,No,
+      IgnoreSulfur,No&quot; -r SampleProperties -o Sample.sdf</div>
+<p>To calculate MolecularComplexity using extendend connectivity fingerprints corresponding
+to atom neighborhood radius of 2 with atomic invariant atom types without any scaling and
+generate a SampleProperties.csv file containing sequential compound IDs along with properties
+data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m MolecularComplexity --MolecularComplexity
+      &quot;MolecularComplexityType,ExtendedConnectivityFingerprints,NeighborhoodRadius,2,
+      AtomIdentifierType, AtomicInvariantsAtomTypes,
+      AtomicInvariantsToUse,AS X BO H FC MN,NormalizationMethodology,None&quot;
+      -r SampleProperties -o Sample.sdf</div>
+<p>To calculate RuleOf5 physicochemical properties along with counting RuleOf5 violations and generate
+a SampleRuleOf5Properties.csv file containing compound IDs from molecule name line along with
+properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m RuleOf5 --RuleOf5Violations Yes
+      --DataFieldsMode CompoundID --CompoundIDMode MolName
+      -r SampleRuleOf5Properties -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate a SampleAllProperties.csv
+file containing compound ID using specified data field along with along with properties data,
+type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All
+      --DataFieldsMode CompoundID --CompoundIDMode DataField --CompoundID Mol_ID
+      -r SampleAllProperties -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate a SampleAllProperties.csv
+file containing compound ID using combination of molecule name line and an explicit compound
+prefix along with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All
+      --DataFieldsMode CompoundID --CompoundIDMode MolnameOrLabelPrefix
+      --CompoundID Cmpd --CompoundIDLabel MolID  -r SampleAllProperties
+      -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate a SampleAllProperties.csv
+file containing specific data fields columns along with with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All
+      --DataFieldsMode Specify --DataFields Mol_ID -r SampleAllProperties
+      -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate a SampleAllProperties.csv
+file containing common data fields columns along with with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All
+      --DataFieldsMode Common -r SampleAllProperties -o Sample.sdf</div>
+<p>To calculate all available physicochemical properties and generate both SampleAllProperties.csv
+and CSV files containing all data fields columns in CSV files along with with properties data, type:</p>
+<div class="ExampleBox">
+    % CalculatePhysicochemicalProperties.pl -m All
+      --DataFieldsMode All  --output both -r SampleAllProperties
+      -o Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromSDtFiles.html">ExtractFromSDtFiles.pl</a>,&nbsp<a href="./ExtractFromTextFiles.html">ExtractFromTextFiles.pl</a>,&nbsp<a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./InfoTextFiles.html">InfoTextFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AtomTypesFingerprints.html" title="AtomTypesFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./DBSchemaTablesToTextFiles.html" title="DBSchemaTablesToTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>CalculatePhysicochemicalProperties.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

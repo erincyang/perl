@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:FilterSDFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromTextFiles.html" title="ExtractFromTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoAminoAcids.html" title="InfoAminoAcids.html">Next</a></td><td width="34%" align="middle"><strong>FilterSDFiles.pl</strong></td><td width="33%" align="right"><a href="././code/FilterSDFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/FilterSDFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/FilterSDFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/FilterSDFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/FilterSDFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>FilterSDFiles.pl - Filter compounds from SDFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>FilterSDFiles.pl SDFile(s)...</p>
+<p>FilterSDFiles.pl [<strong>-a, --all</strong>] [<strong>-e, --empty</strong>] [<strong>-c, --cleansalts</strong>] [<strong>-h, --help</strong>]
+[<strong>-k, --keep</strong>] [<strong>-m, --mismatch</strong>] [<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> <em>rootname</em>]
+[<strong>-s, --salts</strong>] [<strong>-u, --unknownatoms</strong>] [<strong>-w, --workingdir</strong> <em>dirname</em>] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Filter specific compounds from <em>SDFile(s)</em>. Available choices are: wash or
+remove compounds with salts; take out compounds with no
+structural data; remove compounds with mismatched atom/bond blocks data;
+remove compounds which contain uknown atoms and so on. Multiple SDFile
+names are separated by spaces. The valid file extensions are <em>.sdf</em> and <em>.sd</em>.
+All other file names are ignored. All the SD files in a current directory can be
+specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --all</strong></strong></dt>
+<dd>
+<p>Use all options to filter compounds.</p>
+</dd>
+<dt><strong><strong>-e, --empty</strong></strong></dt>
+<dd>
+<p>Filter compounds with empty atom/bond blocks. This is <strong>default behavior</strong>.</p>
+</dd>
+<dt><strong><strong>-c, --cleansalts</strong></strong></dt>
+<dd>
+<p>Wash compounds which contain salts identified as disconnected structural
+units. The largest fragment is kept.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-k, --keep</strong></strong></dt>
+<dd>
+<p>Keep the compounds which were filtered in a separate file. Default: Just
+ignore these compounds. Option <strong>-r --root</strong> is used to generate the new file
+name: &lt;Root&gt;Ignored.sdf. Default file name: &lt;SDFileName&gt;Ignored.sdf.</p>
+</dd>
+<dt><strong><strong>-m, --mismatch</strong></strong></dt>
+<dd>
+<p>Remove compounds with mismatched atom/bond blocks and counts line
+information specified by header block.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New SD file name is generated using the root: &lt;Root&gt;.sdf. Default file
+name:&lt;SDFileName&gt;Filtered.sdf. This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-s, --salts</strong></strong></dt>
+<dd>
+<p>Remove compounds which contain salts identified as disconnected structural
+units.</p>
+</dd>
+<dt><strong><strong>-u, --unknownatoms</strong></strong></dt>
+<dd>
+<p>Remove compounds with atom blocks containing  special atom symbols such
+as L, Q, * ,LP, X, R#, or any other non periodic table symbols.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To remove compounds from SD files which contain salts, unknown atoms, or
+mismatched atom/bonds block data or no structural data, type:</p>
+<div class="ExampleBox">
+    % FilterSDFiles.pl -a -o Sample.sdf
+    <br/>% FilterSDFiles.pl -a -o *.sdf</div>
+<p>And to generate a new NewSampleIgnored.sdf file for filtered compounds, type:</p>
+<div class="ExampleBox">
+    % FilterSDFiles.pl -a -k -r NewSample -o Sample.sdf</div>
+<p>To wash compounds in order to get rid of all disconnected fragments except for
+the largest one, type:</p>
+<div class="ExampleBox">
+    % FilterSDFiles.pl -c -o Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromSDFiles.html">ExtractFromSDFiles.pl</a>,&nbsp<a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromTextFiles.html" title="ExtractFromTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoAminoAcids.html" title="InfoAminoAcids.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>FilterSDFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

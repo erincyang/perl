@@ -1,0 +1,392 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MolecularDescriptors::MolecularComplexityDescriptors.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./HydrogenBondsDescriptors.html" title="HydrogenBondsDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularDescriptors.html" title="MolecularDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>MolecularDescriptors::MolecularComplexityDescriptors.pm</strong></td><td width="33%" align="right"><a href="././code/MolecularComplexityDescriptors.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/MolecularComplexityDescriptors.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/MolecularComplexityDescriptors.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/MolecularComplexityDescriptors.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/MolecularComplexityDescriptors.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>MolecularComplexityDescriptors</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use MolecularDescriptors::MolecularComplexityDescriptors;</p>
+<p>use MolecularDescriptors::MolecularComplexityDescriptors qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>MolecularComplexityDescriptors</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#generatedescriptors">GenerateDescriptors</a>, <a href="#getdescriptornames">GetDescriptorNames</a>
+, <a href="#getmolecularcomplexitytypeabbreviation">GetMolecularComplexityTypeAbbreviation</a>, <a href="#maccskeyssize">MACCSKeysSize</a>, <a href="#setatomidentifiertype">SetAtomIdentifierType</a>
+, <a href="#setatomicinvariantstouse">SetAtomicInvariantsToUse</a>, <a href="#setdistancebinsize">SetDistanceBinSize</a>, <a href="#setfunctionalclassestouse">SetFunctionalClassesToUse</a>
+, <a href="#setmaxdistance">SetMaxDistance</a>, <a href="#setmaxpathlength">SetMaxPathLength</a>, <a href="#setmindistance">SetMinDistance</a>, <a href="#setminpathlength">SetMinPathLength</a>
+, <a href="#setmolecularcomplexitytype">SetMolecularComplexityType</a>, <a href="#setneighborhoodradius">SetNeighborhoodRadius</a>, <a href="#setnormalizationmethodology">SetNormalizationMethodology</a>
+, <a href="#stringifymolecularcomplexitydescriptors">StringifyMolecularComplexityDescriptors</a>
+</p><p><strong>MolecularComplexityDescriptors</strong> is derived from <strong>MolecularDescriptors</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>MolecularComplexityDescriptors</strong>, <strong>MolecularDescriptors</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>The current release of MayaChemTools supports calculation of molecular complexity using
+<em>MolecularComplexityType</em> parameter corresponding to number of bits-set or unique
+keys [ Ref 117-119 ] in molecular  fingerprints. The valid values for <em>MolecularComplexityType</em>
+are:</p>
+<div class="OptionsBox">
+    AtomTypesFingerprints
+<br/>    ExtendedConnectivityFingerprints
+<br/>    MACCSKeys
+<br/>    PathLengthFingerprints
+<br/>    TopologicalAtomPairsFingerprints
+<br/>    TopologicalAtomTripletsFingerprints
+<br/>    TopologicalAtomTorsionsFingerprints
+<br/>    TopologicalPharmacophoreAtomPairsFingerprints
+<br/>    TopologicalPharmacophoreAtomTripletsFingerprints</div>
+<p>Default value for <em>MolecularComplexityType</em>: <em>MACCSKeys</em>.</p>
+<p><em>AtomIdentifierType</em> parameter name corresponds to atom types used during generation of
+fingerprints. The valid values for <em>AtomIdentifierType</em> are: <em>AtomicInvariantsAtomTypes,
+DREIDINGAtomTypes, EStateAtomTypes, FunctionalClassAtomTypes, MMFF94AtomTypes,
+SLogPAtomTypes, SYBYLAtomTypes, TPSAAtomTypes, UFFAtomTypes</em>. <em>AtomicInvariantsAtomTypes</em>
+is not supported for following values of <em>MolecularComplexityType</em>: <em>MACCSKeys,
+TopologicalPharmacophoreAtomPairsFingerprints, TopologicalPharmacophoreAtomTripletsFingerprints</em>.
+<em>FunctionalClassAtomTypes</em> is the only valid value of <em>AtomIdentifierType</em> for topological
+pharmacophore fingerprints.</p>
+<p>Default value for <em>AtomIdentifierType</em>: <em>AtomicInvariantsAtomTypes</em> for all fingerprints;
+<em>FunctionalClassAtomTypes</em> for topological pharmacophore fingerprints.</p>
+<p><em>AtomicInvariantsToUse</em> parameter name and values are used during <em>AtomicInvariantsAtomTypes</em>
+value of parameter <em>AtomIdentifierType</em>. It's a list of space separated valid atomic invariant atom types.</p>
+<p>Possible values for atomic invariants are: <em>AS, X, BO,  LBO, SB, DB, TB, H, Ar, RA, FC, MN, SM</em>.
+Default value for <em>AtomicInvariantsToUse</em> parameter are set differently for different fingerprints
+using <em>MolecularComplexityType</em> parameter as shown below:</p>
+<div class="OptionsBox">
+    MolecularComplexityType              AtomicInvariantsToUse</div>
+<div class="OptionsBox">
+    AtomTypesFingerprints                AS X BO H FC
+<br/>    TopologicalAtomPairsFingerprints     AS X BO H FC
+<br/>    TopologicalAtomTripletsFingerprints  AS X BO H FC
+<br/>    TopologicalAtomTorsionsFingerprints  AS X BO H FC</div>
+<div class="OptionsBox">
+    ExtendedConnectivityFingerprints     AS X  BO H FC MN
+<br/>    PathLengthFingerprints               AS</div>
+<p><em>FunctionalClassesToUse</em> parameter name and values are used during <em>FunctionalClassAtomTypes</em>
+value of parameter <em>AtomIdentifierType</em>. It's a list of space separated valid atomic invariant atom types.</p>
+<p>Possible values for atom functional classes are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.</p>
+<p>Default value for <em>FunctionalClassesToUse</em> parameter is set to:</p>
+<div class="OptionsBox">
+    HBD HBA PI NI Ar Hal</div>
+<p>for all fingerprints except for the following two <em>MolecularComplexityType</em> fingerints:</p>
+<div class="OptionsBox">
+    MolecularComplexityType                           FunctionalClassesToUse</div>
+<div class="OptionsBox">
+    TopologicalPharmacophoreAtomPairsFingerprints     HBD HBA P, NI H
+<br/>    TopologicalPharmacophoreAtomTripletsFingerprints  HBD HBA PI NI H Ar</div>
+<p><em>MACCSKeysSize</em> parameter name is only used during <em>MACCSKeys</em> value of
+<em>MolecularComplexityType</em> and corresponds to size of MACCS key set. Possible
+values: <em>166 or 322</em>. Default value: <em>166</em>.</p>
+<p><em>NeighborhoodRadius</em> parameter name is only used during <em>ExtendedConnectivityFingerprints</em>
+value of <em>MolecularComplexityType</em> and corresponds to atomic neighborhoods radius for
+generating extended connectivity fingerprints. Possible values: positive integer. Default value:
+<em>2</em>.</p>
+<p><em>MinPathLength</em> and <em>MaxPathLength</em> parameters are only used during <em>PathLengthFingerprints</em>
+value of <em>MolecularComplexityType</em> and correspond to minimum and maximum path lengths to use
+for generating path length fingerprints. Possible values: positive integers. Default value: <em>MinPathLength - 1</em>;
+<em>MaxPathLength - 8</em>.</p>
+<p><em>UseBondSymbols</em> parameter is only used during <em>PathLengthFingerprints</em> value of
+<em>MolecularComplexityType</em> and indicates whether bond symbols are included in atom path
+strings used to generate path length fingerprints. Possible value: <em>Yes or No</em>. Default value:
+<em>Yes</em>.</p>
+<p><em>MinDistance</em> and <em>MaxDistance</em> parameters are only used during <em>TopologicalAtomPairsFingerprints</em>
+and <em>TopologicalAtomTripletsFingerprints</em> values of <em>MolecularComplexityType</em> and correspond to
+minimum and maximum bond distance between atom pairs during topological pharmacophore fingerprints.
+Possible values: positive integers. Default value: <em>MinDistance - 1</em>; <em>MaxDistance - 10</em>.</p>
+<p><em>UseTriangleInequality</em> parameter is used during these values for <em>MolecularComplexityType</em>:
+<em>TopologicalAtomTripletsFingerprints</em> and <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>.
+Possible values: <em>Yes or No</em>. It determines wheter to apply triangle inequality to distance triplets.
+Default value: <em>TopologicalAtomTripletsFingerprints - No</em>;
+<em>TopologicalPharmacophoreAtomTripletsFingerprints - Yes</em>.</p>
+<p><em>DistanceBinSize</em> parameter is used during <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>
+value of <em>MolecularComplexityType</em> and corresponds to distance bin size used for binning
+distances during generation of topological pharmacophore atom triplets fingerprints. Possible
+value: positive integer. Default value: <em>2</em>.</p>
+<p><em>NormalizationMethodology</em> is only used for these values for <em>MolecularComplexityType</em>:
+<em>ExtendedConnectivityFingerprints</em>, <em>TopologicalPharmacophoreAtomPairsFingerprints</em>
+and <em>TopologicalPharmacophoreAtomTripletsFingerprints</em>. It corresponds to normalization
+methodology to use for scaling the number of bits-set or unique keys during generation of
+fingerprints. Possible values during <em>ExtendedConnectivityFingerprints</em>: <em>None or
+ByHeavyAtomsCount</em>; Default value: <em>None</em>. Possible values during topological
+pharmacophore atom pairs and triplets fingerprints: <em>None or ByPossibleKeysCount</em>;
+Default value: <em>None</em>. <em>ByPossibleKeysCount</em> corresponds to total number of
+possible topological pharmacophore atom pairs or triplets in a molecule.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewMolecularComplexityDescriptors = new MolecularDescriptors::
+                                         MolecularComplexityDescriptors(
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                             %NamesAndValues);</div>
+<p>Using specified <em>MolecularComplexityDescriptors</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>MolecularComplexityDescriptors</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'MolecularComplexity'
+<br/>    MolecularComplexityType = 'MACCSKeys'
+<br/>    AtomIdentifierType = ''
+<br/>    MACCSKeysSize = 166
+<br/>    NeighborhoodRadius = 2
+<br/>    MinPathLength = 1
+<br/>    MaxPathLength = 8
+<br/>    UseBondSymbols = 1
+<br/>    MinDistance = 1
+<br/>    MaxDistance = 10
+<br/>    UseTriangleInequality = ''
+<br/>    DistanceBinSize = 2
+<br/>    NormalizationMethodology = 'None'
+<br/>    @DescriptorNames = ('MolecularComplexity')
+<br/>    @DescriptorValues = ('None')</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors = new MolecularDescriptors::
+                                      MolecularComplexityDescriptors(
+                                      'Molecule' =&gt; $Molecule);</div>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors = new MolecularDescriptors::
+                                      MolecularComplexityDescriptors();</div>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMolecule($Molecule);
+<br/>    $MolecularComplexityDescriptors-&gt;GenerateDescriptors();
+<br/>    print &quot;MolecularComplexityDescriptors: $MolecularComplexityDescriptors\n&quot;;</div>
+</dd>
+<dt><strong><a name="generatedescriptors" class="item"><strong>GenerateDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;GenerateDescriptors();</div>
+<p>Calculates MolecularComplexity value for a molecule and returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="getdescriptornames" class="item"><strong>GetDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularComplexityDescriptors-&gt;GetDescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::MolecularComplexityDescriptors::
+                       GetDescriptorNames();</div>
+<p>Returns all available descriptor names as an array.</p>
+</dd>
+<dt><strong><a name="getmolecularcomplexitytypeabbreviation" class="item"><strong>GetMolecularComplexityTypeAbbreviation</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Abbrev = $MolecularComplexityDescriptors-&gt;
+                  GetMolecularComplexityTypeAbbreviation();
+<br/>    $Abbrev = MolecularDescriptors::MolecularComplexityDescriptors::
+                  GetMolecularComplexityTypeAbbreviation($ComplexityType);</div>
+<p>Returns abbreviation for a specified molecular complexity type or corresponding to
+<em>MolecularComplexityDescriptors</em> object.</p>
+</dd>
+<dt><strong><a name="setmaccskeyssize" class="item"><strong>SetMACCSKeysSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;MACCSKeysSize($Size);</div>
+<p>Sets MACCS keys size and returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setatomidentifiertype" class="item"><strong>SetAtomIdentifierType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetAtomIdentifierType($IdentifierType);</div>
+<p>Sets atom <em>IdentifierType</em> to use during fingerprints generation corresponding to
+<em>MolecularComplexityType</em> and returns <em>MolecularComplexityDescriptors</em>.</p>
+<p>Possible values: <em>AtomicInvariantsAtomTypes, DREIDINGAtomTypes, EStateAtomTypes,
+FunctionalClassAtomTypes, MMFF94AtomTypes, SLogPAtomTypes, SYBYLAtomTypes,
+TPSAAtomTypes, UFFAtomTypes</em>.</p>
+</dd>
+<dt><strong><a name="setatomicinvariantstouse" class="item"><strong>SetAtomicInvariantsToUse</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetAtomicInvariantsToUse($ValuesRef);
+<br/>    $MolecularComplexityDescriptors-&gt;SetAtomicInvariantsToUse(@Values);</div>
+<p>Sets atomic invariants to use during <em>AtomicInvariantsAtomTypes</em> value of <em>AtomIdentifierType</em>
+for fingerprints generation and returns <em>MolecularComplexityDescriptors</em>.</p>
+<p>Possible values for atomic invariants are: <em>AS, X, BO,  LBO, SB, DB, TB,
+H, Ar, RA, FC, MN, SM</em>. Default value [ Ref 24 ]: <em>AS,X,BO,H,FC,MN</em>.</p>
+<p>The atomic invariants abbreviations correspond to:</p>
+<div class="OptionsBox">
+    AS = Atom symbol corresponding to element symbol</div>
+<div class="OptionsBox">
+    X&lt;n&gt;   = Number of non-hydrogen atom neighbors or heavy atoms
+<br/>    BO&lt;n&gt; = Sum of bond orders to non-hydrogen atom neighbors or heavy atoms
+<br/>    LBO&lt;n&gt; = Largest bond order of non-hydrogen atom neighbors or heavy atoms
+<br/>    SB&lt;n&gt; = Number of single bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    DB&lt;n&gt; = Number of double bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    TB&lt;n&gt; = Number of triple bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    H&lt;n&gt;   = Number of implicit and explicit hydrogens for atom
+<br/>    Ar     = Aromatic annotation indicating whether atom is aromatic
+<br/>    RA     = Ring atom annotation indicating whether atom is a ring
+<br/>    FC&lt;+n/-n&gt; = Formal charge assigned to atom
+<br/>    MN&lt;n&gt; = Mass number indicating isotope other than most abundant isotope
+<br/>    SM&lt;n&gt; = Spin multiplicity of atom. Possible values: 1 (singlet), 2 (doublet) or
+            3 (triplet)</div>
+<p>Atom type generated by AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</p>
+<div class="OptionsBox">
+    AS.X&lt;n&gt;.BO&lt;n&gt;.LBO&lt;n&gt;.&lt;SB&gt;&lt;n&gt;.&lt;DB&gt;&lt;n&gt;.&lt;TB&gt;&lt;n&gt;.H&lt;n&gt;.Ar.RA.FC&lt;+n/-n&gt;.MN&lt;n&gt;.SM&lt;n&gt;</div>
+<p>Except for AS which is a required atomic invariant in atom types, all other atomic invariants are
+optional. Atom type specification doesn't include atomic invariants with zero or undefined values.</p>
+<p>In addition to usage of abbreviations for specifying atomic invariants, the following descriptive words
+are also allowed:</p>
+<div class="OptionsBox">
+    X : NumOfNonHydrogenAtomNeighbors or NumOfHeavyAtomNeighbors
+<br/>    BO : SumOfBondOrdersToNonHydrogenAtoms or SumOfBondOrdersToHeavyAtoms
+<br/>    LBO : LargestBondOrderToNonHydrogenAtoms or LargestBondOrderToHeavyAtoms
+<br/>    SB :  NumOfSingleBondsToNonHydrogenAtoms or NumOfSingleBondsToHeavyAtoms
+<br/>    DB : NumOfDoubleBondsToNonHydrogenAtoms or NumOfDoubleBondsToHeavyAtoms
+<br/>    TB : NumOfTripleBondsToNonHydrogenAtoms or NumOfTripleBondsToHeavyAtoms
+<br/>    H :  NumOfImplicitAndExplicitHydrogens
+<br/>    Ar : Aromatic
+<br/>    RA : RingAtom
+<br/>    FC : FormalCharge
+<br/>    MN : MassNumber
+<br/>    SM : SpinMultiplicity</div>
+<p><em>AtomTypes::AtomicInvariantsAtomTypes</em> module is used to assign atomic invariant
+atom types.</p>
+</dd>
+<dt><strong><a name="setdistancebinsize" class="item"><strong>SetDistanceBinSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetDistanceBinSize($BinSize);</div>
+<p>Sets distance bin size used to bin distances between atom pairs in atom triplets for
+topological pharmacophore atom triplets fingerprints generation and returns
+<em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setfunctionalclassestouse" class="item"><strong>SetFunctionalClassesToUse</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetFunctionalClassesToUse($ValuesRef);
+<br/>    $MolecularComplexityDescriptors-&gt;SetFunctionalClassesToUse(@Values);</div>
+<p>Sets functional classes invariants to use during <em>FunctionalClassAtomTypes</em> value of <em>AtomIdentifierType</em>
+for fingerprints generation and returns <em>MolecularComplexityDescriptors</em>.</p>
+<p>Possible values for atom functional classes are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.
+Default value [ Ref 24 ]: <em>HBD,HBA,PI,NI,Ar,Hal</em>.</p>
+<p>The functional class abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<div class="OptionsBox">
+ Functional class atom type specification for an atom corresponds to:</div>
+<div class="OptionsBox">
+    Ar.CA.H.HBA.HBD.Hal.NI.PI.RA or None</div>
+<p><em>AtomTypes::FunctionalClassAtomTypes</em> module is used to assign functional class atom
+types. It uses following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+</dd>
+<dt><strong><a name="setmaxdistance" class="item"><strong>SetMaxDistance</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMaxDistance($MaxDistance);</div>
+<p>Sets maximum distance to use during topological atom pairs and triplets fingerprints
+generation and returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setmaxpathlength" class="item"><strong>SetMaxPathLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMaxPathLength($Length);</div>
+<p>Sets maximum path length to use during path length fingerprints generation and returns
+<em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setmindistance" class="item"><strong>SetMinDistance</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMinDistance($MinDistance);</div>
+<p>Sets minimum distance to use during topological atom pairs and triplets fingerprints
+generation and returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setminpathlength" class="item"><strong>SetMinPathLength</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMinPathLength($MinPathLength);</div>
+<p>Sets minimum path length to use during path length fingerprints generation and returns
+<em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setmolecularcomplexitytype" class="item"><strong>SetMolecularComplexityType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetMolecularComplexityType($ComplexityType);</div>
+<p>Sets molecular complexity type to use for calculating its value and returns
+<em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setneighborhoodradius" class="item"><strong>SetNeighborhoodRadius</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetNeighborhoodRadius($Radius);</div>
+<p>Sets neighborhood radius to use during extended connectivity fingerprints generation and
+returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setnormalizationmethodology" class="item"><strong>SetNormalizationMethodology</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularComplexityDescriptors-&gt;SetNormalizationMethodology($Methodology);</div>
+<p>Sets normalization methodology to use during calculation of molecular complexity
+corresponding to extended connectivity, topological pharmacophore atom pairs and
+tripletes fingerprints returns <em>MolecularComplexityDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="stringifymolecularcomplexitydescriptors" class="item"><strong>StringifyMolecularComplexityDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $MolecularComplexityDescriptors-&gt;
+                  StringifyMolecularComplexityDescriptors();</div>
+<p>Returns a string containing information about <em>MolecularComplexityDescriptors</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./MolecularDescriptors.html">MolecularDescriptors.pm</a>,&nbsp<a href="./MolecularDescriptorsGenerator.html">MolecularDescriptorsGenerator.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./HydrogenBondsDescriptors.html" title="HydrogenBondsDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularDescriptors.html" title="MolecularDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MolecularDescriptors::MolecularComplexityDescriptors.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

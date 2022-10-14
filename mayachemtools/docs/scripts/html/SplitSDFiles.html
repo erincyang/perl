@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:SplitSDFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SortTextFiles.html" title="SortTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SplitTextFiles.html" title="SplitTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>SplitSDFiles.pl</strong></td><td width="33%" align="right"><a href="././code/SplitSDFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SplitSDFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SplitSDFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SplitSDFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SplitSDFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SplitSDFiles.pl - Split SDFile(s) into multiple SD files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>SplitSDFiles.pl SDFile(s)...</p>
+<p>SplitSDFiles.pl [<strong>-c, --CmpdsMode</strong> DataField | MolName | RootPrefix]
+[<strong>-d, --DataField</strong> DataFieldName] [<strong>-h, --help</strong>] [<strong>-m, --mode</strong> Cmpds | Files]
+[<strong>-n, --numfiles</strong> number] [<strong>--numcmpds</strong> number] [<strong>-o, --overwrite</strong>]
+[<strong>-r, --root</strong> rootname] [<strong>-w,--workingdir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Split <em>SDFile(s)</em> into multiple SD files. Each new SDFile contains a compound
+subset of similar size from the initial file. Multiple <em>SDFile(s)</em> names are separated
+by space. The valid file extensions are <em>.sdf</em> and <em>.sd</em>. All other file names are
+ignored. All the SD files in a current directory can be specified either by <em>*.sdf</em>
+or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-c, --CmpdsMode</strong> <em>DataField | MolName | RootPrefix</em></strong></dt>
+<dd>
+<p>This option is only used during <em>Cmpds</em> value of &lt;-m, --mode&gt; option with
+specified <strong>--numcmpds</strong> value of 1.</p>
+<p>Specify how to generate new file names during <em>Cmpds</em> value of &lt;-m, --mode&gt;
+option: use <em>SDFile(s)</em> datafield value or molname line for a specific compound;
+generate a sequential ID using root prefix specified by <strong>-r, --root</strong> option.</p>
+<p>Possible values: <em>DataField | MolName | RootPrefix | RootPrefix</em>.
+Default: <em>RootPrefix</em>.</p>
+<p>For empty <em>MolName</em> and <em>DataField</em> values during these specified modes, file
+name is automatically generated using <em>RootPrefix</em>.</p>
+<p>For <em>RootPrefix</em> value of <strong>-c, --CmpdsMode</strong> option, new file names are
+generated using by appending compound record number to value of <strong>-r, --root</strong> option.
+For example: <em>RootName</em>Cmd&lt;RecordNumber&gt;.sdf.</p>
+<p>Allowed characters in file names are: a-zA-Z0-9_. All other characters in datafield
+values, molname line, and root prefix are ignore during generation of file names.</p>
+</dd>
+<dt><strong><strong>-d, --DataField</strong> <em>DataFieldName</em></strong></dt>
+<dd>
+<p>This option is only used during <em>DataField</em> value of &lt;-c, --CmpdsMode&gt; option.</p>
+<p>Specify <em>SDFile(s)</em> datafield label name whose value is used for generation of new file
+for a specific compound. Default value: <em>None</em>.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>Cmpds | Files</em></strong></dt>
+<dd>
+<p>Specify how to split <em>SDFile(s)</em>: split into files with each file containing specified
+number of compounds or split into a specified number of files.</p>
+<p>Possible values: <em>Cmpds | Files</em>. Default: <em>Files</em>.</p>
+<p>For <em>Cmpds</em> value of <strong>-m, --mode</strong> option, value of <strong>--numcmpds</strong> option
+determines the number of new files. And value of <strong>-n, --numfiles</strong> option is
+used to figure out the number of new files for <em>Files</em> value of <strong>-m, --mode</strong> option.</p>
+</dd>
+<dt><strong><strong>-n, --numfiles</strong> <em>number</em></strong></dt>
+<dd>
+<p>Number of new files to generate for each <em>SDFile(s)</em>. Default: <em>2</em>.</p>
+<p>This value is only used during <em>Files</em> value of <strong>-m, --mode</strong> option.</p>
+</dd>
+<dt><strong><strong>--numcmpds</strong> <em>number</em></strong></dt>
+<dd>
+<p>Number of compounds in each new file corresponding to each <em>SDFile(s)</em>.
+Default: <em>1</em>.</p>
+<p>This value is only used during <em>Cmpds</em> value of <strong>-m, --mode</strong> option.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New SD file names are generated using the root: &lt;Root&gt;Part&lt;Count&gt;.sdf.
+Default new file names: &lt;InitialSDFileName&gt; Part&lt;Count&gt;.sdf. This option
+is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-w,--workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To split each SD file into 5 new SD files, type:</p>
+<div class="ExampleBox">
+    % SplitSDFiles.pl -n 5 -o Sample1.sdf Sample2.sdf
+    <br/>% SplitSDFiles.pl -n 5 -o *.sdf</div>
+<p>To split Sample1.sdf into 10 new NewSample*.sdf files, type:</p>
+<div class="ExampleBox">
+    % SplitSDFiles.pl -m Files -n 10 -r NewSample -o Sample1.sdf</div>
+<p>To split Sample1.sdf into new NewSample*.sdf files containing maximum of 5 compounds
+in each file, type:</p>
+<div class="ExampleBox">
+    % SplitSDFiles.pl -m Cmpds --numcmpds 5 -r NewSample -o Sample1.sdf</div>
+<p>To split Sample1.sdf into new SD files containing one compound each with new file
+names corresponding to molname line, type:</p>
+<div class="ExampleBox">
+    % SplitSDFiles.pl -m Cmpds --numcmpds 1 -c MolName -o Sample1.sdf</div>
+<p>To split Sample1.sdf into new SD files containing one compound each with new file
+names corresponding to value of datafield MolID, type:</p>
+<div class="ExampleBox">
+    % SplitSDFiles.pl -m Cmpds --numcmpds 1 -c DataField -d MolID
+      -o Sample1.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./JoinSDFiles.html">JoinSDFiles.pl</a>,&nbsp<a href="./MolFilesToSD.html">MolFilesToSD.pl</a>,&nbsp<a href="./SDToMolFiles.html">SDToMolFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SortTextFiles.html" title="SortTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SplitTextFiles.html" title="SplitTextFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>SplitSDFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

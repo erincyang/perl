@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AminoAcids.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./index.html" title="index.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Atom.html" title="Atom.html">Next</a></td><td width="34%" align="middle"><strong>AminoAcids.pm</strong></td><td width="33%" align="right"><a href="././code/AminoAcids.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/AminoAcids.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/AminoAcids.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/AminoAcids.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/AminoAcids.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>AminoAcids</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use AminoAcids;</p>
+<p>use AminoAcids qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>AminoAcids</strong> module provides the following functions:</p>
+<p> <a href="#getaminoacidpropertiesdata">GetAminoAcidPropertiesData</a>, <a href="#getaminoacidpropertiesnames">GetAminoAcidPropertiesNames</a>, GetAminoAcid&lt;PropertyName&gt;
+, <a href="#getaminoacids">GetAminoAcids</a>, <a href="#isaminoacid">IsAminoAcid</a>, <a href="#isaminoacidproperty">IsAminoAcidProperty</a>
+</p><p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="getaminoacidpropertiesdata" class="item"><strong>GetAminoAcidPropertiesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DataHashRef = GetAminoAcidPropertiesData($AminoAcidID);</div>
+<p>Returns a reference to hash containing property names and values for a specified
+amino acid.</p>
+</dd>
+<dt><strong><a name="getaminoacidpropertiesnames" class="item"><strong>GetAminoAcidPropertiesNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Names = GetAminoAcidPropertiesNames([$Mode]);
+<br/>    $NamesRef = GetAminoAcidPropertiesNames([$Mode]);</div>
+<p>Returns an array or a reference to an array containing names of amino acids
+properties. Order of amino acids properties is controlled by optional parameter
+<em>Mode</em>. Possible values for <em>Mode</em>: <em>Alphabetical or  ByGroup</em>; Default: <em>ByGroup</em></p>
+</dd>
+<dt><strong><a name="getaminoacidpropertyname" class="item"><strong>GetAminoAcidPropertyName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = GetAminoAcid&lt;PropertyName&gt;($AminoAcidID);</div>
+<p>Returns amino acid property value for a specified amino acid. These functions are
+not defined in this modules; these are implemented on the fly using Perl's AUTOLOAD
+funcion. Here is the list of known amino acids <em>property names</em>: DNACodons, RNACodons,
+AcidicBasic, PolarNonpolar, Charged, Aromatic, HydrophobicHydophilic, IsoelectricPoint,
+pKCOOH, pKNH3+, ChemicalFormula, MolecularWeight, ExactMass, ChemicalFormulaMinusH2O,
+MolecularWeightMinusH2O(18.01524), ExactMassMinusH2O(18.01056), vanderWaalsVolume,
+%AccessibleResidues, %BuriedResidues, AlphaHelixChouAndFasman,
+AlphaHelixDeleageAndRoux, AlphaHelixLevitt, AminoAcidsComposition,
+AminoAcidsCompositionInSwissProt, AntiparallelBetaStrand, AverageAreaBuried, AverageFlexibility,
+BetaSheetChouAndFasman, BetaSheetDeleageAndRoux, BetaSheetLevitt,
+BetaTurnChouAndFasman, BetaTurnDeleageAndRoux, BetaTurnLevitt, Bulkiness,
+CoilDeleageAndRoux, HPLCHFBARetention, HPLCRetentionAtpH2.1, HPLCRetentionAtpH7.4,
+HPLCTFARetention, HydrophobicityAbrahamAndLeo, HydrophobicityBlack,
+HydrophobicityBullAndBreese, HydrophobicityChothia, HydrophobicityEisenbergAndOthers,
+HydrophobicityFauchereAndOthers, HydrophobicityGuy, HydrophobicityHPLCAtpH3.4Cowan,
+HydrophobicityHPLCAtpH7.5Cowan, HydrophobicityHPLCParkerAndOthers,
+HydrophobicityHPLCWilsonAndOthers, HydrophobicityHoppAndWoods, HydrophobicityJanin,
+HydrophobicityKyteAndDoolittle, HydrophobicityManavalanAndOthers,
+HydrophobicityMiyazawaAndOthers, HydrophobicityOMHSweetAndOthers,
+HydrophobicityRaoAndArgos, HydrophobicityRfMobility, HydrophobicityRoseAndOthers,
+HydrophobicityRoseman, HydrophobicityWellingAndOthers, HydrophobicityWolfendenAndOthers,
+ParallelBetaStrand, PolarityGrantham, PolarityZimmerman, RatioHeteroEndToSide,
+RecognitionFactors, Refractivity, RelativeMutability, TotalBetaStrand, LinearStructure,
+LinearStructureAtpH7.4</p>
+</dd>
+<dt><strong><a name="getaminoacids" class="item"><strong>GetAminoAcids</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NamesRef = GetAminoAcids([$NameType]);
+<br/>    (@Names) = GetAminoAcids([$NameType]);</div>
+<p>Returns an array or a reference to an array containing names of amino acids
+as one letter code, three letter code, or amino acid name controlled by optional
+parameter $NameType. By default, amino acids names are returned as three
+letter code. Possible values for <em>NameType</em>: <em>ThreeLetterCode, OneLetterCode, or
+AminoAcid</em>.</p>
+</dd>
+<dt><strong><a name="isaminoacid" class="item"><strong>IsAminoAcid</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsAminoAcid($AminoAcidID);</div>
+<p>Returns a flag indicating whether or not its a known amino acid ID.</p>
+</dd>
+<dt><strong><a name="isaminoacidproperty" class="item"><strong>IsAminoAcidProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsAminoAcid($PropertyName);</div>
+<p>Returns a flag indicating whether or not its a known amino acid property name.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./NucleicAcids.html">NucleicAcids.pm</a>,&nbsp<a href="./PeriodicTable.html">PeriodicTable.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./index.html" title="index.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Atom.html" title="Atom.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AminoAcids.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

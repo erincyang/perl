@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:InfoSDFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoPeriodicTableElements.html" title="InfoPeriodicTableElements.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoSequenceFiles.html" title="InfoSequenceFiles.html">Next</a></td><td width="34%" align="middle"><strong>InfoSDFiles.pl</strong></td><td width="33%" align="right"><a href="././code/InfoSDFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/InfoSDFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/InfoSDFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/InfoSDFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/InfoSDFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>InfoSDFiles.pl - List information about SDFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>InfoSDFile.pl SDFile(s)...</p>
+<p>InfoSDFile.pl [<strong>-a --all</strong>] [<strong>-c --count</strong>] [<strong>--chiral</strong>] [<strong>--datacheck</strong>]
+[<strong>-d --detail</strong> infolevel] [<strong>-e --empty</strong>] [<strong>-f, --fields</strong>] [<strong>-h, --help</strong>]
+[<strong>-i, --invalidatomnumbers</strong>] [<strong>-m, --mismatch</strong>] [<strong>-s, --salts</strong>] [<strong>-u, --unknownatoms</strong>]
+[<strong>-w, --workingdir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>List information about <em>SDFile(s)</em> contents: number of compounds, empty records
+and so on. Multiple SDFile names are separated by spaces. The valid file extensions
+are <em>.sdf</em> and <em>.sd</em>. All other file names are ignored. All the SD files in a current
+directory can be specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --all</strong></strong></dt>
+<dd>
+<p>List all the available information.</p>
+</dd>
+<dt><strong><strong>-c, --count</strong></strong></dt>
+<dd>
+<p>List number of compounds. This is <strong>default behavior</strong>.</p>
+</dd>
+<dt><strong><strong>--chiral</strong></strong></dt>
+<dd>
+<p>List number of empty atom/bond blocks for compounds with chiral flag set in
+count line.</p>
+</dd>
+<dt><strong><strong>-d, --detail</strong> <em>infolevel</em></strong></dt>
+<dd>
+<p>Level of information to print. Default: 1. Possible values: <em>1, 2, or 3</em>.</p>
+</dd>
+<dt><strong><strong>--datacheck</strong></strong></dt>
+<dd>
+<p>List number of numerical and non-numerical values for each data field.</p>
+</dd>
+<dt><strong><strong>-e, --empty</strong></strong></dt>
+<dd>
+<p>List number of empty atom/bond blocks and data fields for compounds.</p>
+</dd>
+<dt><strong><strong>-f, --fields</strong></strong></dt>
+<dd>
+<p>List data field labels present for compounds.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-i, --invalidatomnumbers</strong></strong></dt>
+<dd>
+<p>List number of bond blocks for compounds which contain invalid atom numbers.</p>
+</dd>
+<dt><strong><strong>-m, --mismatch</strong></strong></dt>
+<dd>
+<p>List number of atom/bond blocks for compounds which don't match with counts
+line information in header block.</p>
+</dd>
+<dt><strong><strong>-s, --salts</strong></strong></dt>
+<dd>
+<p>List number of atom blocks for compounds which contain salts identified as
+disconnected structural units.</p>
+</dd>
+<dt><strong><strong>-u, --unknownatoms</strong></strong></dt>
+<dd>
+<p>List number of atom blocks for compounds which contain special atom symbols
+such as L, Q, * ,LP, X, R#, or any other non periodic table symbols.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To count compounds in SD file(s), type:</p>
+<div class="ExampleBox">
+    % InfoSDFiles.pl Sample1.sdf
+    <br/>% InfoSDFiles.pl Sample1.sdf Sample2.sdf
+    <br/>% InfoSDFiles.pl *.sdf</div>
+<p>To list all available information for SD file(s), type:</p>
+<div class="ExampleBox">
+    % InfoSDFiles.pl -a *.sdf</div>
+<p>To list all data fields present in sample.sdf, type:</p>
+<div class="ExampleBox">
+    % InfoSDFiles.pl -f Sample.sdf</div>
+<p>To count number of compounds which contain salts and list associated structural
+data, type:</p>
+<div class="ExampleBox">
+    % InfoSDFiles.pl -s -d 3 Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromSDFiles.html">ExtractFromSDFiles.pl</a>,&nbsp<a href="./FilterSDFiles.html">FilterSDFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoPeriodicTableElements.html" title="InfoPeriodicTableElements.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./InfoSequenceFiles.html" title="InfoSequenceFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>InfoSDFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

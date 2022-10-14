@@ -1,0 +1,824 @@
+<html>
+<head>
+<title>MayaChemTools:Code:MolecularDescriptors::MolecularDescriptorsGenerator.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-MolecularDescriptors::MolecularDescriptorsGenerator-"></a>   1 <span class="k">package </span><span class="i">MolecularDescriptors::MolecularDescriptorsGenerator</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: MolecularDescriptorsGenerator.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:45 $</span>
+   5 <span class="c"># $Revision: 1.15 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Scalar::Util</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">ObjectProperty</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">FileUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  36 <span class="k">use</span> <span class="w">Molecule</span><span class="sc">;</span>
+  37 <span class="k">use</span> <span class="w">MolecularDescriptors::MolecularDescriptors</span><span class="sc">;</span>
+  38 
+  39 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  40 
+  41 <span class="i">@ISA</span> = <span class="q">qw(ObjectProperty Exporter)</span><span class="sc">;</span>
+  42 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  43 <span class="i">@EXPORT_OK</span> = <span class="q">qw(GetAvailableDescriptorClassNames GetAvailableClassAndDescriptorNames GetAvailableDescriptorNames GetAvailableDescriptorNamesForDescriptorClass GetAvailableClassNameForDescriptorName GetRuleOf5DescriptorNames GetRuleOf3DescriptorNames IsDescriptorClassNameAvailable IsDescriptorNameAvailable)</span><span class="sc">;</span>
+  44 
+  45 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  46 
+  47 <span class="c"># Setup class variables...</span>
+  48 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="cm">,</span> <span class="i">%DescriptorsDataMap</span><span class="s">)</span><span class="sc">;</span>
+  49 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  50 
+  51 <span class="c"># Overload Perl functions...</span>
+  52 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyMolecularDescriptorsGenerator&#39;</span><span class="sc">;</span>
+  53 
+  54 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  55 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  56   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  57 
+  58   <span class="c"># Initialize object...</span>
+  59   <span class="k">my</span> <span class="i">$This</span> = <span class="s">{</span><span class="s">}</span><span class="sc">;</span>
+  60   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  61   <span class="i">$This</span><span class="i">-&gt;_InitializeMolecularDescriptorsGenerator</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  62 
+  63   <span class="i">$This</span><span class="i">-&gt;_InitializeMolecularDescriptorsGeneratorProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  64 
+  65   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  66 <span class="s">}</span>
+  67 
+  68 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a>  69 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+  70   <span class="c">#Class name...</span>
+  71   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+  72 
+  73   <span class="c"># Load available molecular descriptor classes...</span>
+  74   <span class="i">_LoadMolecularDescriptorsData</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  75 
+  76 <span class="s">}</span>
+  77 
+  78 <span class="c"># Initialize object data...</span>
+  79 <span class="c">#</span>
+<a name="_InitializeMolecularDescriptorsGenerator-"></a>  80 <span class="k">sub </span><span class="m">_InitializeMolecularDescriptorsGenerator</span> <span class="s">{</span>
+  81   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  82 
+  83   <span class="c"># Type of desciptors to generate...</span>
+  84   <span class="c">#</span>
+  85   <span class="c"># The current release of MayaChemTools supports generation of four sets of</span>
+  86   <span class="c"># descriptors: All available descriptors, rule of 5 or 3 descriptors or a specified</span>
+  87   <span class="c"># set of descriptors.</span>
+  88   <span class="c">#</span>
+  89   <span class="c"># Possible values: All, RuleOf5, RuleOf3 or Specify</span>
+  90   <span class="c">#</span>
+  91   <span class="c"># RuleOf5 [ Ref 91 ] descriptor names: MolecularWeight, HydrogenBondDonors, HydrogenBondAcceptors,</span>
+  92   <span class="c"># SLogP. RuleOf5 states: MolecularWeight &lt;= 500, HydrogenBondDonors &lt;= 5, HydrogenBondAcceptors &lt;= 10,</span>
+  93   <span class="c"># and logP &lt;= 5.</span>
+  94   <span class="c">#</span>
+  95   <span class="c"># RuleOf3 [ Ref 92 ] descriptor names: MolecularWeight, RotatableBonds, HydrogenBondDonors,</span>
+  96   <span class="c"># HydrogenBondAcceptors, SLogP, TPSA. RuleOf3 states: MolecularWeight &lt;= 300, RotatableBonds &lt;= 3,</span>
+  97   <span class="c"># HydrogenBondDonors &lt;= 3, HydrogenBondAcceptors &lt;= 3, logP &lt;= 3, and TPSA &lt;= 60.</span>
+  98   <span class="c">#</span>
+  99   <span class="c"># For Specify value of Mode, a set of descritor names must be specified using</span>
+ 100   <span class="c"># DescriptorNames parameter.</span>
+ 101   <span class="c">#</span>
+ 102   <span class="c"># Default: All</span>
+ 103   <span class="c">#</span>
+ 104   <span class="i">$This</span>-&gt;{<span class="w">Mode</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 105 
+ 106   <span class="c"># Descriptor names used to generate descriptor values during a specified descriptor</span>
+ 107   <span class="c"># generation mode...</span>
+ 108   <span class="c">#</span>
+ 109   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 110 
+ 111   <span class="c"># Descriptor calculation control parameters for specified descriptor class names...</span>
+ 112   <span class="c">#</span>
+ 113   <span class="c"># These parameters are passed on to appropriate descriptor classes during</span>
+ 114   <span class="c"># instantiations of descriptor class objects.</span>
+ 115   <span class="c">#</span>
+ 116   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 117 
+ 118   <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassesInstantiated</span>} = <span class="n">0</span><span class="sc">;</span>
+ 119 
+ 120   <span class="c"># Descriptor class names and objects corresponding to specified descriptor names...</span>
+ 121   <span class="c">#</span>
+ 122   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 123   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 124 
+ 125   <span class="c"># Descriptor values generated for specified descriptor names...</span>
+ 126   <span class="c">#</span>
+ 127   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 128 
+ 129   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 130 <span class="s">}</span>
+ 131 
+ 132 <span class="c"># Initialize object properties...</span>
+ 133 <span class="c">#</span>
+<a name="_InitializeMolecularDescriptorsGeneratorProperties-"></a> 134 <span class="k">sub </span><span class="m">_InitializeMolecularDescriptorsGeneratorProperties</span> <span class="s">{</span>
+ 135   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 136 
+ 137   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 138   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 139     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 140     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 141   <span class="s">}</span>
+ 142 
+ 143   <span class="c"># Set default value for Mode...</span>
+ 144   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">Mode</span>}<span class="s">)</span> <span class="s">{</span>
+ 145     <span class="i">$This</span>-&gt;{<span class="w">Mode</span>} = <span class="q">&#39;All&#39;</span><span class="sc">;</span>
+ 146   <span class="s">}</span>
+ 147 
+ 148   <span class="i">$This</span><span class="i">-&gt;_CheckAndInitializeDescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 149 
+ 150   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 151 <span class="s">}</span>
+ 152 
+ 153 <span class="c"># Set descriptors generation mode......</span>
+ 154 <span class="c">#</span>
+<a name="SetMode-"></a> 155 <span class="k">sub </span><span class="m">SetMode</span> <span class="s">{</span>
+ 156   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 157 
+ 158   <span class="c"># All - all available descriptors</span>
+ 159   <span class="c"># Specify - Specified set of descriptors</span>
+ 160 
+ 161   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> !~ <span class="q">/^(All|RuleOf5|RuleOf3|Specify)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 162     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMode: Mode value, $Value, is not valid; Supported values: All, RuleOf5, RuleOf3 or Specify...&quot;</span><span class="sc">;</span>
+ 163   <span class="s">}</span>
+ 164 
+ 165   <span class="i">$This</span>-&gt;{<span class="w">Mode</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 166 
+ 167   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 168 <span class="s">}</span>
+ 169 
+ 170 <span class="c"># Set descriptor names to use for generating descriptor values using an array</span>
+ 171 <span class="c"># or reference to an array...</span>
+ 172 <span class="c">#</span>
+<a name="SetDescriptorNames-"></a> 173 <span class="k">sub </span><span class="m">SetDescriptorNames</span> <span class="s">{</span>
+ 174   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@Values</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 175 
+ 176   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^All$/i</span><span class="s">)</span> <span class="s">{</span>
+ 177     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetDescriptorNames: Descriptor names cann&#39;t be specified during \&quot;All\&quot; value of descsriptors generation \&quot;Mode\&quot;...&quot;</span><span class="sc">;</span>
+ 178   <span class="s">}</span>
+ 179 
+ 180   <span class="k">if</span> <span class="s">(</span>!<span class="i">@Values</span><span class="s">)</span> <span class="s">{</span>
+ 181     <span class="k">return</span><span class="sc">;</span>
+ 182   <span class="s">}</span>
+ 183 
+ 184   <span class="k">my</span><span class="s">(</span><span class="i">$FirstValue</span><span class="cm">,</span> <span class="i">$TypeOfFirstValue</span><span class="s">)</span><span class="sc">;</span>
+ 185 
+ 186   <span class="i">$FirstValue</span> = <span class="i">$Values</span>[<span class="n">0</span>]<span class="sc">;</span>
+ 187   <span class="i">$TypeOfFirstValue</span> = <span class="k">ref</span> <span class="i">$FirstValue</span><span class="sc">;</span>
+ 188 
+ 189   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 190 
+ 191   <span class="k">if</span> <span class="s">(</span><span class="i">$TypeOfFirstValue</span> =~ <span class="q">/^ARRAY/</span><span class="s">)</span> <span class="s">{</span>
+ 192     <span class="c"># Initialize using array refernce...</span>
+ 193     <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="cm">,</span> <span class="i">@</span>{<span class="i">$FirstValue</span>}<span class="sc">;</span>
+ 194   <span class="s">}</span>
+ 195   <span class="k">else</span> <span class="s">{</span>
+ 196     <span class="c"># It&#39;s a list of values...</span>
+ 197     <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="cm">,</span> <span class="i">@Values</span><span class="sc">;</span>
+ 198   <span class="s">}</span>
+ 199 
+ 200   <span class="c"># Make sure specified descriptor names are valid...</span>
+ 201   <span class="i">$This</span><span class="i">-&gt;_ValidateDescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 202 
+ 203   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 204 <span class="s">}</span>
+ 205 
+ 206 <span class="c"># Get descriptor names as an array...</span>
+ 207 <span class="c">#</span>
+<a name="GetDescriptorNames-"></a> 208 <span class="k">sub </span><span class="m">GetDescriptorNames</span> <span class="s">{</span>
+ 209   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 210 
+ 211   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} <span class="co">:</span> <span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="sc">;</span>
+ 212 <span class="s">}</span>
+ 213 
+ 214 <span class="c"># Get all descriptor values as an array...</span>
+ 215 <span class="c">#</span>
+<a name="GetDescriptorValues-"></a> 216 <span class="k">sub </span><span class="m">GetDescriptorValues</span> <span class="s">{</span>
+ 217   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 218 
+ 219   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">DescriptorsGenerated</span>}<span class="s">)</span> <span class="s">{</span>
+ 220     <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}} <span class="co">:</span> <span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}}<span class="sc">;</span>
+ 221   <span class="s">}</span>
+ 222   <span class="k">else</span> <span class="s">{</span>
+ 223     <span class="k">my</span><span class="s">(</span><span class="i">@DescriptorValues</span><span class="s">)</span><span class="sc">;</span>
+ 224 
+ 225     <span class="i">@DescriptorValues</span> = <span class="s">(</span><span class="q">&#39;None&#39;</span><span class="s">)</span> x <span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="sc">;</span>
+ 226 
+ 227     <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@DescriptorValues</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@DescriptorValues</span><span class="sc">;</span>
+ 228   <span class="s">}</span>
+ 229 <span class="s">}</span>
+ 230 
+ 231 <span class="c"># Get descriptor value for a specified descriptor name...</span>
+ 232 <span class="c">#</span>
+<a name="GetDescriptorValueByName-"></a> 233 <span class="k">sub </span><span class="m">GetDescriptorValueByName</span> <span class="s">{</span>
+ 234   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Name</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 235   <span class="k">my</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+ 236 
+ 237   <span class="i">%NamesAndValues</span> = <span class="i">$This</span><span class="i">-&gt;GetDescriptorNamesAndValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 238 
+ 239   <span class="k">return</span> <span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="i">$Name</span>} ? <span class="i">$NamesAndValues</span>{<span class="i">$Name</span>} <span class="co">:</span> <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 240 
+ 241 <span class="s">}</span>
+ 242 
+ 243 <span class="c"># Get calculated molecular descriptor names sand values as a  hash with names</span>
+ 244 <span class="c"># and values as key/value pairs...</span>
+ 245 <span class="c">#</span>
+<a name="GetDescriptorNamesAndValues-"></a> 246 <span class="k">sub </span><span class="m">GetDescriptorNamesAndValues</span> <span class="s">{</span>
+ 247   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 248   <span class="k">my</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+ 249 
+ 250   <span class="i">%NamesAndValues</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 251   <span class="i">@NamesAndValues</span>{ <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} } = <span class="i">$This</span><span class="i">-&gt;GetDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 252 
+ 253   <span class="k">return</span> <span class="i">%NamesAndValues</span><span class="sc">;</span>
+ 254 <span class="s">}</span>
+ 255 
+ 256 <span class="c"># Set up descriptor calculation control parameters for a specified descriptor class name...</span>
+ 257 <span class="c">#</span>
+ 258 <span class="c"># The specified parameter names and values are simply passed on to specified descriptor</span>
+ 259 <span class="c"># class during instantiation of descriptor class object without any performing any validation</span>
+ 260 <span class="c"># of parameter names and associated values. It&#39;s up to the appropriate descriptor class methods</span>
+ 261 <span class="c"># to validate these parameters and values.</span>
+ 262 <span class="c">#</span>
+ 263 <span class="c"># In addition to specified parameter names and values, the parameter hash must also contain</span>
+ 264 <span class="c"># descriptor class name as key and value pair with DescriptorClassName as key with class</span>
+ 265 <span class="c"># name as value.</span>
+ 266 <span class="c">#</span>
+<a name="SetDescriptorClassParameters-"></a> 267 <span class="k">sub </span><span class="m">SetDescriptorClassParameters</span> <span class="s">{</span>
+ 268   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 269   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 270 
+ 271   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">DescriptorClassName</span>}<span class="s">)</span> <span class="s">{</span>
+ 272     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_SetDescriptorNameParameters: Can&#39;t set descriptor class name paramaters: DescriptorClassName is not specified...&quot;</span><span class="sc">;</span>
+ 273   <span class="s">}</span>
+ 274 
+ 275   <span class="i">$DescriptorClassName</span> = <span class="i">$NamesAndValues</span>{<span class="w">DescriptorClassName</span>}<span class="sc">;</span>
+ 276   <span class="k">if</span> <span class="s">(</span>!<span class="i">IsDescriptorClassNameAvailable</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 277     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;_SetDescriptorClassParameters: Can&#39;t set descriptor class name paramaters: Specified descriptor class name, $DescriptorClassName, is not available...&quot;</span><span class="sc">;</span>
+ 278     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 279   <span class="s">}</span>
+ 280 
+ 281   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}{<span class="i">$DescriptorClassName</span>}<span class="s">)</span> <span class="s">{</span>
+ 282     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetDescriptorClassParameters: Class name parameters for $DescriptorClassName have already been specified: Replacing previous values...&quot;</span><span class="sc">;</span>
+ 283   <span class="s">}</span>
+ 284 
+ 285   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}{<span class="i">$DescriptorClassName</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 286   <span class="j">NAME:</span> <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 287     <span class="k">if</span> <span class="s">(</span><span class="i">$Name</span> =~ <span class="q">/^DescriptorClassName$/</span><span class="s">)</span> <span class="s">{</span>
+ 288       <span class="k">next</span> <span class="j">NAME</span><span class="sc">;</span>
+ 289     <span class="s">}</span>
+ 290     <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}{<span class="i">$DescriptorClassName</span>}{<span class="i">$Name</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 291   <span class="s">}</span>
+ 292 
+ 293   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 294 <span class="s">}</span>
+ 295 
+ 296 <span class="c"># Get descriptor name parameters as a reference to hash of hashes with hash</span>
+ 297 <span class="c"># keys corresponding to class name and class parameter name with hash value</span>
+ 298 <span class="c"># as class parameter value...</span>
+ 299 <span class="c">#</span>
+<a name="GetDescriptorClassParameters-"></a> 300 <span class="k">sub </span><span class="m">GetDescriptorClassParameters</span> <span class="s">{</span>
+ 301   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 302 
+ 303   <span class="k">return</span> \<span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}}<span class="sc">;</span>
+ 304 <span class="s">}</span>
+ 305 
+ 306 <span class="c"># Get available descriptor class names as an array.</span>
+ 307 <span class="c">#</span>
+ 308 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 309 <span class="c"># object method.</span>
+ 310 <span class="c">#</span>
+<a name="GetAvailableDescriptorClassNames-"></a> 311 <span class="k">sub </span><span class="m">GetAvailableDescriptorClassNames</span> <span class="s">{</span>
+ 312 
+ 313   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}} <span class="co">:</span> <span class="k">scalar</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}}<span class="sc">;</span>
+ 314 <span class="s">}</span>
+ 315 
+ 316 <span class="c"># Get available descriptors class and descriptors names as a hash containing key/value</span>
+ 317 <span class="c"># pairs corresponding to class name and an array of descriptor names available for the</span>
+ 318 <span class="c"># class.</span>
+ 319 <span class="c">#</span>
+ 320 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 321 <span class="c"># object method.</span>
+ 322 <span class="c">#</span>
+<a name="GetAvailableClassAndDescriptorNames-"></a> 323 <span class="k">sub </span><span class="m">GetAvailableClassAndDescriptorNames</span> <span class="s">{</span>
+ 324   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">@DescriptorNames</span><span class="cm">,</span> <span class="i">%ClassAndDescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 325 
+ 326   <span class="i">%ClassAndDescriptorNames</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 327   <span class="k">for</span> <span class="i">$DescriptorClassName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 328     <span class="i">@</span>{<span class="i">$ClassAndDescriptorNames</span>{<span class="i">$DescriptorClassName</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 329     <span class="k">push</span> <span class="i">@</span>{<span class="i">$ClassAndDescriptorNames</span>{<span class="i">$DescriptorClassName</span>}}<span class="cm">,</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}}<span class="sc">;</span>
+ 330   <span class="s">}</span>
+ 331 
+ 332   <span class="k">return</span> <span class="i">%ClassAndDescriptorNames</span><span class="sc">;</span>
+ 333 <span class="s">}</span>
+ 334 
+ 335 <span class="c"># Get available descriptor names as an array.</span>
+ 336 <span class="c">#</span>
+ 337 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 338 <span class="c"># object method.</span>
+ 339 <span class="c">#</span>
+<a name="GetAvailableDescriptorNames-"></a> 340 <span class="k">sub </span><span class="m">GetAvailableDescriptorNames</span> <span class="s">{</span>
+ 341   <span class="k">my</span><span class="s">(</span><span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 342 
+ 343   <span class="i">@DescriptorNames</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 344   <span class="k">push</span> <span class="i">@DescriptorNames</span><span class="cm">,</span> <span class="k">map</span> <span class="s">{</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$_</span>}} <span class="s">}</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}}<span class="sc">;</span>
+ 345 
+ 346   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@DescriptorNames</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@DescriptorNames</span><span class="sc">;</span>
+ 347 <span class="s">}</span>
+ 348 
+ 349 <span class="c"># Is it a valid descriptors class name?</span>
+ 350 <span class="c">#</span>
+ 351 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 352 <span class="c"># object method.</span>
+ 353 <span class="c">#</span>
+<a name="IsDescriptorClassNameAvailable-"></a> 354 <span class="k">sub </span><span class="m">IsDescriptorClassNameAvailable</span> <span class="s">{</span>
+ 355   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 356   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="s">)</span><span class="sc">;</span>
+ 357 
+ 358   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsMolecularDescriptorsGenerator</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 359     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 360   <span class="s">}</span>
+ 361   <span class="k">else</span> <span class="s">{</span>
+ 362     <span class="s">(</span><span class="i">$DescriptorClassName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 363   <span class="s">}</span>
+ 364 
+ 365   <span class="k">return</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}<span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 366 <span class="s">}</span>
+ 367 
+ 368 <span class="c"># Is it a valid descriptor name?</span>
+ 369 <span class="c">#</span>
+ 370 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 371 <span class="c"># object method.</span>
+ 372 <span class="c">#</span>
+<a name="IsDescriptorNameAvailable-"></a> 373 <span class="k">sub </span><span class="m">IsDescriptorNameAvailable</span> <span class="s">{</span>
+ 374   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 375   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="s">)</span><span class="sc">;</span>
+ 376 
+ 377   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsMolecularDescriptorsGenerator</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 378     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 379   <span class="s">}</span>
+ 380   <span class="k">else</span> <span class="s">{</span>
+ 381     <span class="s">(</span><span class="i">$DescriptorName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 382   <span class="s">}</span>
+ 383 
+ 384   <span class="k">return</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 385 <span class="s">}</span>
+ 386 
+ 387 <span class="c"># Get available descriptors names for a descriptor class as an array.</span>
+ 388 <span class="c">#</span>
+ 389 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 390 <span class="c"># object method.</span>
+ 391 <span class="c">#</span>
+<a name="GetAvailableDescriptorNamesForDescriptorClass-"></a> 392 <span class="k">sub </span><span class="m">GetAvailableDescriptorNamesForDescriptorClass</span> <span class="s">{</span>
+ 393   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 394   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 395 
+ 396   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsMolecularDescriptorsGenerator</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 397     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 398   <span class="s">}</span>
+ 399   <span class="k">else</span> <span class="s">{</span>
+ 400     <span class="s">(</span><span class="i">$DescriptorClassName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 401   <span class="s">}</span>
+ 402 
+ 403   <span class="i">@DescriptorNames</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 404   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}<span class="s">)</span> <span class="s">{</span>
+ 405     <span class="k">push</span> <span class="i">@DescriptorNames</span><span class="cm">,</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}}<span class="sc">;</span>
+ 406   <span class="s">}</span>
+ 407 
+ 408   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@DescriptorNames</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@DescriptorNames</span><span class="sc">;</span>
+ 409 <span class="s">}</span>
+ 410 
+ 411 <span class="c"># Get available descriptors class name for a descriptor name.</span>
+ 412 <span class="c">#</span>
+ 413 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 414 <span class="c"># object method.</span>
+ 415 <span class="c">#</span>
+<a name="GetAvailableClassNameForDescriptorName-"></a> 416 <span class="k">sub </span><span class="m">GetAvailableClassNameForDescriptorName</span> <span class="s">{</span>
+ 417   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 418   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="s">)</span><span class="sc">;</span>
+ 419 
+ 420   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsMolecularDescriptorsGenerator</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 421     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 422   <span class="s">}</span>
+ 423   <span class="k">else</span> <span class="s">{</span>
+ 424     <span class="s">(</span><span class="i">$DescriptorName</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 425   <span class="s">}</span>
+ 426 
+ 427   <span class="i">$DescriptorClassName</span> = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+ 428   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="s">)</span> <span class="s">{</span>
+ 429     <span class="i">$DescriptorClassName</span> = <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="sc">;</span>
+ 430   <span class="s">}</span>
+ 431 
+ 432   <span class="k">return</span> <span class="i">$DescriptorClassName</span><span class="sc">;</span>
+ 433 <span class="s">}</span>
+ 434 
+ 435 <span class="c"># Get RuleOf5 descriptor names as an array.</span>
+ 436 <span class="c">#</span>
+ 437 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 438 <span class="c"># object method.</span>
+ 439 <span class="c">#</span>
+<a name="GetRuleOf5DescriptorNames-"></a> 440 <span class="k">sub </span><span class="m">GetRuleOf5DescriptorNames</span> <span class="s">{</span>
+ 441   <span class="k">my</span><span class="s">(</span><span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 442 
+ 443   <span class="i">@DescriptorNames</span> = <span class="q">qw(MolecularWeight HydrogenBondDonors HydrogenBondAcceptors SLogP)</span><span class="sc">;</span>
+ 444 
+ 445   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@DescriptorNames</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@DescriptorNames</span><span class="sc">;</span>
+ 446 <span class="s">}</span>
+ 447 
+ 448 <span class="c"># Get RuleOf3 descriptor names as an array.</span>
+ 449 <span class="c">#</span>
+ 450 <span class="c"># This functionality can be either invoked as a class function or an</span>
+ 451 <span class="c"># object method.</span>
+ 452 <span class="c">#</span>
+<a name="GetRuleOf3DescriptorNames-"></a> 453 <span class="k">sub </span><span class="m">GetRuleOf3DescriptorNames</span> <span class="s">{</span>
+ 454   <span class="k">my</span><span class="s">(</span><span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 455 
+ 456   <span class="i">@DescriptorNames</span> = <span class="q">qw(MolecularWeight RotatableBonds HydrogenBondDonors HydrogenBondAcceptors SLogP TPSA)</span><span class="sc">;</span>
+ 457 
+ 458   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@DescriptorNames</span> <span class="co">:</span> <span class="k">scalar</span> <span class="i">@DescriptorNames</span><span class="sc">;</span>
+ 459 <span class="s">}</span>
+ 460 
+ 461 
+ 462 <span class="c"># Set molecule object...</span>
+ 463 <span class="c">#</span>
+<a name="SetMolecule-"></a> 464 <span class="k">sub </span><span class="m">SetMolecule</span> <span class="s">{</span>
+ 465   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Molecule</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 466 
+ 467   <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>} = <span class="i">$Molecule</span><span class="sc">;</span>
+ 468 
+ 469   <span class="c"># Weaken the reference to disable increment of reference count...</span>
+ 470   <span class="i">Scalar::Util::weaken</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span><span class="sc">;</span>
+ 471 
+ 472   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 473 <span class="s">}</span>
+ 474 
+ 475 <span class="c"># Generate specified molecular descriptors...</span>
+ 476 <span class="c">#</span>
+ 477 <span class="c"># After instantiating descriptor class objects at first invocation and  initialializing</span>
+ 478 <span class="c"># descriptor values during subsequent invocations, GenerateDescriptors method</span>
+ 479 <span class="c"># provided by each descriptor class is used to calculate descriptor values for</span>
+ 480 <span class="c"># specified descriptors.</span>
+ 481 <span class="c">#</span>
+<a name="GenerateDescriptors-"></a> 482 <span class="k">sub </span><span class="m">GenerateDescriptors</span> <span class="s">{</span>
+ 483   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 484   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorClassObject</span><span class="s">)</span><span class="sc">;</span>
+ 485 
+ 486   <span class="c"># Initialize descriptor values...</span>
+ 487   <span class="i">$This</span><span class="i">-&gt;_InitializeDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 488 
+ 489   <span class="c"># Instantiate decriptor classed corresponding to specified descriptors...</span>
+ 490   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassesInstantiated</span>}<span class="s">)</span> <span class="s">{</span>
+ 491     <span class="i">$This</span><span class="i">-&gt;_InstantiateDescriptorClasses</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 492   <span class="s">}</span>
+ 493 
+ 494   <span class="c"># Check availability of molecule...</span>
+ 495   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span> <span class="s">{</span>
+ 496     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDescriptors: $This-&gt;{Type} molecular descriptors generation didn&#39;t succeed: Molecule data is not available: Molecule object hasn&#39;t been set...&quot;</span><span class="sc">;</span>
+ 497     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 498   <span class="s">}</span>
+ 499 
+ 500   <span class="c"># Calculate descriptor values...</span>
+ 501   <span class="k">for</span> <span class="i">$DescriptorClassName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 502     <span class="i">$DescriptorClassObject</span> = <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>}<span class="sc">;</span>
+ 503 
+ 504     <span class="i">$DescriptorClassObject</span><span class="i">-&gt;SetMolecule</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span><span class="sc">;</span>
+ 505     <span class="i">$DescriptorClassObject</span><span class="i">-&gt;GenerateDescriptors</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 506 
+ 507     <span class="k">if</span> <span class="s">(</span>!<span class="i">$DescriptorClassObject</span><span class="i">-&gt;IsDescriptorsGenerationSuccessful</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 508       <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 509     <span class="s">}</span>
+ 510   <span class="s">}</span>
+ 511 
+ 512   <span class="c"># Set final descriptor values...</span>
+ 513   <span class="i">$This</span><span class="i">-&gt;_SetFinalDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 514 
+ 515   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 516 <span class="s">}</span>
+ 517 
+ 518 <span class="c"># Initialize descriptor values...</span>
+ 519 <span class="c">#</span>
+<a name="_InitializeDescriptorValues-"></a> 520 <span class="k">sub </span><span class="m">_InitializeDescriptorValues</span> <span class="s">{</span>
+ 521   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 522 
+ 523   <span class="i">$This</span>-&gt;{<span class="w">DescriptorsGenerated</span>} = <span class="n">0</span><span class="sc">;</span>
+ 524 
+ 525   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 526 
+ 527   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 528 <span class="s">}</span>
+ 529 
+ 530 <span class="c"># Setup final descriptor values...</span>
+ 531 <span class="c">#</span>
+<a name="_SetFinalDescriptorValues-"></a> 532 <span class="k">sub </span><span class="m">_SetFinalDescriptorValues</span> <span class="s">{</span>
+ 533   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 534   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorName</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorClassObject</span><span class="s">)</span><span class="sc">;</span>
+ 535 
+ 536   <span class="i">$This</span>-&gt;{<span class="w">DescriptorsGenerated</span>} = <span class="n">1</span><span class="sc">;</span>
+ 537 
+ 538   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 539 
+ 540   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^All$/i</span><span class="s">)</span> <span class="s">{</span>
+ 541     <span class="c"># Set descriptor values for all available descriptors...</span>
+ 542     <span class="k">for</span> <span class="i">$DescriptorClassName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 543       <span class="i">$DescriptorClassObject</span> = <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>}<span class="sc">;</span>
+ 544 
+ 545       <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}}<span class="cm">,</span> <span class="i">$DescriptorClassObject</span><span class="i">-&gt;GetDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 546     <span class="s">}</span>
+ 547   <span class="s">}</span>
+ 548   <span class="k">else</span> <span class="s">{</span>
+ 549     <span class="c"># Set descriptor values for a subset of available descriptors...</span>
+ 550     <span class="k">for</span> <span class="i">$DescriptorName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 551       <span class="i">$DescriptorClassName</span> = <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="sc">;</span>
+ 552       <span class="i">$DescriptorClassObject</span> = <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>}<span class="sc">;</span>
+ 553 
+ 554       <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorValues</span>}}<span class="cm">,</span> <span class="i">$DescriptorClassObject</span><span class="i">-&gt;GetDescriptorValueByName</span><span class="s">(</span><span class="i">$DescriptorName</span><span class="s">)</span><span class="sc">;</span>
+ 555     <span class="s">}</span>
+ 556   <span class="s">}</span>
+ 557 
+ 558   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 559 <span class="s">}</span>
+ 560 
+ 561 <span class="c"># Is descriptors generation successful?</span>
+ 562 <span class="c">#</span>
+ 563 <span class="c"># Notes:</span>
+ 564 <span class="c">#   . After successful generation of descriptor values by each descriptor class</span>
+ 565 <span class="c">#     corresponding to specified descriptor names, DescriptorsCalculated  to 1;</span>
+ 566 <span class="c">#     otherwise, it&#39;s set to 0.</span>
+ 567 <span class="c">#</span>
+<a name="IsDescriptorsGenerationSuccessful-"></a> 568 <span class="k">sub </span><span class="m">IsDescriptorsGenerationSuccessful</span> <span class="s">{</span>
+ 569   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 570 
+ 571   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">DescriptorsGenerated</span>} ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 572 <span class="s">}</span>
+ 573 
+ 574 <span class="c"># Check and set default descriptor names for generating descriptor values...</span>
+ 575 <span class="c">#</span>
+<a name="_CheckAndInitializeDescriptorNames-"></a> 576 <span class="k">sub </span><span class="m">_CheckAndInitializeDescriptorNames</span> <span class="s">{</span>
+ 577   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 578 
+ 579   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^(All|RuleOf5|RuleOf3)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 580     <span class="k">if</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 581       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_CheckAndInitializeDescriptorNames: Descriptor names can&#39;t be specified during \&quot;All, RuleOf5 or RuleOf3\&quot; values of descsriptors generation \&quot;Mode\&quot;...&quot;</span><span class="sc">;</span>
+ 582     <span class="s">}</span>
+ 583   <span class="s">}</span>
+ 584 
+ 585   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^All$/i</span><span class="s">)</span> <span class="s">{</span>
+ 586     <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} = <span class="i">GetAvailableDescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 587   <span class="s">}</span>
+ 588   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^RuleOf5$/i</span><span class="s">)</span> <span class="s">{</span>
+ 589     <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} = <span class="i">GetRuleOf5DescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 590   <span class="s">}</span>
+ 591   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^RuleOf3$/i</span><span class="s">)</span> <span class="s">{</span>
+ 592     <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}} = <span class="i">GetRuleOf3DescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 593   <span class="s">}</span>
+ 594   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Mode</span>} =~ <span class="q">/^Specify$/i</span><span class="s">)</span> <span class="s">{</span>
+ 595     <span class="k">if</span> <span class="s">(</span>!<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 596       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_CheckAndInitializeDescriptorNames: DescriptorNames must be specified during Specify value for Mode...&quot;</span><span class="sc">;</span>
+ 597     <span class="s">}</span>
+ 598   <span class="s">}</span>
+ 599   <span class="k">else</span> <span class="s">{</span>
+ 600     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_CheckAndInitializeDescriptorNames: Mode value, $This-&gt;{Mode}, is not valid...&quot;</span><span class="sc">;</span>
+ 601   <span class="s">}</span>
+ 602 <span class="s">}</span>
+ 603 
+ 604 <span class="c"># Instantiate descriptor classes corresponding to specified descriptor names...</span>
+ 605 <span class="c">#</span>
+<a name="_InstantiateDescriptorClasses-"></a> 606 <span class="k">sub </span><span class="m">_InstantiateDescriptorClasses</span> <span class="s">{</span>
+ 607   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 608   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="cm">,</span> <span class="i">$DescriptorClassPath</span><span class="s">)</span><span class="sc">;</span>
+ 609 
+ 610   <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassesInstantiated</span>} = <span class="n">1</span><span class="sc">;</span>
+ 611 
+ 612   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 613   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 614 
+ 615   <span class="j">NAME:</span> <span class="k">for</span> <span class="i">$DescriptorName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 616     <span class="i">$DescriptorClassName</span> = <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="sc">;</span>
+ 617 
+ 618     <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>}<span class="s">)</span> <span class="s">{</span>
+ 619       <span class="k">next</span> <span class="j">NAME</span><span class="sc">;</span>
+ 620     <span class="s">}</span>
+ 621     <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassNames</span>}}<span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="sc">;</span>
+ 622 
+ 623     <span class="i">$DescriptorClassPath</span> = <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNameToClassPath</span>}{<span class="i">$DescriptorClassName</span>}<span class="sc">;</span>
+ 624 
+ 625     <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}{<span class="i">$DescriptorClassName</span>}<span class="s">)</span> <span class="s">{</span>
+ 626       <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>} = <span class="i">$DescriptorClassPath</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorClassParameters</span>}{<span class="i">$DescriptorClassName</span>}}<span class="s">)</span><span class="sc">;</span>
+ 627     <span class="s">}</span>
+ 628     <span class="k">else</span> <span class="s">{</span>
+ 629       <span class="i">$This</span>-&gt;{<span class="w">DescriptorClassObjects</span>}{<span class="i">$DescriptorClassName</span>} = <span class="i">$DescriptorClassPath</span><span class="i">-&gt;new</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 630     <span class="s">}</span>
+ 631   <span class="s">}</span>
+ 632 
+ 633   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 634 <span class="s">}</span>
+ 635 
+ 636 <span class="c"># Return a string containg data for MolecularDescriptorsGenerator object...</span>
+ 637 <span class="c">#</span>
+<a name="StringifyMolecularDescriptorsGenerator-"></a> 638 <span class="k">sub </span><span class="m">StringifyMolecularDescriptorsGenerator</span> <span class="s">{</span>
+ 639   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 640   <span class="k">my</span><span class="s">(</span><span class="i">$TheString</span><span class="cm">,</span> <span class="i">$NamesAndValuesString</span><span class="cm">,</span> <span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">@NamesAndValuesInfo</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+ 641 
+ 642   <span class="c"># Type of MolecularDescriptors...</span>
+ 643   <span class="i">$TheString</span> = <span class="q">&quot;MolecularDescriptorsGenerator: Mode - $This-&gt;{Mode}; SpecifiedDescriptorNames - &lt; @{$This-&gt;{DescriptorNames}} &gt;; AvailableMolecularDescriptorClassNames - &lt; @{$DescriptorsDataMap{ClassNames}} &gt;&quot;</span><span class="sc">;</span>
+ 644 
+ 645   <span class="i">@NamesAndValuesInfo</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 646   <span class="i">%NamesAndValues</span> = <span class="i">$This</span><span class="i">-&gt;GetDescriptorNamesAndValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 647 
+ 648   <span class="k">for</span> <span class="i">$Name</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 649     <span class="i">$Value</span> = <span class="i">$NamesAndValues</span>{<span class="i">$Name</span>}<span class="sc">;</span>
+ 650     <span class="i">$Value</span> = <span class="s">(</span><span class="i">TextUtil::IsEmpty</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span> || <span class="i">$Value</span> =~ <span class="q">/^None$/i</span><span class="s">)</span> ? <span class="q">&#39;None&#39;</span> <span class="co">:</span> <span class="i">$Value</span><span class="sc">;</span>
+ 651     <span class="k">push</span> <span class="i">@NamesAndValuesInfo</span><span class="cm">,</span> <span class="q">&quot;$Name - $Value&quot;</span><span class="sc">;</span>
+ 652   <span class="s">}</span>
+ 653   <span class="k">if</span> <span class="s">(</span><span class="i">@NamesAndValuesInfo</span><span class="s">)</span> <span class="s">{</span>
+ 654     <span class="i">$TheString</span> .= <span class="q">&quot;Names - Values: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@NamesAndValuesInfo</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 655   <span class="s">}</span>
+ 656   <span class="k">else</span> <span class="s">{</span>
+ 657     <span class="i">$TheString</span> .= <span class="q">&quot;Names - Values: &lt; None&gt;&quot;</span><span class="sc">;</span>
+ 658   <span class="s">}</span>
+ 659 
+ 660   <span class="k">return</span> <span class="i">$TheString</span><span class="sc">;</span>
+ 661 <span class="s">}</span>
+ 662 
+ 663 <span class="c"># Is it a MolecularDescriptorsGenerator object?</span>
+<a name="_IsMolecularDescriptorsGenerator-"></a> 664 <span class="k">sub </span><span class="m">_IsMolecularDescriptorsGenerator</span> <span class="s">{</span>
+ 665   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 666 
+ 667   <span class="k">return</span> <span class="s">(</span><span class="i">Scalar::Util::blessed</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> &amp;&amp; <span class="i">$Object</span><span class="i">-&gt;isa</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 668 <span class="s">}</span>
+ 669 
+ 670 <span class="c"># Validate descriptor names for generating descriptor values...</span>
+ 671 <span class="c">#</span>
+<a name="_ValidateDescriptorNames-"></a> 672 <span class="k">sub </span><span class="m">_ValidateDescriptorNames</span> <span class="s">{</span>
+ 673   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 674   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorName</span><span class="s">)</span><span class="sc">;</span>
+ 675 
+ 676   <span class="k">for</span> <span class="i">$DescriptorName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">DescriptorNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 677     <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="s">)</span> <span class="s">{</span>
+ 678       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_SetAndValidateDescriptorNames: Specified descriptor name, $DescriptorName, is not valid...&quot;</span><span class="sc">;</span>
+ 679     <span class="s">}</span>
+ 680   <span class="s">}</span>
+ 681 
+ 682   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 683 <span class="s">}</span>
+ 684 
+ 685 <span class="c">#</span>
+ 686 <span class="c"># Load available molecular descriptors data...</span>
+ 687 <span class="c">#</span>
+ 688 <span class="c"># All available molecular descriptors classes are automatically detected in</span>
+ 689 <span class="c"># MolecularDescriptors directory under &lt;MayaChemTools&gt;/lib directory and</span>
+ 690 <span class="c"># information about available descriptor names is retrieved from each descriptor</span>
+ 691 <span class="c"># class using function GetDescriptorNames. The following %DescriptorsDataMap</span>
+ 692 <span class="c"># is setup containing all available molecular descriptors data:</span>
+ 693 <span class="c">#</span>
+ 694 <span class="c">#   @{$DescriptorsDataMap{ClassNames}}</span>
+ 695 <span class="c">#   %{$DescriptorsDataMap{ClassNameToPath}}</span>
+ 696 <span class="c">#   %{$DescriptorsDataMap{ClassToDescriptorNames}}</span>
+ 697 <span class="c">#   %{$DescriptorsDataMap{DescriptorToClassName}}</span>
+ 698 <span class="c">#</span>
+ 699 <span class="c"># GenerateDescriptors method is invoked fo each specified descriptor class</span>
+ 700 <span class="c"># object to calculate descriptor values for specified descriptors. After successful</span>
+ 701 <span class="c"># calculation of descriptors, GetDescriptorValues or GetDescriptorValueByName</span>
+ 702 <span class="c"># methods provided by descriptor objects are used to retrieve calculated</span>
+ 703 <span class="c"># descriptor values.</span>
+ 704 <span class="c">#</span>
+<a name="_LoadMolecularDescriptorsData-"></a> 705 <span class="k">sub </span><span class="m">_LoadMolecularDescriptorsData</span> <span class="s">{</span>
+ 706 
+ 707   <span class="i">%DescriptorsDataMap</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 708 
+ 709   <span class="i">_RetrieveAndLoadDescriptorClasses</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 710   <span class="i">_SetupDescriptorsDataMap</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 711 <span class="s">}</span>
+ 712 
+ 713 <span class="c">#</span>
+ 714 <span class="c"># Retrieve available molecular descriptors classes from MolecularDescriptors directory under</span>
+ 715 <span class="c"># &lt;MayaChemTools&gt;/lib directory...</span>
+ 716 <span class="c">#</span>
+<a name="_RetrieveAndLoadDescriptorClasses-"></a> 717 <span class="k">sub </span><span class="m">_RetrieveAndLoadDescriptorClasses</span> <span class="s">{</span>
+ 718   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorsDirName</span><span class="cm">,</span> <span class="i">$MayaChemToolsLibDir</span><span class="cm">,</span> <span class="i">$DescriptorsDirPath</span><span class="cm">,</span> <span class="i">$IncludeDirName</span><span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorClassPath</span><span class="cm">,</span> <span class="i">$DescriptorsClassFileName</span><span class="cm">,</span> <span class="i">@FileNames</span><span class="cm">,</span> <span class="i">@DescriptorsClassFileNames</span><span class="s">)</span><span class="sc">;</span>
+ 719 
+ 720   <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 721   <span class="i">%</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNameToPath</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 722 
+ 723   <span class="i">$DescriptorsDirName</span> = <span class="q">&quot;MolecularDescriptors&quot;</span><span class="sc">;</span>
+ 724   <span class="i">$MayaChemToolsLibDir</span> = <span class="i">FileUtil::GetMayaChemToolsLibDirName</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 725 
+ 726   <span class="i">$DescriptorsDirPath</span> = <span class="q">&quot;$MayaChemToolsLibDir/$DescriptorsDirName&quot;</span><span class="sc">;</span>
+ 727 
+ 728   <span class="k">if</span> <span class="s">(</span>! <span class="k">-d</span> <span class="q">&quot;$DescriptorsDirPath&quot;</span><span class="s">)</span> <span class="s">{</span>
+ 729     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_RetrieveAndLoadDescriptorClasses: MayaChemTools package molecular descriptors directory, $DescriptorsDirPath, is missing: Possible installation problems...&quot;</span><span class="sc">;</span>
+ 730   <span class="s">}</span>
+ 731 
+ 732   <span class="i">@FileNames</span> = <span class="s">(</span><span class="q">&quot;$DescriptorsDirPath/*&quot;</span><span class="s">)</span><span class="sc">;</span>
+ 733   <span class="i">$IncludeDirName</span> = <span class="n">0</span><span class="sc">;</span>
+ 734   <span class="i">@DescriptorsClassFileNames</span> = <span class="i">FileUtil::ExpandFileNames</span><span class="s">(</span>\<span class="i">@FileNames</span><span class="cm">,</span> <span class="q">&quot;pm&quot;</span><span class="cm">,</span> <span class="i">$IncludeDirName</span><span class="s">)</span><span class="sc">;</span>
+ 735 
+ 736   <span class="k">if</span> <span class="s">(</span>!<span class="i">@DescriptorsClassFileNames</span><span class="s">)</span> <span class="s">{</span>
+ 737     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_RetrieveAndLoadDescriptorClasses: MayaChemTools package molecular descriptors directory, $DescriptorsDirPath, doesn&#39;t contain any molecular descriptor class: Possible installation problems...&quot;</span><span class="sc">;</span>
+ 738   <span class="s">}</span>
+ 739 
+ 740   <span class="j">FILENAME:</span> <span class="k">for</span> <span class="i">$DescriptorsClassFileName</span> <span class="s">(</span><span class="k">sort</span> <span class="i">@DescriptorsClassFileNames</span><span class="s">)</span> <span class="s">{</span>
+ 741     <span class="k">if</span> <span class="s">(</span><span class="i">$DescriptorsClassFileName</span> !~ <span class="q">/\.pm/</span><span class="s">)</span> <span class="s">{</span>
+ 742       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_RetrieveAndLoadDescriptorClasses: MayaChemTools package molecular descriptors directory, $DescriptorsDirPath, contains invalid class file name $DescriptorsClassFileName: Possible installation problems...&quot;</span><span class="sc">;</span>
+ 743     <span class="s">}</span>
+ 744 
+ 745     <span class="c"># Ignore base class and descriptors generator class...</span>
+ 746     <span class="k">if</span> <span class="s">(</span><span class="i">$DescriptorsClassFileName</span> =~ <span class="q">/^(MolecularDescriptorsGenerator\.pm|MolecularDescriptors\.pm)$/</span><span class="s">)</span> <span class="s">{</span>
+ 747       <span class="k">next</span> <span class="j">FILENAME</span><span class="sc">;</span>
+ 748     <span class="s">}</span>
+ 749 
+ 750     <span class="s">(</span><span class="i">$DescriptorClassName</span><span class="s">)</span> = <span class="k">split</span> <span class="q">/\./</span><span class="cm">,</span> <span class="i">$DescriptorsClassFileName</span><span class="sc">;</span>
+ 751     <span class="i">$DescriptorClassPath</span> = <span class="q">&quot;${DescriptorsDirName}::${DescriptorClassName}&quot;</span><span class="sc">;</span>
+ 752 
+ 753     <span class="c"># Load descriptors class...</span>
+ 754     <span class="k">eval</span> <span class="q">&quot;use $DescriptorClassPath&quot;</span><span class="sc">;</span>
+ 755 
+ 756     <span class="k">if</span> <span class="s">(</span><span class="i">$@</span><span class="s">)</span> <span class="s">{</span>
+ 757       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_RetrieveAndLoadDescriptorClasses: use $DescriptorClassPath failed: $@ ...&quot;</span><span class="sc">;</span>
+ 758     <span class="s">}</span>
+ 759 
+ 760     <span class="k">push</span> <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}}<span class="cm">,</span> <span class="i">$DescriptorClassName</span><span class="sc">;</span>
+ 761 
+ 762     <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNameToClassPath</span>}{<span class="i">$DescriptorClassName</span>} = <span class="i">$DescriptorClassPath</span><span class="sc">;</span>
+ 763   <span class="s">}</span>
+ 764 <span class="s">}</span>
+ 765 
+ 766 <span class="c">#</span>
+ 767 <span class="c"># Setup descriptors data map using loaded descriptor classes...</span>
+ 768 <span class="c">#</span>
+<a name="_SetupDescriptorsDataMap-"></a> 769 <span class="k">sub </span><span class="m">_SetupDescriptorsDataMap</span> <span class="s">{</span>
+ 770   <span class="k">my</span><span class="s">(</span><span class="i">$DescriptorClassName</span><span class="cm">,</span> <span class="i">$DescriptorName</span><span class="cm">,</span> <span class="i">$DescriptorClassPath</span><span class="cm">,</span> <span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 771 
+ 772   <span class="c"># Class to decriptor names map...</span>
+ 773   <span class="i">%</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 774 
+ 775   <span class="c"># Descriptor to class name map...</span>
+ 776   <span class="i">%</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 777 
+ 778   <span class="k">for</span> <span class="i">$DescriptorClassName</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNames</span>}}<span class="s">)</span> <span class="s">{</span>
+ 779     <span class="i">$DescriptorClassPath</span> = <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassNameToClassPath</span>}{<span class="i">$DescriptorClassName</span>}<span class="sc">;</span>
+ 780 
+ 781     <span class="i">@DescriptorNames</span> = <span class="i">$DescriptorClassPath</span><span class="i">-&gt;GetDescriptorNames</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 782 
+ 783     <span class="k">if</span> <span class="s">(</span>!<span class="i">@DescriptorNames</span><span class="s">)</span> <span class="s">{</span>
+ 784       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_SetupDescriptorsDataMap: Molecular descriptor class $DescriptorClassName doesn&#39;t provide any descriptor names...&quot;</span><span class="sc">;</span>
+ 785     <span class="s">}</span>
+ 786 
+ 787     <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>} <span class="s">)</span> <span class="s">{</span>
+ 788       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_SetupDescriptorsDataMap: Molecular descriptor class $DescriptorClassName has already been processed...&quot;</span><span class="sc">;</span>
+ 789     <span class="s">}</span>
+ 790 
+ 791     <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 792     <span class="i">@</span>{<span class="i">$DescriptorsDataMap</span>{<span class="w">ClassToDescriptorNames</span>}{<span class="i">$DescriptorClassName</span>}} = <span class="i">@DescriptorNames</span><span class="sc">;</span>
+ 793 
+ 794     <span class="k">for</span> <span class="i">$DescriptorName</span> <span class="s">(</span><span class="i">@DescriptorNames</span><span class="s">)</span> <span class="s">{</span>
+ 795       <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>}<span class="s">)</span> <span class="s">{</span>
+ 796         <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_SetupDescriptorsDataMap: Molecular descriptor name, $DescriptorName, in class name, $DescriptorClassName, has already been provided by class name $DescriptorsDataMap{DescriptorToClassName}{$DescriptorName}...&quot;</span><span class="sc">;</span>
+ 797       <span class="s">}</span>
+ 798 
+ 799       <span class="i">$DescriptorsDataMap</span>{<span class="w">DescriptorToClassName</span>}{<span class="i">$DescriptorName</span>} = <span class="i">$DescriptorClassName</span><span class="sc">;</span>
+ 800     <span class="s">}</span>
+ 801   <span class="s">}</span>
+ 802 <span class="s">}</span>
+ 803 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

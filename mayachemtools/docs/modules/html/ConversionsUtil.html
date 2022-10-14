@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ConversionsUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Constants.html" title="Constants.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./DBUtil.html" title="DBUtil.html">Next</a></td><td width="34%" align="middle"><strong>ConversionsUtil.pm</strong></td><td width="33%" align="right"><a href="././code/ConversionsUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ConversionsUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ConversionsUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ConversionsUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ConversionsUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ConversionsUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use ConversionsUtil;</p>
+<p>use ConversionsUtil qw(:math);</p>
+<p>use ConversionsUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>ConversionsUtil</strong> module provides the following functions:</p>
+<p> <a href="#binarytodecimal">BinaryToDecimal</a>, <a href="#binarytohexadecimal">BinaryToHexadecimal</a>, <a href="#decimaltobinary">DecimalToBinary</a>, <a href="#decimaltohexadecimal">DecimalToHexadecimal</a>
+, <a href="#decimaltooctal">DecimalToOctal</a>, <a href="#degreestoradians">DegreesToRadians</a>, <a href="#hexadecimaltobinary">HexadecimalToBinary</a>, <a href="#hexadecimaltodecimal">HexadecimalToDecimal</a>
+, <a href="#hexadecimaltooctal">HexadecimalToOctal</a>, <a href="#octaltodecimal">OctalToDecimal</a>, <a href="#octaltohexadecimal">OctalToHexadecimal</a>, <a href="#radianstodegrees">RadiansToDegrees</a>
+, <a href="#stringtobinary">StringToBinary</a>, <a href="#stringtohexadecimal">StringToHexadecimal</a>
+</p><p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="binarytodecimal" class="item"><strong>BinaryToDecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Decimal = BinaryToDecimal($Binary);</div>
+<p>Converts a <em>Binary</em> string to <strong>Decimal</strong> string.</p>
+</dd>
+<dt><strong><a name="binarytohexadecimal" class="item"><strong>BinaryToHexadecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Hexadecimal = BinaryToHexadecimal($Binary);</div>
+<p>Converts a <em>Binary</em> string to <strong>Hexadecimal</strong> string.</p>
+</dd>
+<dt><strong><a name="decimaltobinary" class="item"><strong>DecimalToBinary</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Binary = DecimalToBinary($Decimal);</div>
+<p>Converts a <em>Decimal</em> string to <strong>Binary</strong> string.</p>
+</dd>
+<dt><strong><a name="decimaltohexadecimal" class="item"><strong>DecimalToHexadecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Hexadecimal = DecimalToHexadecimal($Decimal);</div>
+<p>Converts a <em>Decimal</em> string to <strong>Hexadecimal</strong> string.</p>
+</dd>
+<dt><strong><a name="decimaltooctal" class="item"><strong>DecimalToOctal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Octal = DecimalToOctal($Decimal);</div>
+<p>Converts a <em>Decimal</em> string to <strong>Octal</strong> string.</p>
+</dd>
+<dt><strong><a name="degreestoradians" class="item"><strong>DegreesToRadians</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Radians = DegreesToRadians($Degrees, [$DoNotWrapValue]);</div>
+<p>Converts degrees to radians in the range from 0 to 2PI or to corresponding radians without
+wrapping the converted value to 0 to 2PI. Default is to wrap the converted value.</p>
+</dd>
+<dt><strong><a name="hexadecimaltobinary" class="item"><strong>HexadecimalToBinary</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Binary = HexadecimalToBinary($Hexadecimal);</div>
+<p>Converts a <em>Hexadecimal</em> string to <strong>Binary</strong> string.</p>
+</dd>
+<dt><strong><a name="hexadecimaltodecimal" class="item"><strong>HexadecimalToDecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Decimal = HexadecimalToDecimal($Hexadecimal);</div>
+<p>Converts a <em>Hexadecimal</em> string to <strong>Decimal</strong> string.</p>
+</dd>
+<dt><strong><a name="hexadecimaltooctal" class="item"><strong>HexadecimalToOctal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Octal = HexadecimalToOctal($Hexadecimal);</div>
+<p>Converts a <em>Hexadecimal</em> string to <strong>Octal</strong> string.</p>
+</dd>
+<dt><strong><a name="octaltodecimal" class="item"><strong>OctalToDecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Decimal = OctalToDecimal($Octal);</div>
+<p>Converts a <em>Octal</em> string to <strong>Decimal</strong> string.</p>
+</dd>
+<dt><strong><a name="octaltohexadecimal" class="item"><strong>OctalToHexadecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Hexadecimal = OctalToHexadecimal($Octal);</div>
+<p>Converts a <em>Octal</em> string to <strong>Hexadecimal</strong> string.</p>
+</dd>
+<dt><strong><a name="radianstodegrees" class="item"><strong>RadiansToDegrees</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Degrees = RadiansToDegrees($Radians, [$DoNotWrapValue]);</div>
+<p>Converts radians to degrees in the range from 0 to 360 or to corresponding degrees without
+wrapping the converted value to 0 to 360. Default is to wrap the converted value.</p>
+</dd>
+<dt><strong><a name="stringtobinary" class="item"><strong>StringToBinary</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BinaryString = StringToBinary($String, [$UseReverseBitOrder]);</div>
+<p>Converts specified <em>String</em> into a <strong>Binarystring</strong>. Going from left to right, two ways of arranging
+bits inside each byte are available: Most Significat Bits (MSB) first or Least Significat Bits (LSB) first.
+Default is MSB corresponding to  descending bits order (PerlSpeak) inside each each packed byte
+(Most singificat bits first).</p>
+</dd>
+<dt><strong><a name="stringtohexadecimal" class="item"><strong>StringToHexadecimal</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $HexadecimalString = StringToHexadecimal($String,
+                         [$UseReverseBitOrder]);</div>
+<p>Convert string into a hexadecimal string. Two ways of arranging nybbles (pair of 4 bits in each
+byte) are available: high nybbles first or low nybbles first. Default is MSB corresponding to high
+nybbles (PerlSpeak) first. Low and high nybbles correspond to pair of a low and high four bits in a byte.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./Constants.html">Constants.pm</a>,&nbsp<a href="./MathUtil.html">MathUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./Constants.html" title="Constants.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./DBUtil.html" title="DBUtil.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ConversionsUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

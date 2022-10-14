@@ -1,0 +1,534 @@
+<html>
+<head>
+<title>MayaChemTools:Code:Graph::GraphMatrix.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-Graph::GraphMatrix-"></a>   1 <span class="k">package </span><span class="i">Graph::GraphMatrix</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: GraphMatrix.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:34 $</span>
+   5 <span class="c"># $Revision: 1.19 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Graph</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">Matrix</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">Constants</span><span class="sc">;</span>
+  35 
+  36 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  37 
+  38 <span class="i">@ISA</span> = <span class="q">qw(Exporter)</span><span class="sc">;</span>
+  39 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  40 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  41 
+  42 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  43 
+  44 <span class="c"># Setup class variables...</span>
+  45 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  46 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  47 
+  48 <span class="c"># Overload Perl functions...</span>
+  49 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyGraphMatrix&#39;</span><span class="sc">;</span>
+  50 
+  51 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  52 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  53   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">$Graph</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  54 
+  55   <span class="c"># Initialize object...</span>
+  56   <span class="k">my</span> <span class="i">$This</span> = <span class="s">{</span><span class="s">}</span><span class="sc">;</span>
+  57   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  58   <span class="i">$This</span><span class="i">-&gt;_InitializeGraphMatrix</span><span class="s">(</span><span class="i">$Graph</span><span class="s">)</span><span class="sc">;</span>
+  59 
+  60   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  61 <span class="s">}</span>
+  62 
+  63 <span class="c"># Initialize object data...</span>
+<a name="_InitializeGraphMatrix-"></a>  64 <span class="k">sub </span><span class="m">_InitializeGraphMatrix</span> <span class="s">{</span>
+  65   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Graph</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  66 
+  67   <span class="c"># Specified graph object...</span>
+  68   <span class="i">$This</span>-&gt;{<span class="w">Graph</span>} = <span class="i">$Graph</span><span class="sc">;</span>
+  69 
+  70   <span class="c"># Generated matrix...</span>
+  71   <span class="i">$This</span>-&gt;{<span class="w">Matrix</span>} = <span class="k">undef</span><span class="sc">;</span>
+  72   <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>} = <span class="k">undef</span><span class="sc">;</span>
+  73 
+  74   <span class="c"># Row and columns IDs...</span>
+  75   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">RowIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  76   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  77 
+  78   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  79 <span class="s">}</span>
+  80 
+  81 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a>  82 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+  83   <span class="c">#Class name...</span>
+  84   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+  85 <span class="s">}</span>
+  86 
+  87 <span class="c"># Generate the adjacency matrix for a simple graph.</span>
+  88 <span class="c">#</span>
+  89 <span class="c"># For a simple graph G with n vertices, the adjacency matrix for G is a n x n square matrix and</span>
+  90 <span class="c"># its elements Mij are:</span>
+  91 <span class="c">#</span>
+  92 <span class="c">#   . 0    if i == j</span>
+  93 <span class="c">#   . 1    if i != j and vertex Vi is adjacent to vertex Vj</span>
+  94 <span class="c">#   . 0    if i != j and vertex Vi is not adjacent to vertex Vj</span>
+  95 <span class="c">#</span>
+<a name="GenerateAdjacencyMatrix-"></a>  96 <span class="k">sub </span><span class="m">GenerateAdjacencyMatrix</span> <span class="s">{</span>
+  97   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  98   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+  99 
+ 100   <span class="c"># Get graph vertices...</span>
+ 101   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 102   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 103   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 104 
+ 105   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 106     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateAdjacencyMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 107     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 108   <span class="s">}</span>
+ 109 
+ 110   <span class="c"># Create adjacency matrix...</span>
+ 111   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 112 
+ 113   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 114   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 115 
+ 116   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 117     <span class="i">$RowVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 118     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 119       <span class="i">$ColVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 120       <span class="i">$Value</span> = <span class="s">(</span><span class="i">$RowIndex</span> == <span class="i">$ColIndex</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="i">$Graph</span><span class="i">-&gt;HasEdge</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 121       <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 122     <span class="s">}</span>
+ 123   <span class="s">}</span>
+ 124   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;AdjacencyMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 125 
+ 126   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 127 <span class="s">}</span>
+ 128 
+ 129 <span class="c"># Generate the Siedel adjacency matrix for a simple graph.</span>
+ 130 <span class="c">#</span>
+ 131 <span class="c"># For a simple graph G with n vertices, the Siedal adjacency matrix for G is a n x n square matrix and</span>
+ 132 <span class="c"># its elements Mij are:</span>
+ 133 <span class="c">#</span>
+ 134 <span class="c">#   . 0    if i == j</span>
+ 135 <span class="c">#   . -1   if i != j and vertex Vi is adjacent to vertex Vj</span>
+ 136 <span class="c">#   . 1    if i != j and vertex Vi is not adjacent to vertex Vj</span>
+ 137 <span class="c">#</span>
+<a name="GenerateSiedelAdjacencyMatrix-"></a> 138 <span class="k">sub </span><span class="m">GenerateSiedelAdjacencyMatrix</span> <span class="s">{</span>
+ 139   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 140   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 141 
+ 142   <span class="c"># Get graph vertices...</span>
+ 143   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 144   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 145   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 146 
+ 147   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 148     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateSiedelAdjacencyMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 149     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 150   <span class="s">}</span>
+ 151 
+ 152   <span class="c"># Create Siedel adjacency matrix...</span>
+ 153   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 154 
+ 155   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 156   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 157 
+ 158   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 159     <span class="i">$RowVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 160     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 161       <span class="i">$ColVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 162       <span class="i">$Value</span> = <span class="s">(</span><span class="i">$RowIndex</span> == <span class="i">$ColIndex</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="i">$Graph</span><span class="i">-&gt;HasEdge</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="s">)</span> ? <span class="n">-1</span> <span class="co">:</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 163       <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 164     <span class="s">}</span>
+ 165   <span class="s">}</span>
+ 166   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;SiedelAdjacencyMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 167 
+ 168   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 169 <span class="s">}</span>
+ 170 
+ 171 <span class="c"># Generate distance matrix for a simple graph using Floyd-Marshall algorithm [Ref 67].</span>
+ 172 <span class="c">#</span>
+ 173 <span class="c"># For a simple graph G with n vertices, the distance matrix for G is a n x n square matrix and</span>
+ 174 <span class="c"># its elements Mij are:</span>
+ 175 <span class="c">#</span>
+ 176 <span class="c">#   . 0    if i == j</span>
+ 177 <span class="c">#   . d    if i != j and d is the shortest distance between vertex Vi and vertex Vj</span>
+ 178 <span class="c">#</span>
+ 179 <span class="c"># Note:</span>
+ 180 <span class="c">#   . In the final matrix, BigNumber values correspond to vertices with no edges.</span>
+ 181 <span class="c">#</span>
+<a name="GenerateDistanceMatrix-"></a> 182 <span class="k">sub </span><span class="m">GenerateDistanceMatrix</span> <span class="s">{</span>
+ 183   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 184   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 185 
+ 186   <span class="c"># Get graph vertices...</span>
+ 187   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 188   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 189   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 190 
+ 191   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 192     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDistanceMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 193     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 194   <span class="s">}</span>
+ 195 
+ 196   <span class="c"># Initialize matrix...</span>
+ 197   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$MatrixValuesRef</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 198 
+ 199   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 200   <span class="i">$MatrixValuesRef</span> = <span class="i">$Matrix</span><span class="i">-&gt;GetMatrixValuesReference</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 201 
+ 202   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 203     <span class="i">$RowVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 204     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 205       <span class="i">$ColVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 206       <span class="i">$Value</span> = <span class="s">(</span><span class="i">$RowIndex</span> == <span class="i">$ColIndex</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="s">(</span><span class="i">$Graph</span><span class="i">-&gt;HasEdge</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="w">BigNumber</span><span class="s">)</span><span class="sc">;</span>
+ 207       <span class="i">$MatrixValuesRef</span>-&gt;[<span class="i">$RowIndex</span>][<span class="i">$ColIndex</span>] = <span class="i">$Value</span><span class="sc">;</span>
+ 208     <span class="s">}</span>
+ 209   <span class="s">}</span>
+ 210 
+ 211   <span class="c"># Create distance matrix...</span>
+ 212   <span class="k">my</span><span class="s">(</span><span class="i">$i</span><span class="cm">,</span> <span class="i">$j</span><span class="cm">,</span> <span class="i">$k</span><span class="cm">,</span> <span class="i">$Valuejk</span><span class="s">)</span><span class="sc">;</span>
+ 213 
+ 214   <span class="k">for</span> <span class="i">$i</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 215     <span class="k">for</span> <span class="i">$j</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 216       <span class="k">for</span> <span class="i">$k</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 217         <span class="i">$Valuejk</span> = <span class="i">$MatrixValuesRef</span>-&gt;[<span class="i">$j</span>][<span class="i">$i</span>] + <span class="i">$MatrixValuesRef</span>-&gt;[<span class="i">$i</span>][<span class="i">$k</span>]<span class="sc">;</span>
+ 218         <span class="k">if</span> <span class="s">(</span><span class="i">$Valuejk</span> &lt; <span class="i">$MatrixValuesRef</span>-&gt;[<span class="i">$j</span>][<span class="i">$k</span>]<span class="s">)</span> <span class="s">{</span>
+ 219           <span class="i">$MatrixValuesRef</span>-&gt;[<span class="i">$j</span>][<span class="i">$k</span>] = <span class="i">$Valuejk</span><span class="sc">;</span>
+ 220         <span class="s">}</span>
+ 221       <span class="s">}</span>
+ 222     <span class="s">}</span>
+ 223   <span class="s">}</span>
+ 224   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;DistanceMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 225 
+ 226   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 227 <span class="s">}</span>
+ 228 
+ 229 <span class="c"># Generate the incidence matrix for a simple graph.</span>
+ 230 <span class="c">#</span>
+ 231 <span class="c"># For a simple graph G with n vertices and e edges, the incidence matrix for G is a n x e matrix</span>
+ 232 <span class="c"># its elements Mij are:</span>
+ 233 <span class="c">#</span>
+ 234 <span class="c">#   . 1    if vertex Vi and the edge Ej are incident; in other words, Vi and Ej are related</span>
+ 235 <span class="c">#   . 0    otherwise</span>
+ 236 <span class="c">#</span>
+<a name="GenerateIncidenceMatrix-"></a> 237 <span class="k">sub </span><span class="m">GenerateIncidenceMatrix</span> <span class="s">{</span>
+ 238   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 239   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfEdges</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="cm">,</span> <span class="i">@EdgeVertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 240 
+ 241   <span class="c"># Get graph vertices and edges...</span>
+ 242   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 243   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 244   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 245 
+ 246   <span class="i">@EdgeVertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetEdges</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 247   <span class="i">$NumOfEdges</span> = <span class="i">@EdgeVertexIDs</span>/<span class="n">2</span><span class="sc">;</span>
+ 248 
+ 249   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 250     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateIncidenceMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 251     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 252   <span class="s">}</span>
+ 253 
+ 254   <span class="c"># Create incidence matrix...</span>
+ 255   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$EdgeVertexIndex</span><span class="cm">,</span> <span class="i">$VertexID</span><span class="cm">,</span> <span class="i">$EdgeVertexID1</span><span class="cm">,</span> <span class="i">$EdgeVertexID2</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 256 
+ 257   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfEdges</span><span class="s">)</span><span class="sc">;</span>
+ 258 
+ 259   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 260   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 261     <span class="i">$VertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 262     <span class="i">$EdgeVertexIndex</span> = <span class="n">0</span><span class="sc">;</span>
+ 263     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfEdges</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 264       <span class="i">$EdgeVertexID1</span> = <span class="i">$EdgeVertexIDs</span>[<span class="i">$EdgeVertexIndex</span>]<span class="sc">;</span> <span class="i">$EdgeVertexIndex</span>++<span class="sc">;</span>
+ 265       <span class="i">$EdgeVertexID2</span> = <span class="i">$EdgeVertexIDs</span>[<span class="i">$EdgeVertexIndex</span>]<span class="sc">;</span> <span class="i">$EdgeVertexIndex</span>++<span class="sc">;</span>
+ 266 
+ 267       <span class="i">$Value</span> = <span class="s">(</span><span class="i">$VertexID</span> == <span class="i">$EdgeVertexID1</span> || <span class="i">$VertexID</span> == <span class="i">$EdgeVertexID2</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 268       <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 269     <span class="s">}</span>
+ 270   <span class="s">}</span>
+ 271   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;IncidenceMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="cm">,</span> \<span class="i">@EdgeVertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 272 
+ 273   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 274 <span class="s">}</span>
+ 275 
+ 276 <span class="c"># Generate the degree matrix for a simple graph.</span>
+ 277 <span class="c">#</span>
+ 278 <span class="c"># For a simple graph G with n vertices, the degree matrix for G is a n x n square matrix and</span>
+ 279 <span class="c"># its elements Mij are:</span>
+ 280 <span class="c">#</span>
+ 281 <span class="c">#   . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi</span>
+ 282 <span class="c">#   . 0         otherwise</span>
+ 283 <span class="c">#</span>
+<a name="GenerateDegreeMatrix-"></a> 284 <span class="k">sub </span><span class="m">GenerateDegreeMatrix</span> <span class="s">{</span>
+ 285   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 286   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 287 
+ 288   <span class="c"># Get graph vertices...</span>
+ 289   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 290   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 291   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 292 
+ 293   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 294     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDegreeMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 295     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 296   <span class="s">}</span>
+ 297 
+ 298   <span class="c"># Create degree matrix...</span>
+ 299   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$Index</span><span class="cm">,</span> <span class="i">$VertexID</span><span class="cm">,</span> <span class="i">$Degree</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 300 
+ 301   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 302   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 303 
+ 304   <span class="k">for</span> <span class="i">$Index</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 305     <span class="i">$VertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$Index</span>]<span class="sc">;</span>
+ 306     <span class="i">$Degree</span> = <span class="i">$Graph</span><span class="i">-&gt;GetDegree</span><span class="s">(</span><span class="i">$VertexID</span><span class="s">)</span><span class="sc">;</span>
+ 307     <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$Index</span><span class="cm">,</span> <span class="i">$Index</span><span class="cm">,</span> <span class="i">$Degree</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 308   <span class="s">}</span>
+ 309   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;DegreeMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 310 
+ 311   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 312 <span class="s">}</span>
+ 313 
+ 314 <span class="c"># Generate the Laplacian matrix for a simple graph.</span>
+ 315 <span class="c">#</span>
+ 316 <span class="c"># For a simple graph G with n vertices, the Laplacian matrix for G is a n x n square matrix and</span>
+ 317 <span class="c"># its elements Mij are:</span>
+ 318 <span class="c">#</span>
+ 319 <span class="c">#   . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi</span>
+ 320 <span class="c">#   . -1        if i != j and vertex Vi is adjacent to vertex Vj</span>
+ 321 <span class="c">#   . 0         otherwise</span>
+ 322 <span class="c">#</span>
+ 323 <span class="c"># Note: The Laplacian matrix is the difference between the degree matrix and adjacency matrix.</span>
+ 324 <span class="c">#</span>
+<a name="GenerateLaplacianMatrix-"></a> 325 <span class="k">sub </span><span class="m">GenerateLaplacianMatrix</span> <span class="s">{</span>
+ 326   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 327   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 328 
+ 329   <span class="c"># Get graph vertices...</span>
+ 330   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 331   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 332   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 333 
+ 334   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 335     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateLaplacianMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 336     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 337   <span class="s">}</span>
+ 338 
+ 339   <span class="c"># Create adjacency matrix...</span>
+ 340   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 341 
+ 342   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 343   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 344 
+ 345   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 346     <span class="i">$RowVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 347     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 348       <span class="i">$ColVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 349       <span class="i">$Value</span> = <span class="s">(</span><span class="i">$RowIndex</span> == <span class="i">$ColIndex</span><span class="s">)</span> ? <span class="i">$Graph</span><span class="i">-&gt;GetDegree</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="s">)</span> <span class="co">:</span> <span class="s">(</span><span class="i">$Graph</span><span class="i">-&gt;HasEdge</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="s">)</span> ? <span class="n">-1</span> <span class="co">:</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 350       <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 351     <span class="s">}</span>
+ 352   <span class="s">}</span>
+ 353   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;LaplacianMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 354 
+ 355   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 356 <span class="s">}</span>
+ 357 
+ 358 <span class="c"># Generate the normalized Laplacian matrix for a simple graph.</span>
+ 359 <span class="c">#</span>
+ 360 <span class="c"># For a simple graph G with n vertices, the normalized Laplacian matrix L for G is a n x n square matrix and</span>
+ 361 <span class="c"># its elements Lij are:</span>
+ 362 <span class="c">#</span>
+ 363 <span class="c">#   . 1                           if i == j and deg(Vi) != 0</span>
+ 364 <span class="c">#   . -1/SQRT(deg(Vi) * deg(Vj))  if i != j and vertex Vi is adjacent to vertex Vj</span>
+ 365 <span class="c">#   . 0                           otherwise</span>
+ 366 <span class="c">#</span>
+ 367 <span class="c">#</span>
+<a name="GenerateNormalizedLaplacianMatrix-"></a> 368 <span class="k">sub </span><span class="m">GenerateNormalizedLaplacianMatrix</span> <span class="s">{</span>
+ 369   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 370   <span class="k">my</span><span class="s">(</span><span class="i">$Graph</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 371 
+ 372   <span class="c"># Get graph vertices...</span>
+ 373   <span class="i">$Graph</span> = <span class="i">$This</span>-&gt;{<span class="w">Graph</span>}<span class="sc">;</span>
+ 374   <span class="i">@VertexIDs</span> = <span class="i">$Graph</span><span class="i">-&gt;GetVertices</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 375   <span class="i">$NumOfVertices</span> = <span class="k">scalar</span> <span class="i">@VertexIDs</span><span class="sc">;</span>
+ 376 
+ 377   <span class="k">if</span> <span class="s">(</span><span class="i">$NumOfVertices</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 378     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateNormalizedLaplacianMatrix: Specified graph doesn&#39;t contain any vertices: No matrix generated...&quot;</span><span class="sc">;</span>
+ 379     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 380   <span class="s">}</span>
+ 381 
+ 382   <span class="c"># Create adjacency matrix...</span>
+ 383   <span class="k">my</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="cm">,</span> <span class="i">$RowVertexDegree</span><span class="cm">,</span> <span class="i">$ColVertexDegree</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 384 
+ 385   <span class="i">$Matrix</span> = <span class="i">new</span> <span class="i">Matrix</span><span class="s">(</span><span class="i">$NumOfVertices</span><span class="cm">,</span> <span class="i">$NumOfVertices</span><span class="s">)</span><span class="sc">;</span>
+ 386   <span class="i">$SkipIndexCheck</span> = <span class="n">1</span><span class="sc">;</span>
+ 387 
+ 388   <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 389     <span class="i">$RowVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$RowIndex</span>]<span class="sc">;</span>
+ 390     <span class="i">$RowVertexDegree</span> = <span class="i">$Graph</span><span class="i">-&gt;GetDegree</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="s">)</span><span class="sc">;</span>
+ 391     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfVertices</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 392       <span class="i">$ColVertexID</span> = <span class="i">$VertexIDs</span>[<span class="i">$ColIndex</span>]<span class="sc">;</span>
+ 393       <span class="i">$Value</span> = <span class="n">0</span><span class="sc">;</span>
+ 394       <span class="k">if</span> <span class="s">(</span><span class="i">$RowIndex</span> == <span class="i">$ColIndex</span><span class="s">)</span> <span class="s">{</span>
+ 395         <span class="i">$Value</span> = <span class="s">(</span><span class="i">$RowVertexDegree</span> == <span class="n">0</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 396       <span class="s">}</span>
+ 397       <span class="k">else</span> <span class="s">{</span>
+ 398         <span class="i">$ColVertexDegree</span> = <span class="i">$Graph</span><span class="i">-&gt;GetDegree</span><span class="s">(</span><span class="i">$ColVertexID</span><span class="s">)</span><span class="sc">;</span>
+ 399         <span class="i">$Value</span> = <span class="i">$Graph</span><span class="i">-&gt;HasEdge</span><span class="s">(</span><span class="i">$RowVertexID</span><span class="cm">,</span> <span class="i">$ColVertexID</span><span class="s">)</span> ? <span class="s">(</span><span class="n">-1</span>/<span class="k">sqrt</span><span class="s">(</span><span class="i">$RowVertexDegree</span> * <span class="i">$ColVertexDegree</span><span class="s">)</span><span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 400       <span class="s">}</span>
+ 401       <span class="i">$Matrix</span><span class="i">-&gt;SetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 402     <span class="s">}</span>
+ 403   <span class="s">}</span>
+ 404   <span class="i">$This</span><span class="i">-&gt;_SetMatrixAndAssociatedInformation</span><span class="s">(</span><span class="i">$Matrix</span><span class="cm">,</span> <span class="q">&quot;NormalizedLaplacianMatrix&quot;</span><span class="cm">,</span> \<span class="i">@VertexIDs</span><span class="s">)</span><span class="sc">;</span>
+ 405 
+ 406   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 407 <span class="s">}</span>
+ 408 
+ 409 <span class="c"># Generate the admittance matrix for a simple graph.</span>
+ 410 <span class="c">#</span>
+<a name="GenerateAdmittanceMatrix-"></a> 411 <span class="k">sub </span><span class="m">GenerateAdmittanceMatrix</span> <span class="s">{</span>
+ 412   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 413 
+ 414   <span class="i">$This</span><span class="i">-&gt;GenerateLaplacianMatrix</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 415   <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>} = <span class="q">&quot;AdmittanceMatrix&quot;</span><span class="sc">;</span>
+ 416 
+ 417   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 418 <span class="s">}</span>
+ 419 
+ 420 <span class="c"># Generate the Kirchhoff matrix for a simple graph.</span>
+ 421 <span class="c">#</span>
+<a name="GenerateKirchhoffMatrix-"></a> 422 <span class="k">sub </span><span class="m">GenerateKirchhoffMatrix</span> <span class="s">{</span>
+ 423   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 424 
+ 425   <span class="i">$This</span><span class="i">-&gt;GenerateLaplacianMatrix</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 426   <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>} = <span class="q">&quot;KirchhoffMatrix&quot;</span><span class="sc">;</span>
+ 427 
+ 428   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 429 <span class="s">}</span>
+ 430 
+ 431 <span class="c"># Get generated matrix...</span>
+ 432 <span class="c">#</span>
+<a name="GetMatrix-"></a> 433 <span class="k">sub </span><span class="m">GetMatrix</span> <span class="s">{</span>
+ 434   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 435 
+ 436   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">Matrix</span>}<span class="sc">;</span>
+ 437 <span class="s">}</span>
+ 438 
+ 439 <span class="c"># Get matrix type...</span>
+ 440 <span class="c">#</span>
+<a name="GetMatrixType-"></a> 441 <span class="k">sub </span><span class="m">GetMatrixType</span> <span class="s">{</span>
+ 442   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 443 
+ 444   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>}<span class="sc">;</span>
+ 445 <span class="s">}</span>
+ 446 
+ 447 <span class="c"># Get row IDs...</span>
+ 448 <span class="c">#</span>
+<a name="GetRowIDs-"></a> 449 <span class="k">sub </span><span class="m">GetRowIDs</span> <span class="s">{</span>
+ 450   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 451 
+ 452   <span class="k">return</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">RowIDs</span>}}<span class="sc">;</span>
+ 453 <span class="s">}</span>
+ 454 
+ 455 <span class="c"># Get column IDs...</span>
+ 456 <span class="c">#</span>
+<a name="GetColumnIDs-"></a> 457 <span class="k">sub </span><span class="m">GetColumnIDs</span> <span class="s">{</span>
+ 458   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 459 
+ 460   <span class="k">return</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}}<span class="sc">;</span>
+ 461 <span class="s">}</span>
+ 462 
+ 463 
+ 464 <span class="c"># Setup matrix and other associated information...</span>
+ 465 <span class="c">#</span>
+<a name="_SetMatrixAndAssociatedInformation-"></a> 466 <span class="k">sub </span><span class="m">_SetMatrixAndAssociatedInformation</span> <span class="s">{</span>
+ 467   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Matrix</span><span class="cm">,</span> <span class="i">$MatrixType</span><span class="cm">,</span> <span class="i">$VertexIDsRef</span><span class="cm">,</span> <span class="i">$EdgeVertexIDsRef</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 468 
+ 469   <span class="i">$This</span>-&gt;{<span class="w">Matrix</span>} = <span class="i">$Matrix</span><span class="sc">;</span>
+ 470   <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>} = <span class="i">$MatrixType</span><span class="sc">;</span>
+ 471 
+ 472   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">RowIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 473   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 474 
+ 475   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">RowIDs</span>}} = <span class="i">@</span>{<span class="i">$VertexIDsRef</span>}<span class="sc">;</span>
+ 476 
+ 477   <span class="k">if</span> <span class="s">(</span><span class="i">$MatrixType</span> =~ <span class="q">/^IncidenceMatrix$/i</span><span class="s">)</span> <span class="s">{</span>
+ 478     <span class="c"># Setup column IDs using edge vertex IDs...</span>
+ 479     <span class="k">my</span><span class="s">(</span><span class="i">$NumOfEdges</span><span class="cm">,</span> <span class="i">$EdgeVertexIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$EdgeVertexID1</span><span class="cm">,</span> <span class="i">$EdgeVertexID2</span><span class="cm">,</span> <span class="i">$EdgeID</span><span class="s">)</span><span class="sc">;</span>
+ 480 
+ 481     <span class="i">$NumOfEdges</span> = <span class="s">(</span><span class="k">scalar</span> <span class="i">@</span>{<span class="i">$EdgeVertexIDsRef</span>}<span class="s">)</span>/<span class="n">2</span><span class="sc">;</span>
+ 482     <span class="i">$EdgeVertexIndex</span> = <span class="n">0</span><span class="sc">;</span>
+ 483 
+ 484     <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfEdges</span> - <span class="n">1</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 485       <span class="i">$EdgeVertexID1</span> = <span class="i">$EdgeVertexIDsRef</span>-&gt;[<span class="i">$EdgeVertexIndex</span>]<span class="sc">;</span> <span class="i">$EdgeVertexIndex</span>++<span class="sc">;</span>
+ 486       <span class="i">$EdgeVertexID2</span> = <span class="i">$EdgeVertexIDsRef</span>-&gt;[<span class="i">$EdgeVertexIndex</span>]<span class="sc">;</span> <span class="i">$EdgeVertexIndex</span>++<span class="sc">;</span>
+ 487       <span class="i">$EdgeID</span> = <span class="s">(</span><span class="i">$EdgeVertexID1</span> &lt; <span class="i">$EdgeVertexID2</span><span class="s">)</span> ? <span class="q">&quot;${EdgeVertexID1}-${EdgeVertexID2}&quot;</span> <span class="co">:</span> <span class="q">&quot;${EdgeVertexID2}-${EdgeVertexID1}&quot;</span><span class="sc">;</span>
+ 488 
+ 489       <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}}<span class="cm">,</span> <span class="i">$EdgeID</span><span class="sc">;</span>
+ 490     <span class="s">}</span>
+ 491   <span class="s">}</span>
+ 492   <span class="k">else</span> <span class="s">{</span>
+ 493     <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}}<span class="cm">,</span> <span class="i">@</span>{<span class="i">$VertexIDsRef</span>}<span class="sc">;</span>
+ 494   <span class="s">}</span>
+ 495   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 496 <span class="s">}</span>
+ 497 
+ 498 <span class="c"># Return a string containg data for GraphMatrix object...</span>
+<a name="StringifyGraphMatrix-"></a> 499 <span class="k">sub </span><span class="m">StringifyGraphMatrix</span> <span class="s">{</span>
+ 500   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 501   <span class="k">my</span><span class="s">(</span><span class="i">$GraphMatrixString</span><span class="cm">,</span> <span class="i">$RowIDs</span><span class="s">)</span><span class="sc">;</span>
+ 502 
+ 503   <span class="i">$GraphMatrixString</span> = <span class="q">&quot;GraphMatrix:&quot;</span><span class="sc">;</span>
+ 504 
+ 505   <span class="i">$GraphMatrixString</span> .= <span class="s">(</span><span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">MatrixType</span>}<span class="s">)</span> ? <span class="q">&quot; MatrixType: $This-&gt;{MatrixType}&quot;</span> <span class="co">:</span> <span class="q">&quot;MatrixType: &lt;Undefined&gt;&quot;</span><span class="sc">;</span>
+ 506   <span class="i">$GraphMatrixString</span> .= <span class="s">(</span><span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">RowIDs</span>}}<span class="s">)</span> ? <span class="q">&quot;; RowIDs: @{$This-&gt;{RowIDs}}&quot;</span> <span class="co">:</span> <span class="q">&quot;; RowIDs: &lt;Undefined&gt;&quot;</span><span class="sc">;</span>
+ 507   <span class="i">$GraphMatrixString</span> .= <span class="s">(</span><span class="k">scalar</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">ColumnIDs</span>}}<span class="s">)</span> ? <span class="q">&quot;; ColumnIDs: @{$This-&gt;{ColumnIDs}}&quot;</span> <span class="co">:</span> <span class="q">&quot;; ColumnIDs: &lt;Undefined&gt;&quot;</span><span class="sc">;</span>
+ 508 
+ 509   <span class="i">$GraphMatrixString</span> .= <span class="s">(</span><span class="k">defined</span> <span class="i">$This</span>-&gt;{<span class="w">Matrix</span>}<span class="s">)</span> ? <span class="q">&quot;; Matrix: $This-&gt;{Matrix}&quot;</span> <span class="co">:</span> <span class="q">&quot;; Matrix: &lt;Undefined&gt;&quot;</span><span class="sc">;</span>
+ 510 
+ 511   <span class="k">return</span> <span class="i">$GraphMatrixString</span><span class="sc">;</span>
+ 512 <span class="s">}</span>
+ 513 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

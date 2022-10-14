@@ -1,0 +1,267 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:PeriodicTable.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PDBFileUtil.html" title="PDBFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PseudoHeap.html" title="PseudoHeap.html">Next</a></td><td width="34%" align="middle"><strong>PeriodicTable.pm</strong></td><td width="33%" align="right"><a href="././code/PeriodicTable.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/PeriodicTable.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/PeriodicTable.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/PeriodicTable.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/PeriodicTable.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>PeriodicTable</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use PeriodicTable;</p>
+<p>use PeriodicTable qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>PeriodicTable</strong> module provides the following functions:</p>
+<p> <a href="#getelementmostabundantnaturalisotopedata">GetElementMostAbundantNaturalIsotopeData</a>
+, <a href="#getelementmostabundantnaturalisotopemass">GetElementMostAbundantNaturalIsotopeMass</a>
+, <a href="#getelementmostabundantnaturalisotopemassnumber">GetElementMostAbundantNaturalIsotopeMassNumber</a>, <a href="#getelementnaturalisotopeabundance">GetElementNaturalIsotopeAbundance</a>
+, <a href="#getelementnaturalisotopecount">GetElementNaturalIsotopeCount</a>, <a href="#getelementnaturalisotopemass">GetElementNaturalIsotopeMass</a>
+, <a href="#getelementnaturalisotopesdata">GetElementNaturalIsotopesData</a>, <a href="#getelementpropertiesdata">GetElementPropertiesData</a>
+, <a href="#getelementpropertiesnames">GetElementPropertiesNames</a>, <a href="#getelementpropertiesnamesandunits">GetElementPropertiesNamesAndUnits</a>
+, <a href="#getelementpropertyunits">GetElementPropertyUnits</a>, <a href="#getelements">GetElements</a>, <a href="#getelementsbyamericanstylegrouplabel">GetElementsByAmericanStyleGroupLabel</a>
+, <a href="#getelementsbyeuropeanstylegrouplabel">GetElementsByEuropeanStyleGroupLabel</a>, <a href="#getelementsbygroupname">GetElementsByGroupName</a>
+, <a href="#getelementsbygroupnumber">GetElementsByGroupNumber</a>, <a href="#getelementsbyperiodnumber">GetElementsByPeriodNumber</a>
+, <a href="#getiupacgroupnumberfromamericanstylegrouplabel">GetIUPACGroupNumberFromAmericanStyleGroupLabel</a>
+, <a href="#getiupacgroupnumberfromeuropeanstylegrouplabel">GetIUPACGroupNumberFromEuropeanStyleGroupLabel</a>, <a href="#iselement">IsElement</a>
+, <a href="#iselementnaturalisotopemassnumber">IsElementNaturalIsotopeMassNumber</a>, <a href="#iselementproperty">IsElementProperty</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="getelements" class="item"><strong>GetElements</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElements();
+<br/>    $ElementSymbolsRef = GetElements();</div>
+<p>Returns an array or a reference to an array of known element symbols</p>
+</dd>
+<dt><strong><a name="getelementsbygroupname" class="item"><strong>GetElementsByGroupName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElementsByGroupName($GroupName);
+<br/>    $ElementSymbolsRef = GetElementsByGroupName($GroupName);</div>
+<p>Returns an array or a reference to an array of element symbols for a specified <em>GroupName</em>.
+Supported <em>GroupName</em> values are: <em>Alkali metals, Alkaline earth metals, Coinage metals, Pnictogens,
+Chalcogens, Halogens, Noble gases</em>; Additionally, usage of <em>Lanthanides</em> (Lanthanoids)
+and <em>Actinides</em> (Actinoids) is also supported.</p>
+</dd>
+<dt><strong><a name="getelementsbygroupnumber" class="item"><strong>GetElementsByGroupNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElementsByGroupNumber($GroupNumber);
+<br/>    $ElementSymbolsRef = GetElementsByGroupNumber($GroupNumber);</div>
+<p>Returns an array or a reference to an array of element symbols for a specified <em>GroupNumber</em></p>
+</dd>
+<dt><strong><a name="getelementsbyamericanstylegrouplabel" class="item"><strong>GetElementsByAmericanStyleGroupLabel</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElementsByAmericanStyleGroupLabel($GroupLabel);
+<br/>    $ElementSymbolsRef = GetElementsByAmericanStyleGroupLabel($GroupLabel);</div>
+<p>Returns an array or a reference to an array of element symbols for a specified American
+style <em>GroupLabel</em>. Valid values for Amercian style group labels: <em>IA to VIIIA, IB to VIIIB, VIII</em>.</p>
+</dd>
+<dt><strong><a name="getelementsbyeuropeanstylegrouplabel" class="item"><strong>GetElementsByEuropeanStyleGroupLabel</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElementsByEuropeanStyleGroupLabel($GroupLabel);
+<br/>    $ElementSymbolsRef = GetElementsByEuropeanStyleGroupLabel($GroupLabel);</div>
+<p>Returns an array or a reference to an array of element symbols for a specified European
+style <em>GroupLabel</em>. Valid values for European style group labels: <em>IA to VIIIA, IB to VIIIB, VIII</em>.</p>
+</dd>
+<dt><strong><a name="getelementsbyperiodnumber" class="item"><strong>GetElementsByPeriodNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ElementSymbols = GetElementsByPeriodNumber($PeriodNumber);
+<br/>    $ElementSymbolsRef = GetElementsByPeriodNumber($PeriodNumber);</div>
+<p>Returns an array or a reference to an array of element symbols for a specified <em>PeriodNumber</em>.</p>
+</dd>
+<dt><strong><a name="getelementmostabundantnaturalisotopedata" class="item"><strong>GetElementMostAbundantNaturalIsotopeData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @IsotopeData = GetElementMostAbundantNaturalIsotopeData(
+                   $ElementID);
+<br/>    $IsotopeDataRef = GetElementMostAbundantNaturalIsotopeData(
+                   $ElementID);</div>
+<p>Returns an array or reference to an array containing data for most abundant isotope of
+an element specfied by element symbol or atomic number. Isotope data arrays contain these
+values: <em>AtomicNumber, IsotopeSymbol, MassNumber, RelativeAtomicMass, and NaturalAbundance</em>.</p>
+</dd>
+<dt><strong><a name="getelementmostabundantnaturalisotopemassnumber" class="item"><strong>GetElementMostAbundantNaturalIsotopeMassNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MassNumber = GetElementMostAbundantNaturalIsotopeMassNumber($ElementID);</div>
+<p>Returns mass number of most abundant natural isotope of an element specfied by element
+symbol or atomic number</p>
+</dd>
+<dt><strong><a name="getelementnaturalisotopecount" class="item"><strong>GetElementNaturalIsotopeCount</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $IsotopeCount = GetElementNaturalIsotopeCount($ElementID);</div>
+<p>Returns natural isotope count for an element specfied by element symbol or
+atomic number</p>
+</dd>
+<dt><strong><a name="getelementnaturalisotopesdata" class="item"><strong>GetElementNaturalIsotopesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DataHashRef = GetElementNaturalIsotopesData($ElementID,
+                   [$MassNumber]);</div>
+<p>Reurns a reference to a hash containingall available isotope data for an element specified
+using element symbol or aromic number; an optional mass number indicates retrieve data
+for a specific isotope</p>
+</dd>
+<dt><strong><a name="getelementnaturalisotopeabundance" class="item"><strong>GetElementNaturalIsotopeAbundance</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Abundance = GetElementNaturalIsotopeAbundance($ElementID,
+                 $MassNumber);</div>
+<p>Returns percent abundance of natural isotope for an element with specfic mass
+number.</p>
+</dd>
+<dt><strong><a name="getelementmostabundantnaturalisotopemass" class="item"><strong>GetElementMostAbundantNaturalIsotopeMass</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RelativeAtomicMass = GetElementMostAbundantNaturalIsotopeMass(
+                          $ElementID);</div>
+<p>Returns relative atomic mass of most abundant isotope for an element specified using
+element symbol or aromic number.</p>
+</dd>
+<dt><strong><a name="getelementnaturalisotopemass" class="item"><strong>GetElementNaturalIsotopeMass</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RelativeAtomicMass = GetElementNaturalIsotopeMass($ElementID,
+                          $MassNumber);</div>
+<p>Returns relative atomic mass of an element with specfic mass number.</p>
+</dd>
+<dt><strong><a name="getelementpropertiesdata" class="item"><strong>GetElementPropertiesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PropertyDataHashRef = GetElementPropertiesData($ElementID);</div>
+<p>Returns a reference to a hash containing all available properties data for an element
+specified using element symbol or atomic number.</p>
+</dd>
+<dt><strong><a name="getelementpropertyname" class="item"><strong>GetElementPropertyName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PropertyValue = GetElement&lt;PropertyName&gt;($ElementID);</div>
+<p>Returns value of an element for a element specified using element symbol or atomic number.</p>
+<p>These functions are not defined in this modules; these are implemented on-the-fly using
+Perl's AUTOLOAD funcionality.</p>
+<p>Here is the list of known element <em>property names</em>: AllenElectronegativity,
+AllredRochowElectronegativity, AtomicNumber, AtomicRadiusCalculated,
+AtomicRadiusEmpirical, AtomicWeight, Block, BoilingPoint, BondLength,
+BrinellHardness, BulkModulus, Classification, CoefficientOfLinearExpansion, Color,
+CommonValences, LowestCommonValence, HighestCommonValence,
+CommonOxidationNumbers, LowestCommonOxidationNumber, HighestCommonOxidationNumber,
+CovalentRadiusEmpirical, CriticalTemperature, DensityOfSolid, DiscoveredAt, DiscoveredBy,
+DiscoveredWhen, ElectricalResistivity, ElectronAffinity, ElementName, ElementSymbol, EnthalpyOfAtmization,
+EnthalpyOfFusion, EnthalpyOfVaporization, FirstIonizationEnergy, GroundStateConfiguration, GroundStateLevel,
+GroupName, GroupNumber, NaturalIsotopeData, MeltingPoint, MineralHardness, MolarVolume,
+MullikenJaffeElectronegativity, OriginOfName, PaulingElectronegativity, PeriodNumber, PoissonsRatio,
+Reflectivity, RefractiveIndex, RigidityModulus, SandersonElectronegativity, StandardState,
+SuperconductionTemperature, ThermalConductivity, VanderWaalsRadius, VelocityOfSound, VickersHardness,
+YoungsModulus.</p>
+</dd>
+<dt><strong><a name="getelementpropertiesnames" class="item"><strong>GetElementPropertiesNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @PropertyNames = GetElementPropertiesNames([$Mode]);
+<br/>    $PropertyNamesRef = GetElementPropertiesNames([$Mode]);</div>
+<p>Returns names of all available element properties. Optional mode parameter controls
+grouping of property names; Possible values: <em>ByGroup or Alphabetical</em>. Default:
+<em>ByGroup</em>.</p>
+</dd>
+<dt><strong><a name="getelementpropertiesnamesandunits" class="item"><strong>GetElementPropertiesNamesAndUnits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NameUnitsHashRef = GetElementPropertiesNamesAndUnits();</div>
+<p>Returns a reference to a hash of property names and units of all available element
+properties. Names with no units contains empty strings.</p>
+</dd>
+<dt><strong><a name="getelementpropertyunits" class="item"><strong>GetElementPropertyUnits</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Units = GetElementPropertyUnits($PropertyName);</div>
+<p>Returns units for a specific element property name. An empty string is returned for
+a property with no units.</p>
+</dd>
+<dt><strong><a name="getiupacgroupnumberfromamericanstylegrouplabel" class="item"><strong>GetIUPACGroupNumberFromAmericanStyleGroupLabel</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GroupNumber = GetIUPACGroupNumberFromAmericanStyleGroupLabel(
+                   $GroupLabel);</div>
+<p>Returns IUPAC group numbers of a specific American style group label. A comma delimited
+string is returned for group VIII or VIIIB.</p>
+</dd>
+<dt><strong><a name="getiupacgroupnumberfromeuropeanstylegrouplabel" class="item"><strong>GetIUPACGroupNumberFromEuropeanStyleGroupLabel</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $GroupNumber = GetIUPACGroupNumberFromEuropeanStyleGroupLabel(
+                   $GroupLabel);</div>
+<p>Returns IUPAC group numbers of a specific European style group label. A comma delimited
+string is returned for group VIII or VIIIA.</p>
+</dd>
+<dt><strong><a name="iselement" class="item"><strong>IsElement</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsElement($ElementID);</div>
+<p>Returns 1 or 0 based on whether it's a known element symbol or atomic number.</p>
+</dd>
+<dt><strong><a name="iselementnaturalisotopemassnumber" class="item"><strong>IsElementNaturalIsotopeMassNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsElementNaturalIsotopeMassNumber($ElementID, $MassNumber);</div>
+<p>Returns 1 or 0 based on whether it's a valid mass number for an element symbol
+or atomic number.</p>
+</dd>
+<dt><strong><a name="iselementproperty" class="item"><strong>IsElementProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsElementProperty($PropertyName);</div>
+<p>Returns 1 or 0 based on whether it's a valid property name.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AminoAcids.html">AminoAcids.pm</a>,&nbsp<a href="./NucleicAcids.html">NucleicAcids.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./PDBFileUtil.html" title="PDBFileUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PseudoHeap.html" title="PseudoHeap.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>PeriodicTable.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

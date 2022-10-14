@@ -1,0 +1,732 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AtomTypesFingerprints.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AtomNeighborhoodsFingerprints.html" title="AtomNeighborhoodsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./CalculatePhysicochemicalProperties.html" title="CalculatePhysicochemicalProperties.html">Next</a></td><td width="34%" align="middle"><strong>AtomTypesFingerprints.pl</strong></td><td width="33%" align="right"><a href="././code/AtomTypesFingerprints.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/AtomTypesFingerprints.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/AtomTypesFingerprints.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/AtomTypesFingerprints.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/AtomTypesFingerprints.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>AtomTypesFingerprints.pl - Generate atom types fingerprints for SD files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>AtomTypesFingerprints.pl SDFile(s)...</p>
+<p>AtomTypesFingerprints.pl [<strong>--AromaticityModel</strong> <em>AromaticityModelType</em>]
+[<strong>-a, --AtomIdentifierType</strong> <em>AtomicInvariantsAtomTypes |
+DREIDINGAtomTypes | EStateAtomTypes | MMFF94AtomTypes | SLogPAtomTypes | SYBYLAtomTypes | TPSAAtomTypes | UFFAtomTypes</em>]
+[<strong>--AtomicInvariantsToUse</strong> <em>&quot;AtomicInvariant, AtomicInvariant...&quot;</em>]
+[<strong>--FunctionalClassesToUse</strong> <em>&quot;FunctionalClass1,FunctionalClass2...&quot;</em>]
+[<strong>--AtomTypesSetToUse</strong> <em>ArbitrarySize | FixedSize</em>]
+[<strong>--BitsOrder</strong> <em>Ascending | Descending</em>] [<strong>-b, --BitStringFormat</strong> <em>BinaryString | HexadecimalString</em>]
+[<strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em>] [<strong>--CompoundIDLabel</strong> <em>text</em>]
+[<strong>--CompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>]
+[<strong>--DataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,...&quot;</em>] [<strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em>]
+[<strong>-f, --Filter</strong> <em>Yes | No</em>] [<strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>] [<strong>--FingerprintsLabel</strong> <em>text</em>]
+[<strong>-h, --help</strong>] [<strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em>]
+[<strong>-m, --mode</strong> <em>AtomTypesCount | AtomTypesBits</em>] [<strong>-i, --IgnoreHydrogens</strong> <em>Yes | No</em>]
+[<strong>--OutDelim</strong> <em>comma | tab | semicolon</em>] [<strong>--output</strong> <em>SD |FP | text | all</em>] [<strong>-o, --overwrite</strong>]
+[<strong>-q, --quote</strong> <em>Yes | No</em>] [<strong>-r, --root</strong> <em>RootName</em>] [<strong>-s, --size</strong> <em>number</em>] [<strong>--ValuesPrecision</strong> <em>number</em>]
+[<strong>-v, --VectorStringFormat</strong> <em>IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em>]
+[<strong>-w, --WorkingDir</strong> <em>DirName</em>]</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Generate atom types fingerprints for <em>SDFile(s)</em> and create appropriate SD, FP or
+CSV/TSV text file(s) containing fingerprints bit-vector or vector strings corresponding to
+molecular fingerprints.</p>
+<p>Multiple SDFile names are separated by spaces. The valid file extensions are <em>.sdf</em>
+and <em>.sd</em>. All other file names are ignored. All the SD files in a current directory
+can be specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>The current release of MayaChemTools supports generation of atom types fingerpritns
+corresponding to following <strong>-a, --AtomIdentifierTypes</strong>:</p>
+<div class="OptionsBox">
+    AtomicInvariantsAtomTypes, DREIDINGAtomTypes, EStateAtomTypes,
+<br/>    FunctionalClassAtomTypes, MMFF94AtomTypes, SLogPAtomTypes,
+<br/>    SYBYLAtomTypes, TPSAAtomTypes, UFFAtomTypes</div>
+<p>Based on the values specified for <strong>-a, --AtomIdentifierType</strong> along with other specified
+parameters such as <strong>--AtomicInvariantsToUse</strong> and <strong>--FunctionalClassesToUse</strong>, initial
+atom types are assigned to all non-hydrogen atoms or all atoms in a molecule</p>
+<p>Using the assigned atom types and specified <strong>-m, --Mode</strong>, one of the following types of
+fingerprints are generated:</p>
+<div class="OptionsBox">
+    AtomTypesCount - A vector containing count of atom types
+<br/>    AtomTypesBits - A bit vector indicating presence/absence of atom types</div>
+<p>For <em>AtomTypesCount</em> fingerprints, two types of atom types set size are allowed as
+value of <strong>--AtomTypesSetToUse</strong> option:</p>
+<div class="OptionsBox">
+    ArbitrarySize - Corresponds to only atom types detected in molecule
+<br/>    FixedSize - Corresponds to fixed number of atom types previously defined</div>
+<p>For <em>AtomTypesBits</em> fingerprints, only <em>FixedSize</em> atom type set is allowed.</p>
+<p><em>ArbitrarySize</em> corresponds to atom types detected in a molecule where as <em>FixedSize</em> implies
+a fix number of all possible atom types previously defined for a specific <strong>-a, --AtomIdentifierType</strong>.</p>
+<p>Fix number of all possible atom types for supported <em>AtomIdentifierTypes</em> in current release
+of MayaChemTools are:</p>
+<div class="OptionsBox">
+    AtomIdentifier       Total    TotalWithoutHydrogens</div>
+<div class="OptionsBox">
+    DREIDINGAtomTypes    37       34
+<br/>    EStateAtomTypes      109      87
+<br/>    MMFF94AtomTypes      212      171
+<br/>    SLogPAtomTypes       72       67
+<br/>    SYBYLAtomTypes       45       44
+<br/>    TPSAAtomTypes        47       47
+<br/>    UFFAtomTypes         126      124</div>
+<p>The current release of MayaChemTools generates the following atom types fingerprints
+bit-vector and vector strings:</p>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:AtomicInvariantsAtomTypes:ArbitraryS
+<br/>    ize;10;NumericalValues;IDsAndValuesString;C.X1.BO1.H3 C.X2.BO2.H2 C.X2
+<br/>    .BO3.H1 C.X3.BO3.H1 C.X3.BO4 F.X1.BO1 N.X2.BO2.H1 N.X3.BO3 O.X1.BO1.H1
+<br/>    O.X1.BO2;2 4 14 3 10 1 1 1 3 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:DREIDINGAtomTypes:ArbitrarySize;8;Nu
+<br/>    mericalValues;IDsAndValuesString;C_2 C_3 C_R F_ N_3 N_R O_2 O_3;2 9 22
+<br/>    1 1 1 2 3</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:DREIDINGAtomTypes:FixedSize;34;Order
+<br/>    edNumericalValues;IDsAndValuesString;B_3 B_2 C_3 C_R C_2 C_1 N_3 N_R N
+<br/>    _2 N_1 O_3 O_R O_2 O_1 F_ Al3 Si3 P_3 S_3 Cl Ga3 Ge3 As3 Se3 Br In3 Sn
+<br/>    3 Sb3 Te3 I_ Na Ca Fe Zn;0 0 9 22 2 0 1 1 0 0 3 0 2 0 1 0 0 0 0 0 0 0 
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:DREIDINGAtomTypes:FixedSize;34;Bin
+<br/>    aryString;Ascending;0011101100101010000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:EStateAtomTypes:ArbitrarySize;11;Num
+<br/>    ericalValues;IDsAndValuesString;aaCH aasC aasN dO dssC sCH3 sF sOH ssC
+<br/>    H2 ssNH sssCH;14 8 1 2 2 2 1 3 4 1 3</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:EStateAtomTypes:FixedSize;87;Ordered
+<br/>    NumericalValues;IDsAndValuesString;sLi ssBe ssssBem sBH2 ssBH sssB sss
+<br/>    sBm sCH3 dCH2 ssCH2 tCH dsCH aaCH sssCH ddC tsC dssC aasC aaaC ssssC s
+<br/>    NH3p sNH2 ssNH2p dNH ssNH aaNH tN sssNHp dsN aaN sssN ddsN aasN ss...;
+<br/>    0 0 0 0 0 0 0 2 0 4 0 0 14 3 0 0 2 8 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 3 2 0 0
+<br/>    0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:EStateAtomTypes:FixedSize;87;Binar
+<br/>    yString;Ascending;0000000101001100110000001000000010110000100000000000
+<br/>    000000000000000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:FunctionalClassAtomTypes:ArbitrarySi
+<br/>    ze;8;NumericalValues;IDsAndValuesString;Ar Ar.HBA HBA HBA.HBD HBD Hal 
+<br/>    NI None;22 1 2 3 1 1 1 10</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:MMFF94AtomTypes:ArbitrarySize;13;Num
+<br/>    ericalValues;IDsAndValuesString;C5A C5B C=ON CB COO CR F N5 NC=O O=CN
+<br/>    O=CO OC=O OR;2 2 1 18 1 9 1 1 1 1 1 1 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:MMFF94AtomTypes:FixedSize;171;Ordere
+<br/>    dNumericalValues;IDsAndValuesString;CR C=C CSP2 C=O C=N CGD C=OR C=ON
+<br/>    CONN COO COON COOO C=OS C=S C=SN CSO2 CS=O CSS C=P CSP =C= OR OC=O OC=
+<br/>    C OC=N OC=S ONO2 ON=O OSO3 OSO2 OSO OS=O -OS OPO3 OPO2 OPO -OP -O-...;
+<br/>    9 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 2 1 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 1 0 1 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18 0 0 0 0 0 0 0 0 ...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:MMFF94AtomTypes:FixedSize;171;Bina
+<br/>    ryString;Ascending;100000010100000000000110000000000000000101000000100
+<br/>    0100000000000000000000000000000000000000000100000000000000000000000000
+<br/>    0000000011000000000000000001000000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SLogPAtomTypes:ArbitrarySize;16;Nume
+<br/>    ricalValues;IDsAndValuesString;C1 C10 C11 C14 C18 C20 C21 C22 C5 CS F
+<br/>    N11 N4 O10 O2 O9;5 1 1 1 14 4 2 1 2 2 1 1 1 1 3 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SLogPAtomTypes:FixedSize;67;OrderedN
+<br/>    umericalValues;IDsAndValuesString;C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C
+<br/>    12 C13 C14 C15 C16 C17 C18 C19 C20 C21 C22 C23 C24 C25 C26 C27 CS N1 N
+<br/>    2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 NS O1 O2 O3 O4 O5 O6 O7 O8
+<br/>    O9 O10 O11 O12 OS F Cl Br I Hal P S1 S2 S3 Me1 Me2;5 0 0 0 2 0 0 0 0 1
+<br/>    1 0 0 1 0 0 0 14 0 4 2 1 0 0 0 0 0 2 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:SLogPAtomTypes:FixedSize;67;Binary
+<br/>    String;Ascending;10001000011001000101110000010001000000100000100000011
+<br/>    0001000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SYBYLAtomTypes:ArbitrarySize;9;Numer
+<br/>    icalValues;IDsAndValuesString;C.2 C.3 C.ar F N.am N.ar O.2 O.3 O.co2;2
+<br/>    9 22 1 1 1 1 2 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SYBYLAtomTypes:FixedSize;44;OrderedN
+<br/>    umericalValues;IDsAndValuesString;C.3 C.2 C.1 C.ar C.cat N.3 N.2 N.1 N
+<br/>    .ar N.am N.pl3 N.4 O.3 O.2 O.co2 S.3 S.2 S.o S.o2 P.3 F Cl Br I ANY HA
+<br/>    L HET Li Na Mg Al Si K Ca Cr.th Cr.oh Mn Fe Co.oh Cu Zn Se Mo Sn;9 2 0
+<br/>    22 0 0 0 0 1 1 0 0 2 1 2 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:SYBYLAtomTypes:FixedSize;44;Binary
+<br/>    String;Ascending;110100001100111000001000000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:TPSAAtomTypes:FixedSize;47;OrderedNu
+<br/>    mericalValues;IDsAndValuesString;N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N1
+<br/>    2 N13 N14 N15 N16 N17 N18 N19 N20 N21 N22 N23 N24 N25 N26 N O1 O2 O3 O
+<br/>    4 O5 O6 O S1 S2 S3 S4 S5 S6 S7 S P1 P2 P3 P4 P;0 0 0 0 0 0 1 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 2 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:TPSAAtomTypes:FixedSize;47;BinaryS
+<br/>    tring;Ascending;000000100000000000001000000001100000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:UFFAtomTypes:ArbitrarySize;8;Numeric
+<br/>    alValues;IDsAndValuesString;C_2 C_3 C_R F_ N_3 N_R O_2 O_3;2 9 22 1 1
+<br/>    1 2 3</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:UFFAtomTypes;124;OrderedNumerical
+<br/>    Values;IDsAndValuesString;He4+4 Li Be3+2 B_3 B_2 C_3 C_R C_2 C_1 N_3 N_
+<br/>    R N_2 N_1 O_3 O_3_z O_R O_2 O_1 F_ Ne4+4 Na Mg3+2 Al3 Si3 P_3+3 P_3+5 P
+<br/>    _3+q S_3+2 S_3+4 S_3+6 S_R S_2 Cl Ar4+4 K_ Ca6+2 Sc3+3 Ti3+4 Ti6+4 V_3+
+<br/>    ;0 0 0 0 0 12 0 3 0 3 0 1 0 2 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:UFFAtomTypes:FixedSize;124;OrderedNu
+<br/>    mericalValues;IDsAndValuesString;He4+4 Li Be3+2 B_3 B_2 C_3 C_R C_2 C_
+<br/>    1 N_3 N_R N_2 N_1 O_3 O_3_z O_R O_2 O_1 F_ Ne4+4 Na Mg3+2 Al3 Si3 P_3+
+<br/>    3 P_3+5 P_3+q S_3+2 S_3+4 S_3+6 S_R S_2 Cl Ar4+4 K_ Ca6+2 Sc3+3 Ti...;
+<br/>    0 0 0 0 0 9 22 2 0 1 1 0 0 3 0 0 2 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0...</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:UFFAtomTypes:FixedSize;124;BinaryS
+<br/>    tring;Ascending;000001110110010010100000000000000000000000000000000000
+<br/>    0000000000000000000000000000000000000000000000000000000000000000000000</div>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>--AromaticityModel</strong> <em>MDLAromaticityModel | TriposAromaticityModel | MMFFAromaticityModel | ChemAxonBasicAromaticityModel | ChemAxonGeneralAromaticityModel | DaylightAromaticityModel | MayaChemToolsAromaticityModel</em></strong></dt>
+<dd>
+<p>Specify aromaticity model to use during detection of aromaticity. Possible values in the current
+release are: <em>MDLAromaticityModel, TriposAromaticityModel, MMFFAromaticityModel,
+ChemAxonBasicAromaticityModel, ChemAxonGeneralAromaticityModel, DaylightAromaticityModel
+or MayaChemToolsAromaticityModel</em>. Default value: <em>MayaChemToolsAromaticityModel</em>.</p>
+<p>The supported aromaticity model names along with model specific control parameters
+are defined in <strong>AromaticityModelsData.csv</strong>, which is distributed with the current release
+and is available under <strong>lib/data</strong> directory. <strong>Molecule.pm</strong> module retrieves data from
+this file during class instantiation and makes it available to method <strong>DetectAromaticity</strong>
+for detecting aromaticity corresponding to a specific model.</p>
+</dd>
+<dt><strong><strong>-a, --AtomIdentifierType</strong> <em>AtomicInvariantsAtomTypes | DREIDINGAtomTypes | EStateAtomTypes | FunctionalClassAtomTypes | MMFF94AtomTypes | SLogPAtomTypes | SYBYLAtomTypes | TPSAAtomTypes | UFFAtomTypes</em></strong></dt>
+<dd>
+<p>Specify atom identifier type to use for assignment of atom types to hydrogen and/or
+non-hydrogen atoms during calculation of atom types fingerprints. Possible values in the
+current release are: <em>AtomicInvariantsAtomTypes, DREIDINGAtomTypes, EStateAtomTypes,
+FunctionalClassAtomTypes, MMFF94AtomTypes, SLogPAtomTypes, SYBYLAtomTypes,
+TPSAAtomTypes, UFFAtomTypes</em>. Default value: <em>AtomicInvariantsAtomTypes</em>.</p>
+</dd>
+<dt><strong><strong>--AtomicInvariantsToUse</strong> <em>&quot;AtomicInvariant,AtomicInvariant...&quot;</em></strong></dt>
+<dd>
+<p>This value is used during <em>AtomicInvariantsAtomTypes</em> value of <strong>a, --AtomIdentifierType</strong>
+option. It's a list of comma separated valid atomic invariant atom types.</p>
+<p>Possible values for atomic invariants are: <em>AS, X, BO,  LBO, SB, DB, TB,
+H, Ar, RA, FC, MN, SM</em>. Default value: <em>AS,X,BO,H,FC</em>.</p>
+<p>The atomic invariants abbreviations correspond to:</p>
+<div class="OptionsBox">
+    AS = Atom symbol corresponding to element symbol</div>
+<div class="OptionsBox">
+    X&lt;n&gt;   = Number of non-hydrogen atom neighbors or heavy atoms
+<br/>    BO&lt;n&gt; = Sum of bond orders to non-hydrogen atom neighbors or heavy atoms
+<br/>    LBO&lt;n&gt; = Largest bond order of non-hydrogen atom neighbors or heavy atoms
+<br/>    SB&lt;n&gt; = Number of single bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    DB&lt;n&gt; = Number of double bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    TB&lt;n&gt; = Number of triple bonds to non-hydrogen atom neighbors or heavy atoms
+<br/>    H&lt;n&gt;   = Number of implicit and explicit hydrogens for atom
+<br/>    Ar     = Aromatic annotation indicating whether atom is aromatic
+<br/>    RA     = Ring atom annotation indicating whether atom is a ring
+<br/>    FC&lt;+n/-n&gt; = Formal charge assigned to atom
+<br/>    MN&lt;n&gt; = Mass number indicating isotope other than most abundant isotope
+<br/>    SM&lt;n&gt; = Spin multiplicity of atom. Possible values: 1 (singlet), 2 (doublet) or
+            3 (triplet)</div>
+<p>Atom type generated by AtomTypes::AtomicInvariantsAtomTypes class corresponds to:</p>
+<div class="OptionsBox">
+    AS.X&lt;n&gt;.BO&lt;n&gt;.LBO&lt;n&gt;.&lt;SB&gt;&lt;n&gt;.&lt;DB&gt;&lt;n&gt;.&lt;TB&gt;&lt;n&gt;.H&lt;n&gt;.Ar.RA.FC&lt;+n/-n&gt;.MN&lt;n&gt;.SM&lt;n&gt;</div>
+<p>Except for AS which is a required atomic invariant in atom types, all other atomic invariants are
+optional. Atom type specification doesn't include atomic invariants with zero or undefined values.</p>
+<p>In addition to usage of abbreviations for specifying atomic invariants, the following descriptive words
+are also allowed:</p>
+<div class="OptionsBox">
+    X : NumOfNonHydrogenAtomNeighbors or NumOfHeavyAtomNeighbors
+<br/>    BO : SumOfBondOrdersToNonHydrogenAtoms or SumOfBondOrdersToHeavyAtoms
+<br/>    LBO : LargestBondOrderToNonHydrogenAtoms or LargestBondOrderToHeavyAtoms
+<br/>    SB :  NumOfSingleBondsToNonHydrogenAtoms or NumOfSingleBondsToHeavyAtoms
+<br/>    DB : NumOfDoubleBondsToNonHydrogenAtoms or NumOfDoubleBondsToHeavyAtoms
+<br/>    TB : NumOfTripleBondsToNonHydrogenAtoms or NumOfTripleBondsToHeavyAtoms
+<br/>    H :  NumOfImplicitAndExplicitHydrogens
+<br/>    Ar : Aromatic
+<br/>    RA : RingAtom
+<br/>    FC : FormalCharge
+<br/>    MN : MassNumber
+<br/>    SM : SpinMultiplicity</div>
+<p><em>AtomTypes::AtomicInvariantsAtomTypes</em> module is used to assign atomic invariant
+atom types.</p>
+</dd>
+<dt><strong><strong>--FunctionalClassesToUse</strong> <em>&quot;FunctionalClass1,FunctionalClass2...&quot;</em></strong></dt>
+<dd>
+<p>This value is used during <em>FunctionalClassAtomTypes</em> value of <strong>a, --AtomIdentifierType</strong>
+option. It's a list of comma separated valid functional classes.</p>
+<p>Possible values for atom functional classes are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.
+Default value [ Ref 24 ]: <em>HBD,HBA,PI,NI,Ar,Hal</em>.</p>
+<p>The functional class abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<div class="OptionsBox">
+ Functional class atom type specification for an atom corresponds to:</div>
+<div class="OptionsBox">
+    Ar.CA.H.HBA.HBD.Hal.NI.PI.RA</div>
+<p><em>AtomTypes::FunctionalClassAtomTypes</em> module is used to assign functional class atom
+types. It uses following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+</dd>
+<dt><strong><strong>--AtomTypesSetToUse</strong> <em>ArbitrarySize | FixedSize</em></strong></dt>
+<dd>
+<p>Atom types set size to use during generation of atom types fingerprints.</p>
+<p>Possible values for <em>AtomTypesCount</em> values of <strong>-m, --mode</strong> option: <em>ArbitrarySize |
+FixedSize</em>; Default value: <em>ArbitrarySize</em>.</p>
+<p>Possible values for <em>AtomTypesBits</em> value of <strong>-m, --mode</strong> option: <em>FixedSize</em>;
+Default value: <em>FixedSize</em>.</p>
+<p><em>FixedSize</em> value is not supported for <em>AtomicInvariantsAtomTypes</em> value of
+<strong>-a, --AtomIdentifierType</strong> option.</p>
+<p><em>ArbitrarySize</em> corresponds to only atom types detected in molecule; <em>FixedSize</em> corresponds
+to fixed number of previously defined atom types for specified <strong>-a, --AtomIdentifierType</strong>.</p>
+</dd>
+<dt><strong><strong>--BitsOrder</strong> <em>Ascending | Descending</em></strong></dt>
+<dd>
+<p>Bits order to use during generation of fingerprints bit-vector string for <em>AtomTypesBits</em> value of
+=item <strong>--BitsOrder</strong> <em>Ascending | Descending</em></p>
+<p>Bits order to use during generation of fingerprints bit-vector string for <em>AtomTypesBits</em> value of
+<strong>-m, --mode</strong> option. Possible values: <em>Ascending, Descending</em>. Default: <em>Ascending</em>.</p>
+<p><em>Ascending</em> bit order which corresponds to first bit in each byte as the lowest bit as
+opposed to the highest bit.</p>
+<p>Internally, bits are stored in <em>Ascending</em> order using Perl vec function. Regardless
+of machine order, big-endian or little-endian, vec function always considers first
+string byte as the lowest byte and first bit within each byte as the lowest bit.</p>
+</dd>
+<dt><strong><strong>-b, --BitStringFormat</strong> <em>BinaryString | HexadecimalString</em></strong></dt>
+<dd>
+<p>Format of fingerprints bit-vector string data in output SD, FP or CSV/TSV text file(s) specified by
+<strong>--output</strong> used during <em>AtomTypesBits</em> value of <strong>-m, --mode</strong> option. Possible
+values: <em>BinaryString, HexadecimalString</em>. Default value: <em>BinaryString</em>.</p>
+<p><em>BinaryString</em> corresponds to an ASCII string containing 1s and 0s. <em>HexadecimalString</em>
+contains bit values in ASCII hexadecimal format.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:DREIDINGAtomTypes;34;BinaryString;
+<br/>    Ascending;0010101010101000000000000000000000000000</div>
+<div class="OptionsBox">
+    FingerprintsBitVector;AtomTypesBits:MMFF94AtomTypes;171;BinaryString;
+<br/>    Ascending;1000010101000000000001100000000000000001010000101000000000000
+<br/>    00000000000000000000000000000000000001000000000000000000000000000000000
+<br/>    0000000000000000000000000000000000000000000</div>
+</dd>
+<dt><strong><strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em></strong></dt>
+<dd>
+<p>This value is <strong>--CompoundIDMode</strong> specific and indicates how compound ID is generated.</p>
+<p>For <em>DataField</em> value of <strong>--CompoundIDMode</strong> option, it corresponds to datafield label name
+whose value is used as compound ID; otherwise, it's a prefix string used for generating compound
+IDs like LabelPrefixString&lt;Number&gt;. Default value, <em>Cmpd</em>, generates compound IDs which
+look like Cmpd&lt;Number&gt;.</p>
+<p>Examples for <em>DataField</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The value specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--CompoundIDLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID column label for FP or CSV/TSV text file(s) used during <em>CompoundID</em> value
+of <strong>--DataFieldsMode</strong> option. Default: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--CompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs and write to FP or CSV/TSV text file(s) along with generated
+fingerprints for <em>FP | text | all</em> values of <strong>--output</strong> option: use a <em>SDFile(s)</em> datafield value;
+use molname line from <em>SDFile(s)</em>; generate a sequential ID with specific prefix; use combination
+of both MolName and LabelPrefix with usage of LabelPrefix values for empty molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--CompoundIDMode</strong>, molname line in <em>SDFile(s)</em> takes
+precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DataFieldsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,...&quot;</em></strong></dt>
+<dd>
+<p>Comma delimited list of <em>SDFiles(s)</em> data fields to extract and write to CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DataFieldsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    Extreg
+<br/>    MolID,CompoundName</div>
+</dd>
+<dt><strong><strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data fields in <em>SDFile(s)</em> are transferred to output CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option: transfer all SD
+data field; transfer SD data files common to all compounds; extract specified data fields;
+generate a compound ID using molname line, a compound prefix, or a combination of both.
+Possible values: <em>All | Common | specify | CompoundID</em>. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>-f, --Filter</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to check and filter compound data in SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>Yes</em>.</p>
+<p>By default, compound data is checked before calculating fingerprints and compounds containing
+atom data corresponding to non-element symbols or no atom data are ignored.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em></strong></dt>
+<dd>
+<p>Specify how fingerprints label is generated in conjunction with <strong>--FingerprintsLabel</strong> option value:
+use fingerprints label generated only by <strong>--FingerprintsLabel</strong> option value or append atom type
+value IDs to <strong>--FingerprintsLabel</strong> option value.</p>
+<p>Possible values: <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>. Default value:
+<em>FingerprintsLabelOnly</em>.</p>
+<p>This option is only used for <em>FixedSize</em> value of <strong>-e, --AtomTypesSetToUse</strong> option during
+generation of <em>AtomTypesCount</em> fingerprints and ignored for <em>AtomTypesBits</em>.</p>
+<p>Atom type IDs appended to <strong>--FingerprintsLabel</strong> value during <em>FingerprintsLabelWithIDs</em>
+values of <strong>--FingerprintsLabelMode</strong> correspond to fixed number of previously defined
+atom types.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>SD data label or text file column label to use for fingerprints string in output SD or
+CSV/TSV text file(s) specified by <strong>--output</strong>. Default value: <em>AtomTypesFingerprints</em>.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-i, --IgnoreHydrogens</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Ignore hydrogens during fingerprints generation. Possible values: <em>Yes or No</em>.
+Default value: <em>Yes</em>.</p>
+<p>For <em>yes</em> value of <strong>-i, --IgnoreHydrogens</strong>, any explicit hydrogens are also used for
+generation of atom type fingerprints; implicit hydrogens are still ignored.</p>
+</dd>
+<dt><strong><strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Generate fingerprints for only the largest component in molecule. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+<p>For molecules containing multiple connected components, fingerprints can be generated
+in two different ways: use all connected components or just the largest connected
+component. By default, all atoms except for the largest connected component are
+deleted before generation of fingerprints.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>AtomTypesCount | AtomTypesBits</em></strong></dt>
+<dd>
+<p>Specify type of atom types fingerprints to generate for molecules in <em>SDFile(s)</em>.
+Possible values: <em>AtomTypesCount or AtomTypesBits</em>. Default value: <em>AtomTypesCount</em>.</p>
+<p>For <em>AtomTypesCount</em> values of <strong>-m, --mode</strong> option, a fingerprint vector string is generated.
+The vector string corresponding to <em>AtomTypesCount</em> contains count of atom types.</p>
+<p>For <em>AtomTypesBits</em> value of <strong>-m, --mode</strong> option, a fingerprint bit-vector string containing
+zeros and ones indicating presence or absence of atom types is generated.</p>
+<p>For <em>AtomTypesCount</em> atom types fingerprints, two types of atom types set size can be specified
+using <strong>-a, --AtomTypesSetToUse</strong> option: <em>ArbitrarySize or FixedSize</em>. <em>ArbitrarySize</em> corrresponds
+to only atom types detected in molecule; <em>FixedSize</em> corresponds to fixed number of atom types
+previously defined.</p>
+<p>For <em>AtomTypesBits</em> atom types fingeprints, only <em>FixedSize</em> is allowed.</p>
+<p>Combination of <strong>-m, --Mode</strong> and <strong>--AtomTypesSetToUse</strong> along with <strong>-a, --AtomtomIdentifierType</strong>
+allows generation of following different atom types fingerprints:</p>
+<div class="OptionsBox">
+    Mode                  AtomIdentifierType           AtomTypesSetToUse</div>
+<div class="OptionsBox">
+    AtomTypesCount        AtomicInvariantsAtomTypes    ArbitrarySize [ Default ]</div>
+<div class="OptionsBox">
+    AtomTypesCount        DREIDINGAtomTypes            ArbitrarySize
+<br/>    AtomTypesCount        DREIDINGAtomTypes            FixedSize
+<br/>    AtomTypesBits         DREIDINGAtomTypes            FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        EStateAtomTypes              ArbitrarySize
+<br/>    AtomTypesCount        EStateAtomTypes              FixedSize
+<br/>    AtomTypesBits         EStateAtomTypes              FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        FunctionalClassAtomTypes    ArbitrarySize</div>
+<div class="OptionsBox">
+    AtomTypesCount        MMFF94AtomTypes              ArbitrarySize
+<br/>    AtomTypesCount        MMFF94AtomTypes              FixedSize
+<br/>    AtomTypesBits         MMFF94AtomTypes              FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        SLogPAtomTypes               ArbitrarySize
+<br/>    AtomTypesCount        SLogPAtomTypes               FixedSize
+<br/>    AtomTypesBits         SLogPAtomTypes               FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        SYBYLAtomTypes               ArbitrarySize
+<br/>    AtomTypesCount        SYBYLAtomTypes               FixedSize
+<br/>    AtomTypesBits         SYBYLAtomTypes               FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        TPSAAtomTypes                 FixedSize
+<br/>    AtomTypesBits         TPSAAtomTypes                 FixedSize</div>
+<div class="OptionsBox">
+    AtomTypesCount        UFFAtomTypes                 ArbitrarySize
+<br/>    AtomTypesCount        UFFAtomTypes                 FixedSize
+<br/>    AtomTypesBits         UFFAtomTypes                 FixedSize</div>
+<p>The default is to generate <em>AtomicInvariantAtomTypes</em> fingeprints corresponding to <em>ArbitrarySize</em> as
+value of <strong>--AtomTypesSetToUse</strong> option.</p>
+</dd>
+<dt><strong><strong>--OutDelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Delimiter for output CSV/TSV text file(s). Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>SD | FP | text | all</em></strong></dt>
+<dd>
+<p>Type of output files to generate. Possible values: <em>SD, FP, text, or all</em>. Default value: <em>text</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Put quote around column values in output CSV/TSV text file(s). Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>RootName</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file
+names: &lt;SDFileName&gt;&lt;AtomTypesFP&gt;.&lt;Ext&gt;. The file type determines &lt;Ext&gt; value.
+The sdf, fpf, csv, and tsv &lt;Ext&gt; values are used for SD, FP, comma/semicolon, and tab
+delimited text files, respectively.This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-v, --VectorStringFormat</strong> <em>ValuesString | IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em></strong></dt>
+<dd>
+<p>Format of fingerprints vector string data in output SD, FP or CSV/TSV text file(s) specified by
+<strong>--output</strong> used during &lt;AtomTypesCount&gt; value of <strong>-m, --mode</strong> option. Possible values:
+<em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString |
+ValuesAndIDsPairsString</em>.</p>
+<p>Default value during <em>ArbitrarySize</em> value of <strong>-e, --AtomTypesSetToUse</strong>
+option: <em>IDsAndValuesString</em>. Default value during <em>FixedSize</em> value of
+<strong>-e, --AtomTypesSetToUse</strong> option: <em>ValuesString</em>.</p>
+<p>Example of <em>SD</em> file containing atom types fingerprints string data:</p>
+<div class="OptionsBox">
+    ... ...
+<br/>    ... ...
+<br/>    $$$$
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...
+<br/>    41 44  0  0  0  0  0  0  0  0999 V2000
+     -3.3652    1.4499    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+<br/>    ... ...
+<br/>    2  3  1  0  0  0  0
+<br/>    ... ...
+<br/>    M  END
+<br/>    &gt;  &lt;CmpdID&gt;
+<br/>    Cmpd1</div>
+<div class="OptionsBox">
+    &gt;  &lt;AtomTypesFingerprints&gt;
+<br/>    FingerprintsVector;AtomTypesCount:AtomicInvariantsAtomTypes:ArbitrarySi
+<br/>    ze;10;NumericalValues;IDsAndValuesString;C.X1.BO1.H3 C.X2.BO2.H2 C.X2.B
+<br/>    O3.H1 C.X3.BO3.H1 C.X3.BO4 F.X1.BO1 N.X2.BO2.H1 N.X3.BO3 O.X1.BO1.H1 O.
+<br/>    X1.BO2;2 4 14 3 10 1 1 1 3 2</div>
+<div class="OptionsBox">
+    $$$$
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Example of <em>FP</em> file containing atom types fingerprints string data:</p>
+<div class="OptionsBox">
+    #
+<br/>    # Package = MayaChemTools 7.4
+<br/>    # Release Date = Oct 21, 2010
+<br/>    #
+<br/>    # TimeStamp = Fri Mar 11 14:28:07 2011
+<br/>    #
+<br/>    # FingerprintsStringType = FingerprintsVector
+<br/>    #
+<br/>    # Description = AtomTypesCount:AtomicInvariantsAtomTypes:ArbitrarySize
+<br/>    # VectorStringFormat = IDsAndValuesString
+<br/>    # VectorValuesType = NumericalValues
+<br/>    #
+<br/>    Cmpd1 10;C.X1.BO1.H3 C.X2.BO2.H2 C.X2.BO3.H1 C.X3.BO3.H1 C.X3.BO4 F...
+<br/>    Cmpd2 9;C.X1.BO1.H3 C.X2.BO2.H2 C.X3.BO3.H1 C.X3.BO4 N.X1.BO1.H2 N....
+<br/>    ... ...
+<br/>    ... ..</div>
+<p>Example of CSV <em>Text</em> file atom types containing fingerprints string data:</p>
+<div class="OptionsBox">
+    &quot;CompoundID&quot;,&quot;AtomTypesFingerprints&quot;
+<br/>    &quot;Cmpd1&quot;,&quot;FingerprintsVector;AtomTypesCount:AtomicInvariantsAtomTypes:Ar
+<br/>    bitrarySize;10;NumericalValues;IDsAndValuesString;C.X1.BO1.H3 C.X2.BO2.
+<br/>    H2 C.X2.BO3.H1 C.X3.BO3.H1 C.X3.BO4 F.X1.BO1 N.X2.BO2.H1 N.X3.BO3 O.X1.
+<br/>    BO1.H1 O.X1.BO2;2 4 14 3 10 1 1 1 3 2&quot;
+<br/>    O.X1.BO2;3 3 6 3 1 1 2 2 2&quot;
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:EStateAtomTypes:ArbitrarySize;11;Num
+<br/>    ericalValues;IDsAndValuesString;aaCH aasC aasN dO dssC sCH3 sF sOH ssC
+<br/>    H2 ssNH sssCH;14 8 1 2 2 2 1 3 4 1 3</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SYBYLAtomTypes:ArbitrarySize;9;Numer
+<br/>    icalValues;IDsAndValuesString;C.2 C.3 C.ar F N.am N.ar O.2 O.3 O.co2;2
+<br/>    9 22 1 1 1 1 2 2</div>
+<div class="OptionsBox">
+    FingerprintsVector;AtomTypesCount:SYBYLAtomTypes:FixedSize;44;OrderedN
+<br/>    umericalValues;IDsAndValuesString;C.3 C.2 C.1 C.ar C.cat N.3 N.2 N.1 N
+<br/>    .ar N.am N.pl3 N.4 O.3 O.2 O.co2 S.3 S.2 S.o S.o2 P.3 F Cl Br I ANY HA
+<br/>    L HET Li Na Mg Al Si K Ca Cr.th Cr.oh Mn Fe Co.oh Cu Zn Se Mo Sn;9 2 0
+<br/>    22 0 0 0 0 1 1 0 0 2 1 2 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<br/>    0 0 0 0 0 0 0</div>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>DirName</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To generate atomic invariants atom types count fingerprints of arbitrary size in vector
+string format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -r SampleATFP -o Sample.sdf</div>
+<p>To generate functional class atom types count fingerprints of arbitrary size in vector
+string format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a FunctionalClassAtomTypes
+      -r SampleATFP -o Sample.sdf</div>
+<p>To generate E-state atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a EStateAtomTypes
+      --AtomTypesSetToUse ArbitrarySize -r SampleATFP -o Sample.sdf</div>
+<p>To generate E-state atom types count fingerprints of fixed size in vector string
+with IDsAndValues format and create a SampleATFP.csv file containing sequential
+compound IDs along with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a EStateAtomTypes
+      --AtomTypesSetToUse FixedSize -v IDsAndValuesString
+      -r SampleATFP -o Sample.sdf</div>
+<p>To generate E-state atom types bits fingerprints of fixed size in bit-vector string
+format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesBits -a EStateAtomTypes
+      --AtomTypesSetToUse FixedSize -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --AtomTypesSetToUse ArbitrarySize -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of fixed size in vector string
+format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --AtomTypesSetToUse FixedSize -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of fixed size in vector string
+with IDsAndValues format and create a SampleATFP.csv file containing sequential
+compound IDs along with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --AtomTypesSetToUse FixedSize -v IDsAndValuesString
+      -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types bits fingerprints of fixed size in bit-vector string
+format and create a SampleATFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesBits -a MMFF94AtomTypes
+      --AtomTypesSetToUse FixedSize -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing compound ID from molecule
+name line along with fingerprints vector strings data, type</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --DataFieldsMode CompoundID --CompoundIDMode MolName
+      -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing compound IDs using specified
+data field along with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --DataFieldsMode CompoundID --CompoundIDMode DataField --CompoundID
+      Mol_ID -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing compound ID using combination
+of molecule name line and an explicit compound prefix along with fingerprints vector
+strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --DataFieldsMode CompoundID --CompoundIDMode MolnameOrLabelPrefix
+      --CompoundID Cmpd --CompoundIDLabel MolID -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing specific data fields columns along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+      --DataFieldsMode Specify --DataFields Mol_ID -r SampleATFP
+      -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create a SampleATFP.csv file containing common data fields columns along
+with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+     --DataFieldsMode Common -r SampleATFP -o Sample.sdf</div>
+<p>To generate MMFF94 atom types count fingerprints of arbitrary size in vector string
+format and create SampleATFP.sdf,  SampleATFP.fpf and  SampleATFP.csv files containing
+all data fields columns in CSV file along with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % AtomTypesFingerprints.pl -m AtomTypesCount -a MMFF94AtomTypes
+     --DataFieldsMode All --output all -r SampleATFP -o Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoFingerprintsFiles.html">InfoFingerprintsFiles.pl</a>,&nbsp<a href="./SimilarityMatricesFingerprints.html">SimilarityMatricesFingerprints.pl</a>,&nbsp<a href="./AtomNeighborhoodsFingerprints.html">AtomNeighborhoodsFingerprints.pl</a>,&nbsp
+<a href="./ExtendedConnectivityFingerprints.html">ExtendedConnectivityFingerprints.pl</a>,&nbsp<a href="./MACCSKeysFingeprints.html">MACCSKeysFingeprints.pl</a>,&nbsp<a href="./PathLengthFingerprints.html">PathLengthFingerprints.pl</a>,&nbsp
+<a href="./TopologicalAtomPairsFingerprints.html">TopologicalAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalAtomTorsionsFingerprints.html">TopologicalAtomTorsionsFingerprints.pl</a>,&nbsp
+<a href="./TopologicalPharmacophoreAtomPairsFingerprints.html">TopologicalPharmacophoreAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html">TopologicalPharmacophoreAtomTripletsFingerprints.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./AtomNeighborhoodsFingerprints.html" title="AtomNeighborhoodsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./CalculatePhysicochemicalProperties.html" title="CalculatePhysicochemicalProperties.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AtomTypesFingerprints.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

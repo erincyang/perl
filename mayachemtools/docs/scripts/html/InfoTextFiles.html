@@ -1,0 +1,141 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:InfoTextFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoSequenceFiles.html" title="InfoSequenceFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./JoinSDFiles.html" title="JoinSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>InfoTextFiles.pl</strong></td><td width="33%" align="right"><a href="././code/InfoTextFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/InfoTextFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/InfoTextFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/InfoTextFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/InfoTextFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>InfoTextFiles.pl - List information about TextFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>InfoTextFiles.pl TextFile(s)...</p>
+<p>InfoTextFiles.pl [<strong>-a, --all</strong>] [<strong>-c, --count</strong>] [<strong>--datacheck</strong>] [<strong>-d, --detail</strong> infolevel] [<strong>-e, --empty</strong>]
+[<strong>-h, --help</strong>] [<strong>--indelim</strong> comma | semicolon] [<strong>-m, --mode</strong> colnum | collabel]
+[<strong>-n, --numericaldatacols</strong> colnum,[colnum,...] | collabel,[collabel,...]]
+[<strong>-w, --workingdir</strong> dirname] TextFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>List information about <em>TextFile(s)</em> contents: number of lines and columns, empty
+column values, and so on. The file names are separated by spaces.
+The valid file extensions are <em>.csv</em> and <em>.tsv</em> for comma/semicolon and tab delimited
+text files respectively. All other file names are ignored. All the text files in a
+current directory can be specified by <em>*.csv</em>, <em>*.tsv</em>, or the current directory
+name. The <strong>--indelim</strong> option determines the format of <em>TextFile(s)</em>. Any file
+which doesn't correspond to the format indicated by <strong>--indelim</strong> option is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-a, --all</strong></strong></dt>
+<dd>
+<p>List all the available information.</p>
+</dd>
+<dt><strong><strong>-c, --count</strong></strong></dt>
+<dd>
+<p>List number of rows and columns. This is <strong>default behavior</strong>.</p>
+</dd>
+<dt><strong><strong>--datacheck</strong></strong></dt>
+<dd>
+<p>List number of numerical and non-numerical values for each column.</p>
+</dd>
+<dt><strong><strong>-d, --detail</strong> <em>infolevel</em></strong></dt>
+<dd>
+<p>Level of information to print about lines being ignored. Default: <em>1</em>. Possible values:
+<em>1, 2 or 3</em>.</p>
+</dd>
+<dt><strong><strong>-e, --empty</strong></strong></dt>
+<dd>
+<p>List number of empty row and column values.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>Specify how to identify numerical data columns: using column number or column label.
+Possible values: <em>colnum or collabel</em>. Default value: <em>colnum</em>.</p>
+</dd>
+<dt><strong><strong>-n, --numericaldatacols</strong> <em>colnum,[colnum,...] | collabel,[collabel,...]</em></strong></dt>
+<dd>
+<p>This value is mode specific. It is a list of column number or labels to check for
+presence of numerical data only; otherwise, the value is flagged. Default value: <em>all;all;...</em>.</p>
+<p>For <em>colnum</em> mode, input value format is: <em>colnum,...;colnum,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    1,3,5
+<br/>    &quot;2,4,6&quot;</div>
+<p>For <em>collabel</em> mode, input value format is: <em>collabel,...;collabel,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;MW,SumNO,SumNHOH&quot;</div>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To count number of lines and columns in Text file(s), type:</p>
+<div class="ExampleBox">
+    % InfoTextFiles.pl Sample1.csv
+    <br/>% InfoTextFiles.pl Sample1.csv Sample1.tsv
+    <br/>% InfoTextFiles.pl *.csv *.tsv</div>
+<p>To count number of lines, columns and empty values in Sample1.csv file and print
+detailed information, type:</p>
+<div class="ExampleBox">
+    % InfoTextFiles.pl -d 3 -e Sample1.csv</div>
+<p>To track all available information and non-numerical values for Mol_ID and MolWeight
+columns in Sample1.csv file and print detailed information, type:</p>
+<div class="ExampleBox">
+    % InfoTextFiles.pl -d 3 -a -m collabel -n Mol_ID,MolWeight Sample1.csv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>,&nbsp<a href="./SplitTextFiles.html">SplitTextFiles.pl</a>,&nbsp<a href="./TextFilesToHTML.html">TextFilesToHTML.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./InfoSequenceFiles.html" title="InfoSequenceFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./JoinSDFiles.html" title="JoinSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>InfoTextFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

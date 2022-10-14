@@ -1,0 +1,636 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:TopologicalPharmacophoreAtomPairsFingerprints.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TopologicalAtomTripletsFingerprints.html" title="TopologicalAtomTripletsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html" title="TopologicalPharmacophoreAtomTripletsFingerprints.html">Next</a></td><td width="34%" align="middle"><strong>TopologicalPharmacophoreAtomPairsFingerprints.pl</strong></td><td width="33%" align="right"><a href="././code/TopologicalPharmacophoreAtomPairsFingerprints.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/TopologicalPharmacophoreAtomPairsFingerprints.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/TopologicalPharmacophoreAtomPairsFingerprints.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/TopologicalPharmacophoreAtomPairsFingerprints.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/TopologicalPharmacophoreAtomPairsFingerprints.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>TopologicalPharmacophoreAtomPairsFingerprints.pl - Generate topological pharmacophore atom pairs fingerprints for SD files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>TopologicalPharmacophoreAtomPairsFingerprints.pl SDFile(s)...</p>
+<p>TopologicalPharmacophoreAtomPairsFingerprints.pl  [<strong>--AromaticityModel</strong> <em>AromaticityModelType</em>]
+[<strong>--AtomPairsSetSizeToUse</strong> <em>ArbitrarySize | FixedSize</em>]
+[<strong>-a, --AtomTypesToUse</strong> <em>&quot;AtomType1, AtomType2...&quot;</em>]
+[<strong>--AtomTypesWeight</strong> <em>&quot;AtomType1, Weight1, AtomType2, Weight2...&quot;</em>]
+[<strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em>] [<strong>--CompoundIDLabel</strong> <em>text</em>]
+[<strong>--CompoundIDMode</strong>] [<strong>--DataFields</strong> <em>&quot;FieldLabel1, FieldLabel2,...&quot;</em>]
+[<strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em>] [<strong>-f, --Filter</strong> <em>Yes | No</em>]
+[<strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>] [<strong>--FingerprintsLabel</strong> <em>text</em>]
+[<strong>--FuzzifyAtomPairsCount</strong> <em>Yes | No</em>] [<strong>--FuzzificationMode</strong> <em>FuzzyBinning | FuzzyBinSmoothing</em>]
+[<strong>--FuzzificationMethodology</strong> <em>FuzzyBinning | FuzzyBinSmoothing</em>] [<strong>--FuzzFactor</strong> <em>number</em>]
+[<strong>-h, --help</strong>] [<strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em>] [<strong>--MinDistance</strong> <em>number</em>]
+[<strong>--MaxDistance</strong> <em>number</em>] [<strong>-n, --NormalizationMethodology</strong> <em>None | ByHeavyAtomsCount | ByAtomTypesCount</em>]
+[<strong>--OutDelim</strong> <em>comma | tab | semicolon</em>] [<strong>--output</strong> <em>SD | FP | text | all</em>] [<strong>-o, --overwrite</strong>]
+[<strong>-q, --quote</strong> <em>Yes | No</em>] [<strong>-r, --root</strong> <em>RootName</em>] [<strong>--ValuesPrecision</strong> <em>number</em>]
+[<strong>-v, --VectorStringFormat</strong> <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em>]
+[<strong>-w, --WorkingDir</strong> dirname] SDFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Generate topological pharmacophore atom pairs fingerprints [ Ref 60-62, Ref 65, Ref 68 ] for
+<em>SDFile(s)</em> and create appropriate SD, FP or CSV/TSV text file(s) containing fingerprints vector
+strings corresponding to molecular fingerprints.</p>
+<p>Multiple SDFile names are separated by spaces. The valid file extensions are <em>.sdf</em>
+and <em>.sd</em>. All other file names are ignored. All the SD files in a current directory
+can be specified either by <em>*.sdf</em> or the current directory name.</p>
+<p>Based on the values specified for <strong>--AtomTypesToUse</strong>, pharmacophore atom types are
+assigned to all non-hydrogen atoms in a molecule and a distance matrix is generated.
+A pharmacophore atom pairs basis set is initialized for all unique possible pairs within
+<strong>--MinDistance</strong> and <strong>--MaxDistance</strong> range.</p>
+<div class="OptionsBox">
+    Let:</div>
+<div class="OptionsBox">
+    P = Valid pharmacophore atom type</div>
+<div class="OptionsBox">
+    Px = Pharmacophore atom type x
+<br/>    Py = Pharmacophore atom type y</div>
+<div class="OptionsBox">
+    Dmin = Minimum distance corresponding to number of bonds between
+           two atoms
+<br/>    Dmax = Maximum distance corresponding to number of bonds between
+           two atoms
+<br/>    D = Distance corresponding to number of bonds between two atoms</div>
+<div class="OptionsBox">
+    Px-Dn-Py = Pharmacophore atom pair ID for atom types Px and Py at
+               distance Dn</div>
+<div class="OptionsBox">
+    P = Number of pharmacophore atom types to consider
+<br/>    PPDn = Number of possible unique pharmacophore atom pairs at a distance Dn</div>
+<div class="OptionsBox">
+    PPT = Total number of possible pharmacophore atom pairs at all distances
+          between Dmin and Dmax</div>
+<div class="OptionsBox">
+    Then:</div>
+<div class="OptionsBox">
+    PPD =  (P * (P - 1))/2 + P</div>
+<div class="OptionsBox">
+    PPT = ((Dmax - Dmin) + 1) * ((P * (P - 1))/2 + P)
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        = ((Dmax - Dmin) + 1) * PPD</div>
+<div class="OptionsBox">
+    So for default values of Dmin = 1, Dmax = 10 and P = 5,</div>
+<div class="OptionsBox">
+    PPD =  (5 * (5 - 1))/2 + 5 = 15
+<br/>    PPT = ((10 - 1) + 1) * 15 = 150</div>
+<div class="OptionsBox">
+    The pharmacophore atom pairs bais set includes 150 values.</div>
+<div class="OptionsBox">
+    The atom pair IDs correspond to:</div>
+<div class="OptionsBox">
+    Px-Dn-Py = Pharmacophore atom pair ID for atom types Px and Py at
+               distance Dn</div>
+<div class="OptionsBox">
+    For example: H-D1-H, H-D2-HBA, PI-D5-PI and so on</div>
+<p>Using distance matrix and pharmacohore atom types, occurrence of unique pharmacohore atom
+pairs is counted. The contribution of each atom type to atom pair interaction is optionally
+weighted by specified <strong>--AtomTypesWeight</strong> before assigning its count to appropriate distance
+bin. Based on <strong>--NormalizationMethodology</strong> option, pharmacophore atom pairs count is optionally
+normalized. Additionally, pharmacohore atom pairs count is optionally fuzzified before or after
+the normalization controlled by values of <strong>--FuzzifyAtomPairsCount</strong>, <strong>--FuzzificationMode</strong>,
+<strong>--FuzzificationMethodology</strong> and <strong>--FuzzFactor</strong> options.</p>
+<p>The final pharmacophore atom pairs count along with atom pair identifiers involving all non-hydrogen
+atoms, with optional normalization and fuzzification, constitute pharmacophore topological atom pairs
+fingerprints of the molecule.</p>
+<p>For <em>ArbitrarySize</em> value of <strong>--AtomPairsSetSizeToUse</strong> option, the fingerprint vector correspond to
+only those topological pharmacophore atom pairs which are present and have non-zero count. However,
+for <em>FixedSize</em> value of <strong>--AtomPairsSetSizeToUse</strong> option, the fingerprint vector contains all possible
+valid topological pharmacophore atom pairs with both zero and non-zero count values.</p>
+<p>Example of <em>SD</em> file containing topological pharmacophore atom pairs fingerprints string data:</p>
+<div class="OptionsBox">
+    ... ...
+<br/>    ... ...
+<br/>    $$$$
+<br/>    ... ...
+<br/>    ... ...
+<br/>    ... ...
+<br/>    41 44  0  0  0  0  0  0  0  0999 V2000
+     -3.3652    1.4499    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+<br/>    ... ...
+<br/>    2  3  1  0  0  0  0
+<br/>    ... ...
+<br/>    M  END
+<br/>    &gt;  &lt;CmpdID&gt;
+<br/>    Cmpd1</div>
+<div class="OptionsBox">
+    &gt;  &lt;TopologicalPharmacophoreAtomPairsFingerprints&gt;
+<br/>    FingerprintsVector;TopologicalPharmacophoreAtomPairs:ArbitrarySize:Min
+<br/>    Distance1:MaxDistance10;54;NumericalValues;IDsAndValuesString;H-D1-H H
+<br/>    -D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA H-D2-HBD HBA-D2-HBA HBA-D2-
+<br/>    HBD H-D3-H H-D3-HBA H-D3-HBD H-D3-NI HBA-D3-NI HBD-D3-NI H-D4-H H-D...;
+<br/>    18 1 2 1 22 12 8 1 2 18 6 3 1 1 1 22 13 6 5 7 2 28 9 5 1 1 1 36 16 10 3
+<br/>    4 1 37 10 8 1 35 10 9 3 3 1 28 7 7 4 18 16 12 5 1 2 1</div>
+<div class="OptionsBox">
+    $$$$
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>Example of <em>FP</em> file containing topological pharmacophore atom pairs fingerprints string data:</p>
+<div class="OptionsBox">
+    #
+<br/>    # Package = MayaChemTools 7.4
+<br/>    # Release Date = Oct 21, 2010
+<br/>    #
+<br/>    # TimeStamp = Fri Mar 11 15:32:48 2011
+<br/>    #
+<br/>    # FingerprintsStringType = FingerprintsVector
+<br/>    #
+<br/>    # Description = TopologicalPharmacophoreAtomPairs:ArbitrarySize:MinDistance1:MaxDistance10
+<br/>    # VectorStringFormat = IDsAndValuesString
+<br/>    # VectorValuesType = NumericalValues
+<br/>    #
+<br/>    Cmpd1 54;H-D1-H H-D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA...;18 1 2...
+<br/>    Cmpd2 61;H-D1-H H-D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA...;5 1 2 ...
+<br/>    ... ...
+<br/>    ... ..</div>
+<p>Example of CSV <em>Text</em> file containing topological pharmacophore atom pairs fingerprints string data:</p>
+<div class="OptionsBox">
+    &quot;CompoundID&quot;,&quot;TopologicalPharmacophoreAtomPairsFingerprints&quot;
+<br/>    &quot;Cmpd1&quot;,&quot;FingerprintsVector;TopologicalPharmacophoreAtomPairs:Arbitrary
+<br/>    Size:MinDistance1:MaxDistance10;54;NumericalValues;IDsAndValuesString;H
+<br/>    -D1-H H-D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA H-D2-HBD HBA-D2-HBA H
+<br/>    BA-D2-HBD H-D3-H H-D3-HBA H-D3-HBD H-D3-NI HBA-D3-NI HBD-D3-NI H-D4...;
+<br/>    18 1 2 1 22 12 8 1 2 18 6 3 1 1 1 22 13 6 5 7 2 28 9 5 1 1 1 36 16 10 3
+<br/>    4 1 37 10 8 1 35 10 9 3 3 1 28 7 7 4 18 16 12 5 1 2 1&quot;
+<br/>    ... ...
+<br/>    ... ...</div>
+<p>The current release of MayaChemTools generates the following types of topological pharmacophore
+atom pairs fingerprints vector strings:</p>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:ArbitrarySize:Min
+<br/>    Distance1:MaxDistance10;54;NumericalValues;IDsAndValuesString;H-D1-H H
+<br/>    -D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA H-D2-HBD HBA-D2-HBA HBA-D2-
+<br/>    HBD H-D3-H H-D3-HBA H-D3-HBD H-D3-NI HBA-D3-NI HBD-D3-NI H-D4-H H-D4-H
+<br/>    BA H-D4-HBD HBA-D4-HBA HBA-D4-HBD HBD-D4-HBD H-D5-H H-D5-HBA H-D5-...;
+<br/>    18 1 2 1 22 12 8 1 2 18 6 3 1 1 1 22 13 6 5 7 2 28 9 5 1 1 1 36 16 10
+<br/>    3 4 1 37 10 8 1 35 10 9 3 3 1 28 7 7 4 18 16 12 5 1 2 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:FixedSize:MinDist
+<br/>    ance1:MaxDistance10;150;OrderedNumericalValues;ValuesString;18 0 0 1 0
+<br/>    0 0 2 0 0 1 0 0 0 0 22 12 8 0 0 1 2 0 0 0 0 0 0 0 0 18 6 3 1 0 0 0 1
+<br/>    0 0 1 0 0 0 0 22 13 6 0 0 5 7 0 0 2 0 0 0 0 0 28 9 5 1 0 0 0 1 0 0 1 0
+<br/>    0 0 0 36 16 10 0 0 3 4 0 0 1 0 0 0 0 0 37 10 8 0 0 0 0 1 0 0 0 0 0 0
+<br/>    0 35 10 9 0 0 3 3 0 0 1 0 0 0 0 0 28 7 7 4 0 0 0 0 0 0 0 0 0 0 0 18...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:FixedSize:MinDist
+<br/>    ance1:MaxDistance10;150;OrderedNumericalValues;IDsAndValuesString;H-D1
+<br/>    -H H-D1-HBA H-D1-HBD H-D1-NI H-D1-PI HBA-D1-HBA HBA-D1-HBD HBA-D1-NI H
+<br/>    BA-D1-PI HBD-D1-HBD HBD-D1-NI HBD-D1-PI NI-D1-NI NI-D1-PI PI-D1-PI H-D
+<br/>    2-H H-D2-HBA H-D2-HBD H-D2-NI H-D2-PI HBA-D2-HBA HBA-D2-HBD HBA-D2...;
+<br/>    18 0 0 1 0 0 0 2 0 0 1 0 0 0 0 22 12 8 0 0 1 2 0 0 0 0 0 0 0 0 18 6 3
+<br/>    1 0 0 0 1 0 0 1 0 0 0 0 22 13 6 0 0 5 7 0 0 2 0 0 0 0 0 28 9 5 1 0 0 0
+<br/>    1 0 0 1 0 0 0 0 36 16 10 0 0 3 4 0 0 1 0 0 0 0</div>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>--AromaticityModel</strong> <em>MDLAromaticityModel | TriposAromaticityModel | MMFFAromaticityModel | ChemAxonBasicAromaticityModel | ChemAxonGeneralAromaticityModel | DaylightAromaticityModel | MayaChemToolsAromaticityModel</em></strong></dt>
+<dd>
+<p>Specify aromaticity model to use during detection of aromaticity. Possible values in the current
+release are: <em>MDLAromaticityModel, TriposAromaticityModel, MMFFAromaticityModel,
+ChemAxonBasicAromaticityModel, ChemAxonGeneralAromaticityModel, DaylightAromaticityModel
+or MayaChemToolsAromaticityModel</em>. Default value: <em>MayaChemToolsAromaticityModel</em>.</p>
+<p>The supported aromaticity model names along with model specific control parameters
+are defined in <strong>AromaticityModelsData.csv</strong>, which is distributed with the current release
+and is available under <strong>lib/data</strong> directory. <strong>Molecule.pm</strong> module retrieves data from
+this file during class instantiation and makes it available to method <strong>DetectAromaticity</strong>
+for detecting aromaticity corresponding to a specific model.</p>
+</dd>
+<dt><strong><strong>--AtomPairsSetSizeToUse</strong> <em>ArbitrarySize | FixedSize</em></strong></dt>
+<dd>
+<p>Atom pairs set size to use during generation of topological pharmacophore atom pairs
+fingerprints.</p>
+<p>Possible values: <em>ArbitrarySize | FixedSize</em>; Default value: <em>ArbitrarySize</em>.</p>
+<p>For <em>ArbitrarySize</em> value of <strong>--AtomPairsSetSizeToUse</strong> option, the fingerprint vector
+correspond to only those topological pharmacophore atom pairs which are present and
+have non-zero count. However, for <em>FixedSize</em> value of <strong>--AtomPairsSetSizeToUse</strong>
+option, the fingerprint vector contains all possible valid topological pharmacophore atom
+pairs with both zero and non-zero count values.</p>
+</dd>
+<dt><strong><strong>-a, --AtomTypesToUse</strong> <em>&quot;AtomType1,AtomType2,...&quot;</em></strong></dt>
+<dd>
+<p>Pharmacophore atom types to use during generation of topological phramacophore
+atom pairs. It's a list of comma separated valid pharmacophore atom types.</p>
+<p>Possible values for pharmacophore atom types are: <em>Ar, CA, H, HBA, HBD, Hal, NI, PI, RA</em>.
+Default value [ Ref 60-62 ] : <em>HBD,HBA,PI,NI,H</em>.</p>
+<p>The pharmacophore atom types abbreviations correspond to:</p>
+<div class="OptionsBox">
+    HBD: HydrogenBondDonor
+<br/>    HBA: HydrogenBondAcceptor
+<br/>    PI :  PositivelyIonizable
+<br/>    NI : NegativelyIonizable
+<br/>    Ar : Aromatic
+<br/>    Hal : Halogen
+<br/>    H : Hydrophobic
+<br/>    RA : RingAtom
+<br/>    CA : ChainAtom</div>
+<p><em>AtomTypes::FunctionalClassAtomTypes</em> module is used to assign pharmacophore atom
+types. It uses following definitions [ Ref 60-61, Ref 65-66 ]:</p>
+<div class="OptionsBox">
+    HydrogenBondDonor: NH, NH2, OH
+<br/>    HydrogenBondAcceptor: N[!H], O
+<br/>    PositivelyIonizable: +, NH2
+<br/>    NegativelyIonizable: -, C(=O)OH, S(=O)OH, P(=O)OH</div>
+</dd>
+<dt><strong><strong>--AtomTypesWeight</strong> <em>&quot;AtomType1,Weight1,AtomType2,Weight2...&quot;</em></strong></dt>
+<dd>
+<p>Weights of specified pharmacophore atom types to use during calculation of their contribution
+to atom pair count. Default value: <em>None</em>. Valid values: real numbers greater than 0. In general
+it's comma delimited list of valid atom type and its weight.</p>
+<p>The weight values allow to increase the importance of specific pharmacophore atom type
+in the generated fingerprints. A weight value of 0 for an atom type eliminates its contribution to
+atom pair count where as weight value of 2 doubles its contribution.</p>
+</dd>
+<dt><strong><strong>--CompoundID</strong> <em>DataFieldName or LabelPrefixString</em></strong></dt>
+<dd>
+<p>This value is <strong>--CompoundIDMode</strong> specific and indicates how compound ID is generated.</p>
+<p>For <em>DataField</em> value of <strong>--CompoundIDMode</strong> option, it corresponds to datafield label name
+whose value is used as compound ID; otherwise, it's a prefix string used for generating compound
+IDs like LabelPrefixString&lt;Number&gt;. Default value, <em>Cmpd</em>, generates compound IDs which
+look like Cmpd&lt;Number&gt;.</p>
+<p>Examples for <em>DataField</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    MolID
+<br/>    ExtReg</div>
+<p>Examples for <em>LabelPrefix</em> or <em>MolNameOrLabelPrefix</em> value of <strong>--CompoundIDMode</strong>:</p>
+<div class="OptionsBox">
+    Compound</div>
+<p>The value specified above generates compound IDs which correspond to Compound&lt;Number&gt;
+instead of default value of Cmpd&lt;Number&gt;.</p>
+</dd>
+<dt><strong><strong>--CompoundIDLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>Specify compound ID column label for CSV/TSV text file(s) used during <em>CompoundID</em> value
+of <strong>--DataFieldsMode</strong> option. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>--CompoundIDMode</strong> <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em></strong></dt>
+<dd>
+<p>Specify how to generate compound IDs and write to FP or CSV/TSV text file(s) along with generated
+fingerprints for <em>FP | text | all</em> values of <strong>--output</strong> option: use a <em>SDFile(s)</em> datafield value;
+use molname line from <em>SDFile(s)</em>; generate a sequential ID with specific prefix; use combination
+of both MolName and LabelPrefix with usage of LabelPrefix values for empty molname lines.</p>
+<p>Possible values: <em>DataField | MolName | LabelPrefix | MolNameOrLabelPrefix</em>.
+Default value: <em>LabelPrefix</em>.</p>
+<p>For <em>MolNameAndLabelPrefix</em> value of <strong>--CompoundIDMode</strong>, molname line in <em>SDFile(s)</em> takes
+precedence over sequential compound IDs generated using <em>LabelPrefix</em> and only empty molname
+values are replaced with sequential compound IDs.</p>
+<p>This is only used for <em>CompoundID</em> value of <strong>--DataFieldsMode</strong> option.</p>
+</dd>
+<dt><strong><strong>--DataFields</strong> <em>&quot;FieldLabel1,FieldLabel2,...&quot;</em></strong></dt>
+<dd>
+<p>Comma delimited list of <em>SDFiles(s)</em> data fields to extract and write to CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option.</p>
+<p>This is only used for <em>Specify</em> value of <strong>--DataFieldsMode</strong> option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    Extreg
+<br/>    MolID,CompoundName</div>
+</dd>
+<dt><strong><strong>-d, --DataFieldsMode</strong> <em>All | Common | Specify | CompoundID</em></strong></dt>
+<dd>
+<p>Specify how data fields in <em>SDFile(s)</em> are transferred to output CSV/TSV text file(s) along
+with generated fingerprints for <em>text | all</em> values of <strong>--output</strong> option: transfer all SD
+data field; transfer SD data files common to all compounds; extract specified data fields;
+generate a compound ID using molname line, a compound prefix, or a combination of both.
+Possible values: <em>All | Common | specify | CompoundID</em>. Default value: <em>CompoundID</em>.</p>
+</dd>
+<dt><strong><strong>-f, --Filter</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Specify whether to check and filter compound data in SDFile(s). Possible values: <em>Yes or No</em>.
+Default value: <em>Yes</em>.</p>
+<p>By default, compound data is checked before calculating fingerprints and compounds containing
+atom data corresponding to non-element symbols or no atom data are ignored.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabelMode</strong> <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em></strong></dt>
+<dd>
+<p>Specify how fingerprints label is generated in conjunction with <strong>--FingerprintsLabel</strong> option value:
+use fingerprints label generated only by <strong>--FingerprintsLabel</strong> option value or append topological
+atom pair count value IDs to <strong>--FingerprintsLabel</strong> option value.</p>
+<p>Possible values: <em>FingerprintsLabelOnly | FingerprintsLabelWithIDs</em>. Default value:
+<em>FingerprintsLabelOnly</em>.</p>
+<p>Topological atom pairs IDs appended to <strong>--FingerprintsLabel</strong> value during <em>FingerprintsLabelWithIDs</em>
+values of <strong>--FingerprintsLabelMode</strong>  correspond to atom pair count values in fingerprint vector string.</p>
+<p><em>FingerprintsLabelWithIDs</em> value of <strong>--FingerprintsLabelMode</strong> is ignored during <em>ArbitrarySize</em> value
+of <strong>--AtomPairsSetSizeToUse</strong> option and topological atom pairs IDs not appended to the label.</p>
+</dd>
+<dt><strong><strong>--FingerprintsLabel</strong> <em>text</em></strong></dt>
+<dd>
+<p>SD data label or text file column label to use for fingerprints string in output SD or
+CSV/TSV text file(s) specified by <strong>--output</strong>. Default value: <em>TopologicalPharmacophoreAtomPairsFingerprints</em>.</p>
+</dd>
+<dt><strong><strong>--FuzzifyAtomPairsCount</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>To fuzzify or not to fuzzify atom pairs count. Possible values: <em>Yes or No</em>. Default value:
+<em>No</em>.</p>
+</dd>
+<dt><strong><strong>--FuzzificationMode</strong> <em>BeforeNormalization | AfterNormalization</em></strong></dt>
+<dd>
+<p>When to fuzzify atom pairs count. Possible values: <em>BeforeNormalization | AfterNormalizationYes</em>.
+Default value: <em>AfterNormalization</em>.</p>
+</dd>
+<dt><strong><strong>--FuzzificationMethodology</strong> <em>FuzzyBinning | FuzzyBinSmoothing</em></strong></dt>
+<dd>
+<p>How to fuzzify atom pairs count. Possible values: <em>FuzzyBinning | FuzzyBinSmoothing</em>.
+Default value: <em>FuzzyBinning</em>.</p>
+<p>In conjunction with values for options <strong>--FuzzifyAtomPairsCount</strong>, <strong>--FuzzificationMode</strong> and
+<strong>--FuzzFactor</strong>, <strong>--FuzzificationMethodology</strong> option is used to fuzzify pharmacophore atom
+pairs count.</p>
+<p>Let:</p>
+<div class="OptionsBox">
+    Px = Pharmacophore atom type x
+<br/>    Py = Pharmacophore atom type y
+<br/>    PPxy = Pharmacophore atom pair between atom type Px and Py</div>
+<div class="OptionsBox">
+    PPxyDn = Pharmacophore atom pairs count between atom type Px and Py
+             at distance Dn
+<br/>    PPxyDn-1 = Pharmacophore atom pairs count between atom type Px and Py
+               at distance Dn - 1
+<br/>    PPxyDn+1 = Pharmacophore atom pairs count between atom type Px and Py
+               at distance Dn + 1</div>
+<div class="OptionsBox">
+    FF = FuzzFactor for FuzzyBinning and FuzzyBinSmoothing</div>
+<p>Then:</p>
+<p>For <em>FuzzyBinning</em>:</p>
+<div class="OptionsBox">
+    PPxyDn = PPxyDn (Unchanged)</div>
+<div class="OptionsBox">
+    PPxyDn-1 = PPxyDn-1 + PPxyDn * FF
+<br/>    PPxyDn+1 = PPxyDn+1 + PPxyDn * FF</div>
+<p>For <em>FuzzyBinSmoothing</em>:</p>
+<div class="OptionsBox">
+    PPxyDn = PPxyDn - PPxyDn * 2FF for Dmin &lt; Dn &lt; Dmax
+<br/>    PPxyDn = PPxyDn - PPxyDn * FF for Dn = Dmin or Dmax</div>
+<div class="OptionsBox">
+    PPxyDn-1 = PPxyDn-1 + PPxyDn * FF
+<br/>    PPxyDn+1 = PPxyDn+1 + PPxyDn * FF</div>
+<p>In both fuzzification schemes, a value of 0 for FF implies no fuzzification of occurrence counts.
+A value of 1 during <em>FuzzyBinning</em> corresponds to maximum fuzzification of occurrence counts;
+however, a value of 1 during <em>FuzzyBinSmoothing</em> ends up completely distributing the value over
+the previous and next distance bins.</p>
+<p>So for default value of <strong>--FuzzFactor</strong> (FF) 0.15, the occurrence count of pharmacohore atom pairs
+at distance Dn during FuzzyBinning is left unchanged and the counts at distances Dn -1 and Dn + 1
+are incremented by PPxyDn * 0.15.</p>
+<p>And during <em>FuzzyBinSmoothing</em> the occurrence counts at Distance Dn is scaled back using multiplicative
+factor of (1 - 2*0.15) and the occurrence counts at distances Dn -1 and Dn + 1 are incremented by
+PPxyDn * 0.15. In otherwords, occurrence bin count is smoothed out by distributing it over the
+previous and next distance value.</p>
+</dd>
+<dt><strong><strong>--FuzzFactor</strong> <em>number</em></strong></dt>
+<dd>
+<p>Specify by how much to fuzzify atom pairs count. Default value: <em>0.15</em>. Valid values: For
+<em>FuzzyBinning</em> value of <strong>--FuzzificationMethodology</strong> option: <em>between 0 and 1.0</em>; For
+<em>FuzzyBinSmoothing</em> value of <strong>--FuzzificationMethodology</strong> option: <em>between 0 and 0.5</em>.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>-k, --KeepLargestComponent</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Generate fingerprints for only the largest component in molecule. Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em>.</p>
+<p>For molecules containing multiple connected components, fingerprints can be generated
+in two different ways: use all connected components or just the largest connected
+component. By default, all atoms except for the largest connected component are
+deleted before generation of fingerprints.</p>
+</dd>
+<dt><strong><strong>--MinDistance</strong> <em>number</em></strong></dt>
+<dd>
+<p>Minimum bond distance between atom pairs for generating topological pharmacophore atom
+pairs. Default value: <em>1</em>. Valid values: positive integers including 0 and less than <strong>--MaxDistance</strong>.</p>
+</dd>
+<dt><strong><strong>--MaxDistance</strong> <em>number</em></strong></dt>
+<dd>
+<p>Maximum bond distance between atom pairs for generating topological pharmacophore atom
+ pairs. Default value: <em>10</em>. Valid values: positive integers and greater than <strong>--MinDistance</strong>.</p>
+</dd>
+<dt><strong><strong>-n, --NormalizationMethodology</strong> <em>None | ByHeavyAtomsCount | ByAtomTypesCount</em></strong></dt>
+<dd>
+<p>Normalization methodology to use for scaling the occurrence count of pharmacophore atom
+pairs within specified distance range. Possible values: <em>None, ByHeavyAtomsCount or
+ByAtomTypesCount</em>. Default value: <em>None</em>.</p>
+</dd>
+<dt><strong><strong>--OutDelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Delimiter for output CSV/TSV text file(s). Possible values: <em>comma, tab, or semicolon</em>
+Default value: <em>comma</em>.</p>
+</dd>
+<dt><strong><strong>--output</strong> <em>SD | FP | text | all</em></strong></dt>
+<dd>
+<p>Type of output files to generate. Possible values: <em>SD, FP, text, or all</em>. Default value: <em>text</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>Yes | No</em></strong></dt>
+<dd>
+<p>Put quote around column values in output CSV/TSV text file(s). Possible values:
+<em>Yes or No</em>. Default value: <em>Yes</em></p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>RootName</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file names:
+&lt;SDFileName&gt;&lt;TopologicalPharmacophoreAtomPairsFP&gt;.&lt;Ext&gt;. The file type determines &lt;Ext&gt; value.
+The sdf, fpf, csv, and tsv &lt;Ext&gt; values are used for SD, FP, comma/semicolon, and tab
+delimited text files, respectively.This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>--ValuesPrecision</strong> <em>number</em></strong></dt>
+<dd>
+<p>Precision of atom pairs count real values which might be generated after normalization
+or fuzzification. Default value: up to <em>2</em> decimal places. Valid values: positive integers.</p>
+</dd>
+<dt><strong><strong>-v, --VectorStringFormat</strong> <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString | ValuesAndIDsString | ValuesAndIDsPairsString</em></strong></dt>
+<dd>
+<p>Format of fingerprints vector string data in output SD, FP or CSV/TSV text file(s) specified by
+<strong>--output</strong> option. Possible values: <em>ValuesString, IDsAndValuesString | IDsAndValuesPairsString
+| ValuesAndIDsString | ValuesAndIDsPairsString</em>.</p>
+<p>Default value during <em>FixedSize</em> value of <strong>--AtomPairsSetSizeToUse</strong> option: <em>ValuesString</em>. Default
+value during <em>ArbitrarySize</em> value of <strong>--AtomPairsSetSizeToUse</strong> option: <em>IDsAndValuesString</em>.</p>
+<p><em>ValuesString</em> option value is not allowed for <em>ArbitrarySize</em> value of <strong>--AtomPairsSetSizeToUse</strong>
+option.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:ArbitrarySize:Min
+<br/>    Distance1:MaxDistance10;54;NumericalValues;IDsAndValuesString;H-D1-H H
+<br/>    -D1-NI HBA-D1-NI HBD-D1-NI H-D2-H H-D2-HBA H-D2-HBD HBA-D2-HBA HBA-D2-
+<br/>    HBD H-D3-H H-D3-HBA H-D3-HBD H-D3-NI HBA-D3-NI HBD-D3-NI H-D4-H H-D4-H
+<br/>    BA H-D4-HBD HBA-D4-HBA HBA-D4-HBD HBD-D4-HBD H-D5-H H-D5-HBA H-D5-...;
+<br/>    18 1 2 1 22 12 8 1 2 18 6 3 1 1 1 22 13 6 5 7 2 28 9 5 1 1 1 36 16 10
+<br/>    3 4 1 37 10 8 1 35 10 9 3 3 1 28 7 7 4 18 16 12 5 1 2 1</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:FixedSize:MinDist
+<br/>    ance1:MaxDistance10;150;OrderedNumericalValues;ValuesString;18 0 0 1 0
+<br/>    0 0 2 0 0 1 0 0 0 0 22 12 8 0 0 1 2 0 0 0 0 0 0 0 0 18 6 3 1 0 0 0 1
+<br/>    0 0 1 0 0 0 0 22 13 6 0 0 5 7 0 0 2 0 0 0 0 0 28 9 5 1 0 0 0 1 0 0 1 0
+<br/>    0 0 0 36 16 10 0 0 3 4 0 0 1 0 0 0 0 0 37 10 8 0 0 0 0 1 0 0 0 0 0 0
+<br/>    0 35 10 9 0 0 3 3 0 0 1 0 0 0 0 0 28 7 7 4 0 0 0 0 0 0 0 0 0 0 0 18...</div>
+<div class="OptionsBox">
+    FingerprintsVector;TopologicalPharmacophoreAtomPairs:FixedSize:MinDist
+<br/>    ance1:MaxDistance10;150;OrderedNumericalValues;IDsAndValuesString;H-D1
+<br/>    -H H-D1-HBA H-D1-HBD H-D1-NI H-D1-PI HBA-D1-HBA HBA-D1-HBD HBA-D1-NI H
+<br/>    BA-D1-PI HBD-D1-HBD HBD-D1-NI HBD-D1-PI NI-D1-NI NI-D1-PI PI-D1-PI H-D
+<br/>    2-H H-D2-HBA H-D2-HBD H-D2-NI H-D2-PI HBA-D2-HBA HBA-D2-HBD HBA-D2...;
+<br/>    18 0 0 1 0 0 0 2 0 0 1 0 0 0 0 22 12 8 0 0 1 2 0 0 0 0 0 0 0 0 18 6 3
+<br/>    1 0 0 0 1 0 0 1 0 0 0 0 22 13 6 0 0 5 7 0 0 2 0 0 0 0 0 28 9 5 1 0 0 0
+<br/>    1 0 0 1 0 0 0 0 36 16 10 0 0 3 4 0 0 1 0 0 0 0</div>
+</dd>
+<dt><strong><strong>-w, --WorkingDir</strong> <em>DirName</em></strong></dt>
+<dd>
+<p>Location of working directory. Default value: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+from 1 through 10 using default atom types with no weighting, normalization, and fuzzification
+of atom pairs count and create a SampleTPAPFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl -r SampleTPAPFP
+      -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of fixed size corresponding to distances
+from 1 through 10 using default atom types with no weighting, normalization, and fuzzification
+of atom pairs count and create a SampleTPAPFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl
+       --AtomPairsSetSizeToUse FixedSize -r SampleTPAPFP-o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+from 1 through 10 using default atom types with no weighting, normalization, and fuzzification
+of atom pairs count and create SampleTPAPFP.sdf, SampleTPAPFP.fpf and SampleTPAPFP.csv files containing
+sequential compound IDs in CSV file along with fingerprints vector strings data in ValuesString
+format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --output all
+      -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+from 1 through 10 using default atom types with no weighting, normalization, and fuzzification
+of atom pairs count and create a SampleTPAPFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in IDsAndValuesPairsString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --VectorStringFormat
+      IDsAndValuesPairsString -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+from 1 through 6 using default atom types with no weighting, normalization, and fuzzification
+of atom pairs count and create a SampleTPAPFP.csv file containing sequential compound IDs along
+with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --MinDistance 1
+      -MaxDistance 6 -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+from 1 through 10 using &quot;HBD,HBA,PI,NI&quot; atom types with double the weighting for &quot;HBD,HBA&quot; and
+normalization by HeavyAtomCount but no fuzzification of atom pairs count and create a
+SampleTPAPFP.csv file containing sequential compound IDs along with fingerprints vector strings
+data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --MinDistance 1
+      -MaxDistance 10  --AtomTypesToUse &quot;HBD,HBA,PI, NI&quot;  --AtomTypesWeight
+      &quot;HBD,2,HBA,2,PI,1,NI,1&quot; --NormalizationMethodology ByHeavyAtomsCount
+      --FuzzifyAtomPairsCount No -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to
+distances from 1 through 10 using &quot;HBD,HBA,PI,NI,H&quot; atom types with no weighting of atom types and
+normalization but with fuzzification of atom pairs count using FuzzyBinning methodology
+with FuzzFactor value 0.15 and create a SampleTPAPFP.csv file containing sequential compound
+IDs along with fingerprints vector strings data in ValuesString format, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --MinDistance 1
+      --MaxDistance 10  --AtomTypesToUse &quot;HBD,HBA,PI, NI,H&quot;  --AtomTypesWeight
+      &quot;HBD,1,HBA,1,PI,1,NI,1,H,1&quot; --NormalizationMethodology None
+      --FuzzifyAtomPairsCount Yes --FuzzificationMethodology FuzzyBinning
+      --FuzzFactor  0.5 -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding to distances
+distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create a SampleTPAPFP.csv
+file containing compound ID from molecule name line along with fingerprints vector strings
+data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode MolName -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding
+to distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create a SampleTPAPFP.csv
+file containing compound IDs using specified data field along with fingerprints vector strings
+data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode DataField --CompoundID Mol_ID
+      -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding
+to distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create a SampleTPAPFP.csv
+file containing compound ID using combination of molecule name line and an explicit compound
+prefix along with fingerprints vector strings data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      CompoundID -CompoundIDMode MolnameOrLabelPrefix
+      --CompoundID Cmpd --CompoundIDLabel MolID -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding
+to distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create a SampleTPAPFP.csv
+file containing specific data fields columns along with fingerprints vector strings
+data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      Specify --DataFields Mol_ID -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding
+to distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create a SampleTPAPFP.csv
+file containing common data fields columns along with fingerprints vector strings
+data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      Common -r SampleTPAPFP -o Sample.sdf</div>
+<p>To generate topological pharmacophore atom pairs fingerprints of arbitrary size corresponding
+to distances from 1 through 10 using default atom types with no weighting,
+normalization, and fuzzification of atom pairs count and create SampleTPAPFP.sdf, SampleTPAPFP.fpf,
+and SampleTPAPFP.csv files containing all data fields columns in CSV file along with fingerprints
+data, type:</p>
+<div class="ExampleBox">
+    % TopologicalPharmacophoreAtomPairsFingerprints.pl --DataFieldsMode
+      All  --output all -r SampleTPAPFP -o Sample.sdf</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./InfoFingerprintsFiles.html">InfoFingerprintsFiles.pl</a>,&nbsp<a href="./SimilarityMatricesFingerprints.html">SimilarityMatricesFingerprints.pl</a>,&nbsp<a href="./AtomNeighborhoodsFingerprints.html">AtomNeighborhoodsFingerprints.pl</a>,&nbsp
+<a href="./ExtendedConnectivityFingerprints.html">ExtendedConnectivityFingerprints.pl</a>,&nbsp<a href="./MACCSKeysFingerprints.html">MACCSKeysFingerprints.pl</a>,&nbsp<a href="./PathLengthFingerprints.html">PathLengthFingerprints.pl</a>,&nbsp
+<a href="./TopologicalAtomPairsFingerprints.html">TopologicalAtomPairsFingerprints.pl</a>,&nbsp<a href="./TopologicalAtomTorsionsFingerprints.html">TopologicalAtomTorsionsFingerprints.pl</a>,&nbsp
+<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html">TopologicalPharmacophoreAtomTripletsFingerprints.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TopologicalAtomTripletsFingerprints.html" title="TopologicalAtomTripletsFingerprints.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TopologicalPharmacophoreAtomTripletsFingerprints.html" title="TopologicalPharmacophoreAtomTripletsFingerprints.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>TopologicalPharmacophoreAtomPairsFingerprints.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

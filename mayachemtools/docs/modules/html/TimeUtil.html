@@ -1,0 +1,154 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:TimeUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TextUtil.html" title="TextUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Vector.html" title="Vector.html">Next</a></td><td width="34%" align="middle"><strong>TimeUtil.pm</strong></td><td width="33%" align="right"><a href="././code/TimeUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/TimeUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/TimeUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/TimeUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/TimeUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>TimeUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use TimeUtil;</p>
+<p>use TimeUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>TimeUtil</strong> module provides the following functions:</p>
+<p> <a href="#ctimestamp">CTimeStamp</a>, <a href="#fpfiletimestamp">FPFileTimeStamp</a>, <a href="#iso8601date">ISO8601Date</a>, <a href="#iso8601time">ISO8601Time</a>, <a href="#iso8601timestamp">ISO8601TimeStamp</a>
+, <a href="#monthnametonumber">MonthNameToNumber</a>, <a href="#monthnumbertoabbreviatedname">MonthNumberToAbbreviatedName</a>, <a href="#monthnumbertofullname">MonthNumberToFullName</a>
+, <a href="#pdbfiletimestamp">PDBFileTimeStamp</a>, <a href="#sdfiletimestamp">SDFileTimeStamp</a>, <a href="#timestamp">TimeStamp</a>, <a href="#weekdaynametonumber">WeekDayNameToNumber</a>
+, <a href="#weekdaynumbertoabbreviatedname">WeekDayNumberToAbbreviatedName</a>, <a href="#weekdaynumbertofullname">WeekDayNumberToFullName</a>
+</p><p>
+</p>
+<h2>FUNCTIONS</h2>
+<dl>
+<dt><strong><a name="ctimestamp" class="item"><strong>CTimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CTimeStamp = CTimeStamp();</div>
+<p>Returns <strong>CTimeStamp</strong> string using the following format: WDay Mon MDay HH:MM:SS YYYY</p>
+</dd>
+<dt><strong><a name="fpfiletimestamp" class="item"><strong>FPFileTimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FPFileTimeStamp = FPFileTimeStamp();</div>
+<p>Returns fingerints <strong>FP</strong> file time stamp string for MayaChemTools package. It corresponds to
+<strong>CTimeStamp</strong>.</p>
+</dd>
+<dt><strong><a name="iso8601date" class="item"><strong>ISO8601Date</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Date = ISO8601Date();</div>
+<p>Returns ISO8601 <strong>Date</strong> string using the following format: [YYYY]-[MM]-[DD]</p>
+</dd>
+<dt><strong><a name="iso8601time" class="item"><strong>ISO8601Time</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Time = ISO8601Time();</div>
+<p>Returns ISO8601 <strong>Time</strong> string using the following extended format: [hh]:[mm]:[ss]</p>
+</dd>
+<dt><strong><a name="iso8601timestamp" class="item"><strong>ISO8601TimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TimeStamp = ISO8601TimeStamp();</div>
+<p>Returns ISO8601 <strong>TimeStamp</strong> string using the following extended format: [YYYY]-[MM]-[DD]T[hh]:[mm]:[ss]</p>
+</dd>
+<dt><strong><a name="monthnametonumber" class="item"><strong>MonthNameToNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Number = MonthNameToNumber($Name);</div>
+<p>Return month <strong>Number</strong> for full month <em>Name</em> or three letter abbreviated month <em>Name</em>.</p>
+</dd>
+<dt><strong><a name="monthnumbertoabbreviatedname" class="item"><strong>MonthNumberToAbbreviatedName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AbbrevMonthName = MonthNumberToAbbreviatedName($Number);</div>
+<p>Returns three letter <strong>AbbrevMonthName</strong> for month <em>Number</em>.</p>
+</dd>
+<dt><strong><a name="monthnumbertofullname" class="item"><strong>MonthNumberToFullName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Name = MonthNumberToFullName($Number);</div>
+<p>Returns full month <strong>Name</strong> for month <em>Number</em>.</p>
+</dd>
+<dt><strong><a name="pdbfiletimestamp" class="item"><strong>PDBFileTimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TimeStamp = PDBFileTimeStamp();</div>
+<p>Returns PDB file <strong>TimeStamp</strong> using the following format: DD-MMM-YY</p>
+</dd>
+<dt><strong><a name="sdfiletimestamp" class="item"><strong>SDFileTimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TimeStamp = SDFileTimeStamp();</div>
+<p>Returns SD file <strong>TimeStamp</strong> using the following format: MMDDYYHHMM</p>
+</dd>
+<dt><strong><a name="timestamp" class="item"><strong>TimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $TimeStamp = TimeStamp();</div>
+<p>Returns deafult <em>TimeStamp</em> for MayaChemTools. It corresponds to <strong>CTimeStamp</strong>.</p>
+</dd>
+<dt><strong><a name="weekdaynametonumber" class="item"><strong>WeekDayNameToNumber</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Number = WeekDayNameToNumber($Name);</div>
+<p>Returns week day <strong>Number</strong> from full week day <em>Name</em> or three letter abbreviated week
+day <em>Name</em>.</p>
+</dd>
+<dt><strong><a name="weekdaynumbertoabbreviatedname" class="item"><strong>WeekDayNumberToAbbreviatedName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Name = WeekDayNumberToAbbreviatedName($Number);</div>
+<p>Returns three letter abbreviates week day <strong>Name</strong> for week day <em>Number</em>.</p>
+</dd>
+<dt><strong><a name="weekdaynumbertofullname" class="item"><strong>WeekDayNumberToFullName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Name = WeekDayNumberToFullName($Number);</div>
+<p>Returns full week day <strong>Name</strong> for week day <em>Number</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./FileUtil.html">FileUtil.pm</a>,&nbsp<a href="./TextUtil.html">TextUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TextUtil.html" title="TextUtil.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Vector.html" title="Vector.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>TimeUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

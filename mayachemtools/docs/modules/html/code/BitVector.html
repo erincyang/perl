@@ -1,0 +1,1058 @@
+<html>
+<head>
+<title>MayaChemTools:Code:BitVector.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-BitVector-"></a>   1 <span class="k">package </span><span class="i">BitVector</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: BitVector.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:57:49 $</span>
+   5 <span class="c"># $Revision: 1.34 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Scalar::Util</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">ConversionsUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">MathUtil</span><span class="sc">;</span>
+  36 
+  37 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  38 
+  39 <span class="i">@ISA</span> = <span class="q">qw(Exporter)</span><span class="sc">;</span>
+  40 <span class="i">@EXPORT</span> = <span class="q">qw(IsBitVector)</span><span class="sc">;</span>
+  41 <span class="i">@EXPORT_OK</span> = <span class="q">qw(NewFromBinaryString NewFromDecimalString NewFromHexadecimalString NewFromOctalString NewFromRawBinaryString)</span><span class="sc">;</span>
+  42 
+  43 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  44 
+  45 <span class="c"># Setup class variables...</span>
+  46 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="cm">,</span> <span class="i">$ValueFormat</span><span class="cm">,</span> <span class="i">$ValueBitOrder</span><span class="s">)</span><span class="sc">;</span>
+  47 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  48 
+  49 <span class="c">#</span>
+  50 <span class="c"># Overload bitwise and some logical operators...</span>
+  51 <span class="c">#</span>
+  52 <span class="c"># &#39;fallback&#39; is set to &#39;false&#39; to raise exception for all other operators.</span>
+  53 <span class="c">#</span>
+  54 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyBitVector&#39;</span><span class="cm">,</span>
+  55   <span class="q">&#39;&amp;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorAndOperator&#39;</span><span class="cm">,</span>
+  56   <span class="q">&#39;|&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorOrOperator&#39;</span><span class="cm">,</span>
+  57   <span class="q">&#39;^&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorExclusiveOrOperator&#39;</span><span class="cm">,</span>
+  58 
+  59   <span class="q">&#39;~&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorNegationOperator&#39;</span><span class="cm">,</span>
+  60 
+  61   <span class="q">&#39;==&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorEqualOperator&#39;</span><span class="cm">,</span>
+  62   <span class="q">&#39;!=&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;_BitVectorNotEqualOperator&#39;</span><span class="cm">,</span>
+  63 
+  64   <span class="q">&#39;fallback&#39;</span> <span class="cm">=&gt;</span> <span class="k">undef</span><span class="sc">;</span>
+  65 
+  66 <span class="c"># Class constructor...</span>
+  67 <span class="c">#</span>
+<a name="new-"></a>  68 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  69   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  70 
+  71   <span class="c"># Initialize object...</span>
+  72   <span class="k">my</span> <span class="i">$This</span> = <span class="s">{</span><span class="s">}</span><span class="sc">;</span>
+  73   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  74   <span class="i">$This</span><span class="i">-&gt;_InitializeBitVector</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+  75 
+  76   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  77 <span class="s">}</span>
+  78 
+  79 <span class="c"># Initialize object data...</span>
+  80 <span class="c">#</span>
+  81 <span class="c"># Note:</span>
+  82 <span class="c">#  . Perl pack function used to initialize vector automatically sets its size to</span>
+  83 <span class="c">#    nearest power of 2 value.</span>
+  84 <span class="c">#</span>
+<a name="_InitializeBitVector-"></a>  85 <span class="k">sub </span><span class="m">_InitializeBitVector</span> <span class="s">{</span>
+  86   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  87 
+  88   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$Size</span><span class="s">)</span> <span class="s">{</span>
+  89     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;new: BitVector object instantiated without specifying its size ...&quot;</span><span class="sc">;</span>
+  90   <span class="s">}</span>
+  91   <span class="k">if</span> <span class="s">(</span><span class="i">$Size</span> &lt;=<span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+  92     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;new: Bit vector size, $Size, must be a positive integer...&quot;</span><span class="sc">;</span>
+  93   <span class="s">}</span>
+  94 
+  95   <span class="c"># Initialize vector with zeros...</span>
+  96   <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="k">pack</span><span class="s">(</span><span class="q">&quot;b*&quot;</span><span class="cm">,</span> <span class="q">&quot;0&quot;</span> x <span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+  97 
+  98   <span class="c"># Size to automatically set to nearest power of 2 by Perl pack function. So use the length</span>
+  99   <span class="c"># of packed vector to set size...</span>
+ 100   <span class="i">$This</span>-&gt;{<span class="w">Size</span>} = <span class="k">length</span><span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetBitsAsBinaryString</span><span class="s">(</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 101 
+ 102   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 103 <span class="s">}</span>
+ 104 
+ 105 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a> 106 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+ 107   <span class="c">#Class name...</span>
+ 108   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+ 109 
+ 110   <span class="c"># Print format for bit vectore values...</span>
+ 111   <span class="i">$ValueFormat</span> = <span class="q">&quot;Binary&quot;</span><span class="sc">;</span>
+ 112 
+ 113   <span class="c"># Bit ordering for printing bit vector value strings. Default is to print lowest bit of each</span>
+ 114   <span class="c"># byte on the left.</span>
+ 115   <span class="c">#</span>
+ 116   <span class="c"># Internally, bits are stored in ascending order using Perl vec function. Regardless</span>
+ 117   <span class="c"># of machine order, big-endian or little-endian, vec function always considers first</span>
+ 118   <span class="c"># string byte as the lowest byte and first bit within each byte as the lowest bit.</span>
+ 119   <span class="c">#</span>
+ 120   <span class="c"># Possible values: Ascending or Descending</span>
+ 121   <span class="c">#</span>
+ 122   <span class="i">$ValueBitOrder</span> = <span class="q">&#39;Ascending&#39;</span><span class="sc">;</span>
+ 123 <span class="s">}</span>
+ 124 
+ 125 <span class="c"># Create a new bit vector using binary string. This functionality can be</span>
+ 126 <span class="c"># either invoked as a class function or an object method.</span>
+ 127 <span class="c">#</span>
+ 128 <span class="c"># The size of bit vector is automatically set to reflect the string.</span>
+ 129 <span class="c">#</span>
+<a name="NewFromBinaryString-"></a> 130 <span class="k">sub </span><span class="m">NewFromBinaryString ($;$)</span> <span class="s">{</span>
+ 131   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 132 
+ 133   <span class="k">if</span> <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 134     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 135   <span class="s">}</span>
+ 136   <span class="k">else</span> <span class="s">{</span>
+ 137     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 138   <span class="s">}</span>
+ 139 <span class="s">}</span>
+ 140 
+ 141 <span class="c"># Create a new bit vector using hexadecimal string. This functionality can be</span>
+ 142 <span class="c"># either invoked as a class function or an object method.</span>
+ 143 <span class="c">#</span>
+ 144 <span class="c"># The size of bit vector is automatically set to reflect the string.</span>
+ 145 <span class="c">#</span>
+<a name="NewFromHexadecimalString-"></a> 146 <span class="k">sub </span><span class="m">NewFromHexadecimalString ($;$)</span> <span class="s">{</span>
+ 147   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 148 
+ 149   <span class="k">if</span> <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 150     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 151   <span class="s">}</span>
+ 152   <span class="k">else</span> <span class="s">{</span>
+ 153     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 154   <span class="s">}</span>
+ 155 <span class="s">}</span>
+ 156 
+ 157 <span class="c"># Create a new bit vector using octal string. This functionality can be</span>
+ 158 <span class="c"># either invoked as a class function or an object method.</span>
+ 159 <span class="c">#</span>
+ 160 <span class="c"># The size of bit vector is automatically set to reflect the string.</span>
+ 161 <span class="c">#</span>
+<a name="NewFromOctalString-"></a> 162 <span class="k">sub </span><span class="m">NewFromOctalString ($;$)</span> <span class="s">{</span>
+ 163   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 164 
+ 165   <span class="k">if</span> <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 166     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Octal&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 167   <span class="s">}</span>
+ 168   <span class="k">else</span> <span class="s">{</span>
+ 169     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Octal&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 170   <span class="s">}</span>
+ 171 <span class="s">}</span>
+ 172 
+ 173 <span class="c"># Create a new bit vector using decimal string. This functionality can be</span>
+ 174 <span class="c"># either invoked as a class function or an object method.</span>
+ 175 <span class="c">#</span>
+ 176 <span class="c"># The size of bit vector is automatically set to reflect the string.</span>
+ 177 <span class="c">#</span>
+<a name="NewFromDecimalString-"></a> 178 <span class="k">sub </span><span class="m">NewFromDecimalString ($;$)</span> <span class="s">{</span>
+ 179   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 180 
+ 181   <span class="k">if</span> <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 182     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span><span class="q">&#39;Decimal&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 183   <span class="s">}</span>
+ 184   <span class="k">else</span> <span class="s">{</span>
+ 185     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;Decimal&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 186   <span class="s">}</span>
+ 187 <span class="s">}</span>
+ 188 
+ 189 <span class="c"># Create a new bit vector using raw binary string. This functionality can be</span>
+ 190 <span class="c"># either invoked as a class function or an object method.</span>
+ 191 <span class="c">#</span>
+ 192 <span class="c"># The size of bit vector is automatically set to reflect the string.</span>
+ 193 <span class="c">#</span>
+<a name="NewFromRawBinaryString-"></a> 194 <span class="k">sub </span><span class="m">NewFromRawBinaryString ($;$)</span> <span class="s">{</span>
+ 195   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 196 
+ 197   <span class="k">if</span> <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 198     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThirdParameter</span><span class="s">)</span><span class="sc">;</span>
+ 199   <span class="s">}</span>
+ 200   <span class="k">else</span> <span class="s">{</span>
+ 201     <span class="k">return</span> <span class="i">_NewBitVectorFromString</span><span class="s">(</span> <span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 202   <span class="s">}</span>
+ 203 <span class="s">}</span>
+ 204 
+ 205 <span class="c"># Create a new bit vector from a string...</span>
+ 206 <span class="c">#</span>
+<a name="_NewBitVectorFromString-"></a> 207 <span class="k">sub </span><span class="m">_NewBitVectorFromString ($$;$)</span> <span class="s">{</span>
+ 208   <span class="k">my</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 209   <span class="k">my</span><span class="s">(</span><span class="i">$Size</span><span class="cm">,</span> <span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 210 
+ 211   <span class="i">$Size</span> = <span class="i">_CalculateStringSizeInBits</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="sc">;</span>
+ 212 
+ 213   <span class="i">$BitVector</span> = <span class="i">new</span> <span class="i">BitVector</span><span class="s">(</span><span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 214   <span class="i">$BitVector</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 215 
+ 216   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 217 <span class="s">}</span>
+ 218 
+ 219 <span class="c"># Copy bit vector...</span>
+<a name="Copy-"></a> 220 <span class="k">sub </span><span class="m">Copy</span> <span class="s">{</span>
+ 221   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 222   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 223 
+ 224   <span class="c"># Make a new bit vector...</span>
+ 225   <span class="i">$BitVector</span> = <span class="s">(</span><span class="k">ref</span> <span class="i">$This</span><span class="s">)</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 226 
+ 227   <span class="c"># Copy bit values...</span>
+ 228   <span class="i">$BitVector</span>-&gt;{<span class="w">BitValues</span>} = <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span>
+ 229 
+ 230   <span class="c"># Copy value format for stringification...</span>
+ 231   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">ValueFormat</span>}<span class="s">)</span> <span class="s">{</span>
+ 232     <span class="i">$BitVector</span>-&gt;{<span class="w">ValueFormat</span>} = <span class="i">$This</span>-&gt;{<span class="w">ValueFormat</span>}<span class="sc">;</span>
+ 233   <span class="s">}</span>
+ 234   <span class="c"># Copy value bit order for stringification...</span>
+ 235   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">ValueBitOrder</span>}<span class="s">)</span> <span class="s">{</span>
+ 236     <span class="i">$BitVector</span>-&gt;{<span class="w">ValueBitOrder</span>} = <span class="i">$This</span>-&gt;{<span class="w">ValueBitOrder</span>}<span class="sc">;</span>
+ 237   <span class="s">}</span>
+ 238   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 239 <span class="s">}</span>
+ 240 
+ 241 <span class="c"># Reverse bit values in bit vector...</span>
+<a name="Reverse-"></a> 242 <span class="k">sub </span><span class="m">Reverse</span> <span class="s">{</span>
+ 243   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 244   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="i">$ReverseBitNum</span><span class="cm">,</span> <span class="i">$BitValue</span><span class="cm">,</span> <span class="i">$ReverseBitValue</span><span class="s">)</span><span class="sc">;</span>
+ 245 
+ 246   <span class="i">$BitNum</span> = <span class="n">0</span><span class="sc">;</span> <span class="i">$ReverseBitNum</span> = <span class="i">$This</span>-&gt;{<span class="w">Size</span>} - <span class="n">1</span><span class="sc">;</span>
+ 247 
+ 248   <span class="k">while</span> <span class="s">(</span><span class="i">$BitNum</span> &lt; <span class="i">$ReverseBitNum</span><span class="s">)</span> <span class="s">{</span>
+ 249     <span class="i">$BitValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 250     <span class="i">$ReverseBitValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$ReverseBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 251 
+ 252     <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="i">$ReverseBitValue</span><span class="s">)</span><span class="sc">;</span>
+ 253     <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$ReverseBitNum</span><span class="cm">,</span> <span class="i">$BitValue</span><span class="s">)</span><span class="sc">;</span>
+ 254 
+ 255     <span class="i">$BitNum</span>++<span class="sc">;</span> <span class="i">$ReverseBitNum</span>--<span class="sc">;</span>
+ 256   <span class="s">}</span>
+ 257   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 258 <span class="s">}</span>
+ 259 
+ 260 <span class="c"># Is it a bit vector object?</span>
+<a name="IsBitVector-"></a> 261 <span class="k">sub </span><span class="m">IsBitVector ($)</span> <span class="s">{</span>
+ 262   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 263 
+ 264   <span class="k">return</span> <span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span><span class="sc">;</span>
+ 265 <span class="s">}</span>
+ 266 
+ 267 <span class="c"># Get size...</span>
+<a name="GetSize-"></a> 268 <span class="k">sub </span><span class="m">GetSize</span> <span class="s">{</span>
+ 269   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 270 
+ 271   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="sc">;</span>
+ 272 <span class="s">}</span>
+ 273 
+ 274 <span class="c"># Set a bit...</span>
+ 275 <span class="c">#</span>
+<a name="SetBit-"></a> 276 <span class="k">sub </span><span class="m">SetBit</span> <span class="s">{</span>
+ 277   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="cm">,</span> <span class="i">$SkipCheck</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 278 
+ 279   <span class="c"># Just set it...</span>
+ 280   <span class="k">if</span> <span class="s">(</span><span class="i">$SkipCheck</span><span class="s">)</span> <span class="s">{</span>
+ 281     <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 282   <span class="s">}</span>
+ 283 
+ 284   <span class="c"># Check and set...</span>
+ 285   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;SetBit&quot;</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 286 
+ 287   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 288 <span class="s">}</span>
+ 289 
+ 290 <span class="c"># Set arbitrary bits specified as a list of bit numbers...</span>
+ 291 <span class="c">#</span>
+<a name="SetBits-"></a> 292 <span class="k">sub </span><span class="m">SetBits</span> <span class="s">{</span>
+ 293   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@BitNums</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 294   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 295 
+ 296   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">@BitNums</span><span class="s">)</span> <span class="s">{</span>
+ 297     <span class="i">$This</span><span class="i">-&gt;SetBit</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 298   <span class="s">}</span>
+ 299   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 300 <span class="s">}</span>
+ 301 
+ 302 <span class="c"># Set bits in a specified range...</span>
+ 303 <span class="c">#</span>
+<a name="SetBitsRange-"></a> 304 <span class="k">sub </span><span class="m">SetBitsRange</span> <span class="s">{</span>
+ 305   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 306   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 307 
+ 308   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;SetBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 309   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;SetBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 310 
+ 311   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">$MinBitNum</span> .. <span class="i">$MaxBitNum</span><span class="s">)</span> <span class="s">{</span>
+ 312     <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 313   <span class="s">}</span>
+ 314   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 315 <span class="s">}</span>
+ 316 
+ 317 <span class="c"># Set all bits...</span>
+ 318 <span class="c">#</span>
+<a name="SetAllBits-"></a> 319 <span class="k">sub </span><span class="m">SetAllBits</span> <span class="s">{</span>
+ 320   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 321 
+ 322   <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="k">pack</span><span class="s">(</span><span class="q">&quot;b*&quot;</span><span class="cm">,</span> <span class="q">&quot;1&quot;</span> x <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 323 <span class="s">}</span>
+ 324 
+ 325 <span class="c"># Clear a bit...</span>
+ 326 <span class="c">#</span>
+<a name="ClearBit-"></a> 327 <span class="k">sub </span><span class="m">ClearBit</span> <span class="s">{</span>
+ 328   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 329 
+ 330   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;ClearBit&quot;</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 331 
+ 332   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 333 <span class="s">}</span>
+ 334 
+ 335 <span class="c"># Clear arbitrary bits specified as a list of bit numbers...</span>
+ 336 <span class="c">#</span>
+<a name="ClearBits-"></a> 337 <span class="k">sub </span><span class="m">ClearBits</span> <span class="s">{</span>
+ 338   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@BitNums</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 339   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 340 
+ 341   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">@BitNums</span><span class="s">)</span> <span class="s">{</span>
+ 342     <span class="i">$This</span><span class="i">-&gt;ClearBit</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 343   <span class="s">}</span>
+ 344   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 345 <span class="s">}</span>
+ 346 
+ 347 <span class="c"># Clear bits in a specified range...</span>
+ 348 <span class="c">#</span>
+<a name="ClearBitsRange-"></a> 349 <span class="k">sub </span><span class="m">ClearBitsRange</span> <span class="s">{</span>
+ 350   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 351   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 352 
+ 353   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;ClearBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 354   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;ClearBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 355 
+ 356   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">$MinBitNum</span> .. <span class="i">$MaxBitNum</span><span class="s">)</span> <span class="s">{</span>
+ 357     <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 358   <span class="s">}</span>
+ 359   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 360 <span class="s">}</span>
+ 361 
+ 362 <span class="c"># Clear all bits...</span>
+ 363 <span class="c">#</span>
+<a name="ClearAllBits-"></a> 364 <span class="k">sub </span><span class="m">ClearAllBits</span> <span class="s">{</span>
+ 365   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 366 
+ 367   <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="k">pack</span><span class="s">(</span><span class="q">&quot;b*&quot;</span><span class="cm">,</span> <span class="q">&quot;0&quot;</span> x <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 368 
+ 369   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 370 <span class="s">}</span>
+ 371 
+ 372 <span class="c"># Set or clear bit...</span>
+ 373 <span class="c">#</span>
+<a name="SetBitValue-"></a> 374 <span class="k">sub </span><span class="m">SetBitValue</span> <span class="s">{</span>
+ 375   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="cm">,</span> <span class="i">$BitValue</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 376 
+ 377  <span class="j">BITVALUE:</span> <span class="s">{</span>
+ 378     <span class="k">if</span> <span class="s">(</span><span class="i">$BitValue</span> == <span class="n">1</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;SetBit</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">BITVALUE</span><span class="sc">;</span> <span class="s">}</span>
+ 379     <span class="k">if</span> <span class="s">(</span><span class="i">$BitValue</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;ClearBit</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">BITVALUE</span><span class="sc">;</span> <span class="s">}</span>
+ 380     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetBit: Specified bit value, $BitValue, must be 0 or 1...&quot;</span><span class="sc">;</span>
+ 381   <span class="s">}</span>
+ 382   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 383 <span class="s">}</span>
+ 384 
+ 385 <span class="c"># Flip bit value...</span>
+ 386 <span class="c">#</span>
+<a name="FlipBit-"></a> 387 <span class="k">sub </span><span class="m">FlipBit</span> <span class="s">{</span>
+ 388   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 389 
+ 390   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;FlipBit&quot;</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 391   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_FlipBit</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 392 <span class="s">}</span>
+ 393 
+ 394 <span class="c"># Flip arbitrary bits specified as a list of bit numbers...</span>
+ 395 <span class="c">#</span>
+<a name="FlipBits-"></a> 396 <span class="k">sub </span><span class="m">FlipBits</span> <span class="s">{</span>
+ 397   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@BitNums</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 398   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 399 
+ 400   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">@BitNums</span><span class="s">)</span> <span class="s">{</span>
+ 401     <span class="i">$This</span><span class="i">-&gt;FlipBit</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 402   <span class="s">}</span>
+ 403   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 404 <span class="s">}</span>
+ 405 
+ 406 <span class="c"># Flip bit value in a specified bit range...</span>
+ 407 <span class="c">#</span>
+<a name="FlipBitsRange-"></a> 408 <span class="k">sub </span><span class="m">FlipBitsRange</span> <span class="s">{</span>
+ 409   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 410   <span class="k">my</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 411 
+ 412   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;FlipBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MinBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 413   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;FlipBitsRange&quot;</span><span class="cm">,</span> <span class="i">$MaxBitNum</span><span class="s">)</span><span class="sc">;</span>
+ 414 
+ 415   <span class="k">for</span> <span class="i">$BitNum</span> <span class="s">(</span><span class="i">$MinBitNum</span> .. <span class="i">$MaxBitNum</span><span class="s">)</span> <span class="s">{</span>
+ 416     <span class="i">$This</span><span class="i">-&gt;_FlipBit</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 417   <span class="s">}</span>
+ 418   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 419 <span class="s">}</span>
+ 420 
+ 421 <span class="c"># Flip all bit valus...</span>
+ 422 <span class="c">#</span>
+<a name="FlipAllBits-"></a> 423 <span class="k">sub </span><span class="m">FlipAllBits</span> <span class="s">{</span>
+ 424   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 425 
+ 426   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;FlipBits</span><span class="s">(</span><span class="n">0</span><span class="cm">,</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>} - <span class="n">1</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 427 <span class="s">}</span>
+ 428 
+ 429 <span class="c"># Flip bit value...</span>
+<a name="_FlipBit-"></a> 430 <span class="k">sub </span><span class="m">_FlipBit</span> <span class="s">{</span>
+ 431   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 432 
+ 433   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 434     <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span><span class="sc">;</span>
+ 435   <span class="s">}</span>
+ 436   <span class="k">else</span> <span class="s">{</span>
+ 437     <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="cm">,</span> <span class="n">1</span><span class="s">)</span><span class="sc">;</span>
+ 438   <span class="s">}</span>
+ 439 <span class="s">}</span>
+ 440 
+ 441 <span class="c"># Get bit value...</span>
+ 442 <span class="c">#</span>
+<a name="GetBit-"></a> 443 <span class="k">sub </span><span class="m">GetBit</span> <span class="s">{</span>
+ 444   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 445 
+ 446   <span class="i">$This</span><span class="i">-&gt;_ValidateBitNumber</span><span class="s">(</span><span class="q">&quot;GetBit&quot;</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 447 
+ 448   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span><span class="sc">;</span>
+ 449 <span class="s">}</span>
+ 450 
+ 451 <span class="c"># Is a specific bit set?</span>
+ 452 <span class="c">#</span>
+<a name="IsBitSet-"></a> 453 <span class="k">sub </span><span class="m">IsBitSet</span> <span class="s">{</span>
+ 454   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 455 
+ 456   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$BitNum</span> &gt;= <span class="n">0</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$BitNum</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 457     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 458   <span class="s">}</span>
+ 459 
+ 460   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 461 <span class="s">}</span>
+ 462 
+ 463 <span class="c"># Is a specific bit clear?</span>
+ 464 <span class="c">#</span>
+<a name="IsBitClear-"></a> 465 <span class="k">sub </span><span class="m">IsBitClear</span> <span class="s">{</span>
+ 466   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 467 
+ 468   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$BitNum</span> &gt;= <span class="n">0</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$BitNum</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 469     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 470   <span class="s">}</span>
+ 471 
+ 472   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitValue</span><span class="s">(</span><span class="i">$BitNum</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 473 <span class="s">}</span>
+ 474 
+ 475 <span class="c"># Get number of set bits...</span>
+ 476 <span class="c">#</span>
+<a name="GetNumOfSetBits-"></a> 477 <span class="k">sub </span><span class="m">GetNumOfSetBits</span> <span class="s">{</span>
+ 478   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 479 
+ 480   <span class="k">return</span> <span class="k">unpack</span><span class="s">(</span><span class="q">&quot;%b*&quot;</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="s">)</span><span class="sc">;</span>
+ 481 <span class="s">}</span>
+ 482 
+ 483 <span class="c"># Get number of clear bits...</span>
+ 484 <span class="c">#</span>
+<a name="GetNumOfClearBits-"></a> 485 <span class="k">sub </span><span class="m">GetNumOfClearBits</span> <span class="s">{</span>
+ 486   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 487 
+ 488   <span class="k">return</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>} - <span class="i">$This</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 489 <span class="s">}</span>
+ 490 
+ 491 <span class="c"># Get density of set bits...</span>
+ 492 <span class="c">#</span>
+<a name="GetDensityOfSetBits-"></a> 493 <span class="k">sub </span><span class="m">GetDensityOfSetBits</span> <span class="s">{</span>
+ 494   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 495 
+ 496   <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">Size</span>} ? <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span>/<span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 497 <span class="s">}</span>
+ 498 
+ 499 <span class="c"># Get density of clear bits...</span>
+ 500 <span class="c">#</span>
+<a name="GetDensityOfClearBits-"></a> 501 <span class="k">sub </span><span class="m">GetDensityOfClearBits</span> <span class="s">{</span>
+ 502   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 503 
+ 504   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;GetNumOfClearBits</span><span class="s">(</span><span class="s">)</span>/<span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="sc">;</span>
+ 505 <span class="s">}</span>
+ 506 
+ 507 <span class="c"># Convert internal bit values stored using Perl vec function with first string byte</span>
+ 508 <span class="c"># as the lowest byte and first bit within each byte as the lowest bit into a binary</span>
+ 509 <span class="c"># string with ascending or descending bit order within each byte. The internal</span>
+ 510 <span class="c"># bit order corresponds to ascending bit order within each byte.</span>
+ 511 <span class="c">#</span>
+<a name="GetBitsAsBinaryString-"></a> 512 <span class="k">sub </span><span class="m">GetBitsAsBinaryString</span> <span class="s">{</span>
+ 513   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 514 
+ 515   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 516 <span class="s">}</span>
+ 517 
+ 518 <span class="c"># Convert internal bit values stored using Perl vec function with first string byte</span>
+ 519 <span class="c"># as the lowest byte and first bit within each byte as the lowest bit into a hexadecimal</span>
+ 520 <span class="c"># string with ascending or descending bit order within each byte. The internal</span>
+ 521 <span class="c"># bit order corresponds to ascending bit order within each byte.</span>
+ 522 <span class="c">#</span>
+ 523 <span class="c">#</span>
+<a name="GetBitsAsHexadecimalString-"></a> 524 <span class="k">sub </span><span class="m">GetBitsAsHexadecimalString</span> <span class="s">{</span>
+ 525   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 526 
+ 527   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 528 <span class="s">}</span>
+ 529 
+ 530 <span class="c"># Convert bit values into a octal string value...</span>
+ 531 <span class="c">#</span>
+<a name="GetBitsAsOctalString-"></a> 532 <span class="k">sub </span><span class="m">GetBitsAsOctalString</span> <span class="s">{</span>
+ 533   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 534 
+ 535   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Octal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 536 <span class="s">}</span>
+ 537 
+ 538 <span class="c"># Convert bit values into a decimal string value...</span>
+ 539 <span class="c">#</span>
+<a name="GetBitsAsDecimalString-"></a> 540 <span class="k">sub </span><span class="m">GetBitsAsDecimalString</span> <span class="s">{</span>
+ 541   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 542 
+ 543   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Decimal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 544 <span class="s">}</span>
+ 545 
+ 546 <span class="c"># Return packed bit values which also contains nonprintable characters...</span>
+ 547 <span class="c">#</span>
+<a name="GetBitsAsRawBinaryString-"></a> 548 <span class="k">sub </span><span class="m">GetBitsAsRawBinaryString</span> <span class="s">{</span>
+ 549   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 550 
+ 551   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="s">)</span><span class="sc">;</span>
+ 552 <span class="s">}</span>
+ 553 
+ 554 <span class="c"># Convert internal bit values stored using Perl vec function with first string byte</span>
+ 555 <span class="c"># as the lowest byte and first bit within each byte as the lowest bit into a</span>
+ 556 <span class="c"># string with ascending or descending bit order within each byte. The internal</span>
+ 557 <span class="c"># bit order corresponds to ascending bit order within each byte.</span>
+ 558 <span class="c">#</span>
+ 559 <span class="c">#</span>
+<a name="_GetBitsAsString-"></a> 560 <span class="k">sub </span><span class="m">_GetBitsAsString</span> <span class="s">{</span>
+ 561   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 562   <span class="k">my</span><span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span><span class="sc">;</span>
+ 563 
+ 564   <span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span> = <span class="i">$This</span><span class="i">-&gt;_SetupBitsPackUnpackTemplate</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 565 
+ 566   <span class="j">FORMAT :</span> <span class="s">{</span>
+ 567     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Hexadecimal|Hex|HexadecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="k">unpack</span><span class="s">(</span><span class="i">$HexadecimalTemplate</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 568     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Octal|Oct|OctalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">ConversionsUtil::HexadecimalToOctal</span><span class="s">(</span><span class="k">unpack</span><span class="s">(</span><span class="i">$HexadecimalTemplate</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="s">)</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 569     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Decimal|Dec|DecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">ConversionsUtil::HexadecimalToDecimal</span><span class="s">(</span><span class="k">unpack</span><span class="s">(</span><span class="i">$HexadecimalTemplate</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="s">)</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 570     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Binary|Bin|BinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="k">unpack</span><span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 571     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 572     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_GetBitsAsString: Specified bit vector string format, $Format, is not supported. Value values: Binary, Bin, BinaryString, Hexdecimal, Hex, HexadecimalString, Decimal, Dec, DecimalString, Octal, Oct, OctalString, RawBinary, RawBin, RawBinaryString...&quot;</span><span class="sc">;</span>
+ 573   <span class="s">}</span>
+ 574 <span class="s">}</span>
+ 575 
+ 576 <span class="c"># Setup templates to unpack bits...</span>
+ 577 <span class="c">#</span>
+<a name="_SetupBitsPackUnpackTemplate-"></a> 578 <span class="k">sub </span><span class="m">_SetupBitsPackUnpackTemplate</span> <span class="s">{</span>
+ 579   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 580   <span class="k">my</span><span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span><span class="sc">;</span>
+ 581 
+ 582   <span class="i">$BitOrder</span> = <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span> &amp;&amp; <span class="i">$BitOrder</span><span class="s">)</span> ? <span class="i">$BitOrder</span> <span class="co">:</span> <span class="q">&#39;Ascending&#39;</span><span class="sc">;</span>
+ 583 
+ 584   <span class="k">if</span> <span class="s">(</span><span class="i">$BitOrder</span> =~ <span class="q">/^Ascending$/i</span><span class="s">)</span> <span class="s">{</span>
+ 585     <span class="i">$BinaryTemplate</span> = <span class="q">&quot;b*&quot;</span><span class="sc">;</span>
+ 586     <span class="i">$HexadecimalTemplate</span> = <span class="q">&quot;h*&quot;</span><span class="sc">;</span>
+ 587   <span class="s">}</span>
+ 588   <span class="k">elsif</span> <span class="s">(</span><span class="i">$BitOrder</span> =~ <span class="q">/^Descending$/i</span><span class="s">)</span> <span class="s">{</span>
+ 589     <span class="i">$BinaryTemplate</span> = <span class="q">&quot;B*&quot;</span><span class="sc">;</span>
+ 590     <span class="i">$HexadecimalTemplate</span> = <span class="q">&quot;H*&quot;</span><span class="sc">;</span>
+ 591   <span class="s">}</span>
+ 592   <span class="k">else</span> <span class="s">{</span>
+ 593     <span class="w">croak</span> <span class="q">&quot;Warning: ${ClassName}::_SetupBitsPackUnpackTemplate: Specified bit order value, $BitOrder, is not supported. Supported values: Ascending, Descending...&quot;</span><span class="sc">;</span>
+ 594   <span class="s">}</span>
+ 595   <span class="k">return</span> <span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span><span class="sc">;</span>
+ 596 <span class="s">}</span>
+ 597 
+ 598 <span class="c"># Set bit values using hexadecimal string. The initial size of bit vector is not changed.</span>
+ 599 <span class="c">#</span>
+<a name="SetBitsAsHexadecimalString-"></a> 600 <span class="k">sub </span><span class="m">SetBitsAsHexadecimalString</span> <span class="s">{</span>
+ 601   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Hexadecimal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 602 
+ 603   <span class="k">if</span> <span class="s">(</span><span class="i">$Hexadecimal</span> =~ <span class="q">/^0x/i</span><span class="s">)</span> <span class="s">{</span>
+ 604     <span class="i">$Hexadecimal</span> =~ <span class="q">s/^0x//i</span><span class="sc">;</span>
+ 605   <span class="s">}</span>
+ 606   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$Hexadecimal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 607 <span class="s">}</span>
+ 608 
+ 609 <span class="c"># Set bit values using octal string. The initial size of bit vector is not changed.</span>
+ 610 <span class="c">#</span>
+<a name="SetBitsAsOctalString-"></a> 611 <span class="k">sub </span><span class="m">SetBitsAsOctalString</span> <span class="s">{</span>
+ 612   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Octal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 613 
+ 614   <span class="k">if</span> <span class="s">(</span><span class="i">$Octal</span> =~ <span class="q">/^0/i</span><span class="s">)</span> <span class="s">{</span>
+ 615     <span class="i">$Octal</span> =~ <span class="q">s/^0//i</span><span class="sc">;</span>
+ 616   <span class="s">}</span>
+ 617   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="q">&#39;Octal&#39;</span><span class="cm">,</span> <span class="i">$Octal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 618 <span class="s">}</span>
+ 619 
+ 620 <span class="c"># Set bit values using a decimal number. The initial size of bit vector is not changed.</span>
+ 621 <span class="c">#</span>
+<a name="SetBitsAsDecimalString-"></a> 622 <span class="k">sub </span><span class="m">SetBitsAsDecimalString</span> <span class="s">{</span>
+ 623   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Decimal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 624 
+ 625   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsPositiveInteger</span><span class="s">(</span><span class="i">$Decimal</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 626     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetBitsAsDecimalString: Specified decimal value, $Decimal, must be a positive integer...&quot;</span><span class="sc">;</span>
+ 627   <span class="s">}</span>
+ 628   <span class="k">if</span> <span class="s">(</span><span class="i">$Decimal</span> =~ <span class="q">/[+]/</span><span class="s">)</span> <span class="s">{</span>
+ 629     <span class="i">$Decimal</span> =~ <span class="q">s/[+]//</span><span class="sc">;</span>
+ 630   <span class="s">}</span>
+ 631   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="q">&#39;Decimal&#39;</span><span class="cm">,</span> <span class="i">$Decimal</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 632 <span class="s">}</span>
+ 633 
+ 634 <span class="c"># Set bit values using hexadecimal string. The initial size of bit vector is not changed.</span>
+ 635 <span class="c">#</span>
+<a name="SetBitsAsBinaryString-"></a> 636 <span class="k">sub </span><span class="m">SetBitsAsBinaryString</span> <span class="s">{</span>
+ 637   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Binary</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 638 
+ 639   <span class="k">if</span> <span class="s">(</span><span class="i">$Binary</span> =~ <span class="q">/^0b/i</span><span class="s">)</span> <span class="s">{</span>
+ 640     <span class="i">$Binary</span> =~ <span class="q">s/^0b//i</span><span class="sc">;</span>
+ 641   <span class="s">}</span>
+ 642   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$Binary</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 643 <span class="s">}</span>
+ 644 
+ 645 <span class="c"># Set bit values using packed binary string. The size of bit vector is changed to reflect</span>
+ 646 <span class="c"># the input raw string...</span>
+ 647 <span class="c">#</span>
+<a name="SetBitsAsRawBinaryString-"></a> 648 <span class="k">sub </span><span class="m">SetBitsAsRawBinaryString</span> <span class="s">{</span>
+ 649   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$RawBinary</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 650 
+ 651   <span class="k">return</span> <span class="i">$This</span><span class="i">-&gt;_SetBitsAsString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="cm">,</span> <span class="i">$RawBinary</span><span class="s">)</span><span class="sc">;</span>
+ 652 <span class="s">}</span>
+ 653 
+ 654 <span class="c"># Set bits using string in a specified format. This size of bit vector is not changed except for</span>
+ 655 <span class="c"># RawBinary string type...</span>
+ 656 <span class="c">#</span>
+<a name="_SetBitsAsString-"></a> 657 <span class="k">sub </span><span class="m">_SetBitsAsString</span> <span class="s">{</span>
+ 658   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 659   <span class="k">my</span><span class="s">(</span><span class="i">$Size</span><span class="cm">,</span> <span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span><span class="sc">;</span>
+ 660 
+ 661   <span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$HexadecimalTemplate</span><span class="s">)</span> = <span class="i">$This</span><span class="i">-&gt;_SetupBitsPackUnpackTemplate</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+ 662 
+ 663   <span class="i">$Size</span> = <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="sc">;</span>
+ 664   <span class="j">FORMAT :</span> <span class="s">{</span>
+ 665     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Hexadecimal|Hex|HexadecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="k">pack</span><span class="s">(</span><span class="i">$HexadecimalTemplate</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 666     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Octal|Oct|OctalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">vec</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="cm">,</span> <span class="n">0</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">ConversionsUtil::OctalToDecimal</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 667     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Decimal|Dec|DecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="k">vec</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="cm">,</span> <span class="n">0</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span> = <span class="i">$String</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 668     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Binary|Bin|BinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="k">pack</span><span class="s">(</span><span class="i">$BinaryTemplate</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 669     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} = <span class="i">$String</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 670     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_SetBitsAsString: Specified bit vector string format, $Format, is not supported. Value values: Binary, Bin, BinaryString, Hexdecimal, Hex, HexadecimalString, Decimal, Dec, DecimalString, Octal, Oct, OctalString, RawBinary, RawBin, RawBinaryString...&quot;</span><span class="sc">;</span>
+ 671   <span class="s">}</span>
+ 672 
+ 673   <span class="c"># Set size using packed string...</span>
+ 674   <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetBitsAsBinaryString</span><span class="s">(</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span>
+ 675   <span class="k">if</span> <span class="s">(</span><span class="i">$Size</span> &lt;=<span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 676     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_SetBitsAsString: Bit vector size, $Size, must be a positive integer...&quot;</span><span class="sc">;</span>
+ 677   <span class="s">}</span>
+ 678   <span class="i">$This</span>-&gt;{<span class="w">Size</span>} = <span class="i">$Size</span><span class="sc">;</span>
+ 679 
+ 680   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 681 <span class="s">}</span>
+ 682 
+ 683 <span class="c"># Calculate string size in bits...</span>
+ 684 <span class="c">#</span>
+<a name="_CalculateStringSizeInBits-"></a> 685 <span class="k">sub </span><span class="m">_CalculateStringSizeInBits ($$;$)</span> <span class="s">{</span>
+ 686   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThisParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 687   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="cm">,</span> <span class="i">$Size</span><span class="s">)</span><span class="sc">;</span>
+ 688 
+ 689   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">3</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 690     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ThisParameter</span><span class="s">)</span><span class="sc">;</span>
+ 691   <span class="s">}</span>
+ 692   <span class="k">else</span> <span class="s">{</span>
+ 693     <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Format</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span> = <span class="s">(</span><span class="k">undef</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 694   <span class="s">}</span>
+ 695 
+ 696   <span class="j">FORMAT :</span> <span class="s">{</span>
+ 697     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Hexadecimal|Hex|HexadecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span> * <span class="n">4</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 698     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Octal|Oct|OctalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span> * <span class="n">3</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 699     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Decimal|Dec|DecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="i">ConversionsUtil::DecimalToHexadecimal</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span><span class="s">)</span> * <span class="n">4</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 700     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(Binary|Bin|BinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="i">$String</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 701     <span class="k">if</span> <span class="s">(</span><span class="i">$Format</span> =~ <span class="q">/^(RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$Size</span> = <span class="k">length</span><span class="s">(</span><span class="k">unpack</span><span class="s">(</span><span class="q">&quot;B*&quot;</span><span class="cm">,</span> <span class="i">$String</span><span class="s">)</span><span class="s">)</span><span class="sc">;</span> <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+ 702     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}::_CalculateStringSizeInBits: Specified bit vector string format, $Format, is not supported. Value values: Binary, Bin, BinaryString, Hexdecimal, Hex, HexadecimalString, Decimal, Dec, DecimalString, Octal, Oct, OctalString, RawBinary, RawBin, RawBinaryString...&quot;</span><span class="sc">;</span>
+ 703   <span class="s">}</span>
+ 704   <span class="k">return</span> <span class="i">$Size</span><span class="sc">;</span>
+ 705 <span class="s">}</span>
+ 706 
+ 707 <span class="c"># Set bit value using Perl vec function with bit numbers going from left to right.</span>
+ 708 <span class="c"># First bit number corresponds to 0.</span>
+ 709 <span class="c">#</span>
+<a name="_SetBitValue-"></a> 710 <span class="k">sub </span><span class="m">_SetBitValue</span> <span class="s">{</span>
+ 711   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="cm">,</span> <span class="i">$BitValue</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 712   <span class="k">my</span><span class="s">(</span><span class="i">$Offset</span><span class="cm">,</span> <span class="i">$Width</span><span class="s">)</span><span class="sc">;</span>
+ 713 
+ 714   <span class="i">$Offset</span> = <span class="i">$BitNum</span><span class="sc">;</span>
+ 715   <span class="i">$Width</span> = <span class="n">1</span><span class="sc">;</span>
+ 716 
+ 717   <span class="k">vec</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="cm">,</span> <span class="i">$Offset</span><span class="cm">,</span> <span class="i">$Width</span><span class="s">)</span> = <span class="i">$BitValue</span><span class="sc">;</span>
+ 718 
+ 719   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 720 <span class="s">}</span>
+ 721 
+ 722 <span class="c"># Get bit value Perl vec function with bit numbers going from left to right.</span>
+ 723 <span class="c"># First bit number corresponds to 0.</span>
+ 724 <span class="c">#</span>
+<a name="_GetBitValue-"></a> 725 <span class="k">sub </span><span class="m">_GetBitValue</span> <span class="s">{</span>
+ 726   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 727   <span class="k">my</span><span class="s">(</span><span class="i">$Offset</span><span class="cm">,</span> <span class="i">$Width</span><span class="cm">,</span> <span class="i">$BitValue</span><span class="s">)</span><span class="sc">;</span>
+ 728 
+ 729   <span class="i">$Offset</span> = <span class="i">$BitNum</span><span class="sc">;</span>
+ 730   <span class="i">$Width</span> = <span class="n">1</span><span class="sc">;</span>
+ 731 
+ 732   <span class="i">$BitValue</span> = <span class="k">vec</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="cm">,</span> <span class="i">$Offset</span><span class="cm">,</span> <span class="i">$Width</span><span class="s">)</span><span class="sc">;</span>
+ 733 
+ 734   <span class="k">return</span> <span class="i">$BitValue</span><span class="sc">;</span>
+ 735 <span class="s">}</span>
+ 736 
+ 737 <span class="c"># Check to make sure it&#39;s a valid bit number...</span>
+ 738 <span class="c">#</span>
+<a name="_ValidateBitNumber-"></a> 739 <span class="k">sub </span><span class="m">_ValidateBitNumber</span> <span class="s">{</span>
+ 740   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$CallerName</span><span class="cm">,</span> <span class="i">$BitNum</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 741 
+ 742   <span class="k">if</span> <span class="s">(</span>!<span class="k">defined</span> <span class="i">$BitNum</span><span class="s">)</span> <span class="s">{</span>
+ 743     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${CallerName}: Bit number is not defined...&quot;</span><span class="sc">;</span>
+ 744   <span class="s">}</span>
+ 745   <span class="k">if</span> <span class="s">(</span><span class="i">$BitNum</span> &lt; <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 746     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${CallerName}: Bit number value, $BitNum, must be &gt;= 0 ...&quot;</span><span class="sc">;</span>
+ 747   <span class="s">}</span>
+ 748   <span class="k">if</span> <span class="s">(</span><span class="i">$BitNum</span> &gt;= <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span> <span class="s">{</span>
+ 749     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${CallerName}: Bit number number value, $BitNum, must be less than the size of bit vector, &quot;</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="cm">,</span> <span class="q">&quot;...&quot;</span><span class="sc">;</span>
+ 750   <span class="s">}</span>
+ 751 
+ 752   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 753 <span class="s">}</span>
+ 754 
+ 755 <span class="c"># Set bit values print format for an individual object or the whole class...</span>
+ 756 <span class="c">#</span>
+<a name="SetBitValuePrintFormat-"></a> 757 <span class="k">sub </span><span class="m">SetBitValuePrintFormat ($;$)</span> <span class="s">{</span>
+ 758   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 759 
+ 760   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 761     <span class="c"># Set bit values print format for the specific object...</span>
+ 762     <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$ValuePrintFormat</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 763 
+ 764     <span class="k">if</span> <span class="s">(</span>!<span class="i">_ValidateBitValuePrintFormat</span><span class="s">(</span><span class="i">$ValuePrintFormat</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 765       <span class="k">return</span><span class="sc">;</span>
+ 766     <span class="s">}</span>
+ 767 
+ 768     <span class="i">$This</span>-&gt;{<span class="w">ValueFormat</span>} = <span class="i">$ValuePrintFormat</span><span class="sc">;</span>
+ 769   <span class="s">}</span>
+ 770   <span class="k">else</span> <span class="s">{</span>
+ 771     <span class="c"># Set value print format for the class...</span>
+ 772     <span class="k">my</span><span class="s">(</span><span class="i">$ValuePrintFormat</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 773 
+ 774     <span class="k">if</span> <span class="s">(</span>!<span class="i">_ValidateBitValuePrintFormat</span><span class="s">(</span><span class="i">$ValuePrintFormat</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 775       <span class="k">return</span><span class="sc">;</span>
+ 776     <span class="s">}</span>
+ 777 
+ 778     <span class="i">$ValueFormat</span> = <span class="i">$ValuePrintFormat</span><span class="sc">;</span>
+ 779   <span class="s">}</span>
+ 780 <span class="s">}</span>
+ 781 
+ 782 <span class="c"># Set bit values bit order for an individual object or the whole class...</span>
+ 783 <span class="c">#</span>
+<a name="SetBitValueBitOrder-"></a> 784 <span class="k">sub </span><span class="m">SetBitValueBitOrder ($;$)</span> <span class="s">{</span>
+ 785   <span class="k">my</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 786 
+ 787   <span class="k">if</span> <span class="s">(</span><span class="s">(</span><span class="i">@_</span> == <span class="n">2</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 788     <span class="c"># Set bit value bit order for the specific object...</span>
+ 789     <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 790 
+ 791     <span class="k">if</span> <span class="s">(</span>!<span class="i">_ValidateBitValueBitOrder</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 792       <span class="k">return</span><span class="sc">;</span>
+ 793     <span class="s">}</span>
+ 794 
+ 795     <span class="i">$This</span>-&gt;{<span class="w">ValueBitOrder</span>} = <span class="i">$BitOrder</span><span class="sc">;</span>
+ 796   <span class="s">}</span>
+ 797   <span class="k">else</span> <span class="s">{</span>
+ 798     <span class="c"># Set bit value bit order for the class...</span>
+ 799     <span class="k">my</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span> = <span class="s">(</span><span class="i">$FirstParameter</span><span class="s">)</span><span class="sc">;</span>
+ 800 
+ 801     <span class="k">if</span> <span class="s">(</span>!<span class="i">_ValidateBitValueBitOrder</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 802       <span class="k">return</span><span class="sc">;</span>
+ 803     <span class="s">}</span>
+ 804 
+ 805     <span class="i">$ValueBitOrder</span> = <span class="i">$BitOrder</span><span class="sc">;</span>
+ 806   <span class="s">}</span>
+ 807 <span class="s">}</span>
+ 808 
+ 809 <span class="c"># Validate print format for bit values...</span>
+<a name="_ValidateBitValueBitOrder-"></a> 810 <span class="k">sub </span><span class="m">_ValidateBitValueBitOrder</span> <span class="s">{</span>
+ 811   <span class="k">my</span><span class="s">(</span><span class="i">$BitOrder</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 812 
+ 813   <span class="k">if</span> <span class="s">(</span><span class="i">$BitOrder</span> !~ <span class="q">/^(Ascending|Descending)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 814     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}::_ValidateBitValueBitOrder: Specified bit order value, $BitOrder, is not supported. Supported values: Ascending, Descending...&quot;</span><span class="sc">;</span>
+ 815     <span class="k">return</span> <span class="n">0</span><span class="sc">;</span>
+ 816   <span class="s">}</span>
+ 817   <span class="k">return</span> <span class="n">1</span><span class="sc">;</span>
+ 818 <span class="s">}</span>
+ 819 
+ 820 <span class="c"># Validate print format for bit values...</span>
+<a name="_ValidateBitValuePrintFormat-"></a> 821 <span class="k">sub </span><span class="m">_ValidateBitValuePrintFormat</span> <span class="s">{</span>
+ 822   <span class="k">my</span><span class="s">(</span><span class="i">$ValuePrintFormat</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 823 
+ 824   <span class="k">if</span> <span class="s">(</span><span class="i">$ValuePrintFormat</span> !~ <span class="q">/^(Binary|Bin||BinaryString|Hexadecimal|Hex||HexadecimalString|Decimal|Dec||DecimalString|Octal|Oct||OctalString|RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 825     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}::_ValidateBitValuePrintFormat: Specified bit vector print format value, $ValuePrintFormat, is not supported. Supported values: Binary, Bin, BinaryString, Hexdecimal, Hex, HexadecimalString, Decimal, Dec, DecimalString, Octal, Oct, OctalString, RawBinary, RawBin, RawBinaryString...&quot;</span><span class="sc">;</span>
+ 826     <span class="k">return</span> <span class="n">0</span><span class="sc">;</span>
+ 827   <span class="s">}</span>
+ 828   <span class="k">return</span> <span class="n">1</span><span class="sc">;</span>
+ 829 <span class="s">}</span>
+ 830 
+ 831 <span class="c"># Bitwise AND operation for BitVectors...</span>
+ 832 <span class="c">#</span>
+<a name="_BitVectorAndOperator-"></a> 833 <span class="k">sub </span><span class="m">_BitVectorAndOperator</span> <span class="s">{</span>
+ 834   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 835 
+ 836   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorAndOperator: Bitwise AND oparation failed&quot;</span><span class="sc">;</span>
+ 837   <span class="i">$CheckBitVectorSizes</span> = <span class="n">1</span><span class="sc">;</span>
+ 838   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 839 
+ 840   <span class="k">if</span> <span class="s">(</span>!<span class="i">$OtherIsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 841     <span class="k">if</span> <span class="s">(</span><span class="i">$OrderFlipped</span><span class="s">)</span> <span class="s">{</span>
+ 842       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: First object must be a bit vector...&quot;</span><span class="sc">;</span>
+ 843     <span class="s">}</span>
+ 844   <span class="s">}</span>
+ 845   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 846   <span class="i">$BitVector</span> = <span class="s">(</span><span class="k">ref</span> <span class="i">$This</span><span class="s">)</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 847   <span class="i">$BitVector</span>-&gt;{<span class="w">BitValues</span>} = <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} &amp; <span class="i">$Other</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span>
+ 848 
+ 849   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 850 <span class="s">}</span>
+ 851 
+ 852 <span class="c"># Bitwise OR operation for BitVectors...</span>
+ 853 <span class="c">#</span>
+<a name="_BitVectorOrOperator-"></a> 854 <span class="k">sub </span><span class="m">_BitVectorOrOperator</span> <span class="s">{</span>
+ 855   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 856 
+ 857   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorAndOperator: Bitwise OR oparation failed&quot;</span><span class="sc">;</span>
+ 858   <span class="i">$CheckBitVectorSizes</span> = <span class="n">1</span><span class="sc">;</span>
+ 859   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 860 
+ 861   <span class="k">if</span> <span class="s">(</span>!<span class="i">$OtherIsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 862     <span class="k">if</span> <span class="s">(</span><span class="i">$OrderFlipped</span><span class="s">)</span> <span class="s">{</span>
+ 863       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: First object must be a bit vector...&quot;</span><span class="sc">;</span>
+ 864     <span class="s">}</span>
+ 865   <span class="s">}</span>
+ 866   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 867   <span class="i">$BitVector</span> = <span class="s">(</span><span class="k">ref</span> <span class="i">$This</span><span class="s">)</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 868   <span class="i">$BitVector</span>-&gt;{<span class="w">BitValues</span>} = <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} | <span class="i">$Other</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span>
+ 869 
+ 870   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 871 <span class="s">}</span>
+ 872 
+ 873 <span class="c"># Bitwise XOR operation for BitVectors...</span>
+ 874 <span class="c">#</span>
+<a name="_BitVectorExclusiveOrOperator-"></a> 875 <span class="k">sub </span><span class="m">_BitVectorExclusiveOrOperator</span> <span class="s">{</span>
+ 876   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 877 
+ 878   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorAndOperator: Bitwise XOR oparation failed&quot;</span><span class="sc">;</span>
+ 879   <span class="i">$CheckBitVectorSizes</span> = <span class="n">1</span><span class="sc">;</span>
+ 880   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 881 
+ 882   <span class="k">if</span> <span class="s">(</span>!<span class="i">$OtherIsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 883     <span class="k">if</span> <span class="s">(</span><span class="i">$OrderFlipped</span><span class="s">)</span> <span class="s">{</span>
+ 884       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: First object must be a bit vector...&quot;</span><span class="sc">;</span>
+ 885     <span class="s">}</span>
+ 886   <span class="s">}</span>
+ 887   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 888   <span class="i">$BitVector</span> = <span class="s">(</span><span class="k">ref</span> <span class="i">$This</span><span class="s">)</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 889   <span class="i">$BitVector</span>-&gt;{<span class="w">BitValues</span>} = <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>} ^ <span class="i">$Other</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span>
+ 890 
+ 891   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 892 <span class="s">}</span>
+ 893 
+ 894 <span class="c"># Bitwise negation operation for BitVectors...</span>
+ 895 <span class="c">#</span>
+<a name="_BitVectorNegationOperator-"></a> 896 <span class="k">sub </span><span class="m">_BitVectorNegationOperator</span> <span class="s">{</span>
+ 897   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 898 
+ 899   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorAndOperator: Bitwise negation oparation failed&quot;</span><span class="sc">;</span>
+ 900   <span class="i">$CheckBitVectorSizes</span> = <span class="n">1</span><span class="sc">;</span>
+ 901   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 902 
+ 903   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 904   <span class="i">$BitVector</span> = <span class="s">(</span><span class="k">ref</span> <span class="i">$This</span><span class="s">)</span><span class="i">-&gt;new</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">Size</span>}<span class="s">)</span><span class="sc">;</span>
+ 905   <span class="i">$BitVector</span>-&gt;{<span class="w">BitValues</span>} = ~ <span class="i">$This</span>-&gt;{<span class="w">BitValues</span>}<span class="sc">;</span>
+ 906 
+ 907   <span class="k">return</span> <span class="i">$BitVector</span><span class="sc">;</span>
+ 908 <span class="s">}</span>
+ 909 
+ 910 <span class="c"># Bit vector equla operator. Two bit vectors are considered equal assuming their size</span>
+ 911 <span class="c"># is same and bits are on at the same positions...</span>
+ 912 <span class="c">#</span>
+<a name="_BitVectorEqualOperator-"></a> 913 <span class="k">sub </span><span class="m">_BitVectorEqualOperator</span> <span class="s">{</span>
+ 914   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 915 
+ 916   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorEqualOperator: BitVector == oparation failed&quot;</span><span class="sc">;</span>
+ 917   <span class="i">$CheckBitVectorSizes</span> = <span class="n">0</span><span class="sc">;</span>
+ 918   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 919 
+ 920   <span class="k">if</span> <span class="s">(</span>!<span class="i">$OtherIsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 921     <span class="k">if</span> <span class="s">(</span><span class="i">$OrderFlipped</span><span class="s">)</span> <span class="s">{</span>
+ 922       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: First object must be a bit vector...&quot;</span><span class="sc">;</span>
+ 923     <span class="s">}</span>
+ 924   <span class="s">}</span>
+ 925   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> != <span class="i">$Other</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 926     <span class="k">return</span> <span class="n">0</span><span class="sc">;</span>
+ 927   <span class="s">}</span>
+ 928   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span> != <span class="i">$Other</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 929     <span class="k">return</span> <span class="n">0</span><span class="sc">;</span>
+ 930   <span class="s">}</span>
+ 931   <span class="c"># Check number of On bits only in This vector. It must be zero for vectors to be equal...</span>
+ 932   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 933   <span class="i">$BitVector</span> = <span class="i">$This</span> &amp; ~<span class="i">$Other</span><span class="sc">;</span>
+ 934 
+ 935   <span class="k">return</span> <span class="i">$BitVector</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span> ? <span class="n">0</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 936 <span class="s">}</span>
+ 937 
+ 938 <span class="c"># Bit vector not equal operator. Two bit vectors are considered not equal when their size</span>
+ 939 <span class="c"># is different or bits are on at the same positions...</span>
+ 940 <span class="c">#</span>
+<a name="_BitVectorNotEqualOperator-"></a> 941 <span class="k">sub </span><span class="m">_BitVectorNotEqualOperator</span> <span class="s">{</span>
+ 942   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 943 
+ 944   <span class="i">$ErrorMsg</span> = <span class="q">&quot;_BitVectorEqualOperator: BitVector != oparation failed&quot;</span><span class="sc">;</span>
+ 945   <span class="i">$CheckBitVectorSizes</span> = <span class="n">0</span><span class="sc">;</span>
+ 946   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span> = <span class="i">_ProcessOverloadedOperatorParameters</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">@_</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 947 
+ 948   <span class="k">if</span> <span class="s">(</span>!<span class="i">$OtherIsBitVector</span><span class="s">)</span> <span class="s">{</span>
+ 949     <span class="k">if</span> <span class="s">(</span><span class="i">$OrderFlipped</span><span class="s">)</span> <span class="s">{</span>
+ 950       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: First object must be a bit vector...&quot;</span><span class="sc">;</span>
+ 951     <span class="s">}</span>
+ 952   <span class="s">}</span>
+ 953   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> != <span class="i">$Other</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 954     <span class="k">return</span> <span class="n">1</span><span class="sc">;</span>
+ 955   <span class="s">}</span>
+ 956   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span> != <span class="i">$Other</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 957     <span class="k">return</span> <span class="n">1</span><span class="sc">;</span>
+ 958   <span class="s">}</span>
+ 959   <span class="c"># Check number of On bits only in This vector. It must be zero for vectors to be equal...</span>
+ 960   <span class="k">my</span><span class="s">(</span><span class="i">$BitVector</span><span class="s">)</span><span class="sc">;</span>
+ 961   <span class="i">$BitVector</span> = <span class="i">$This</span> &amp; ~<span class="i">$Other</span><span class="sc">;</span>
+ 962 
+ 963   <span class="k">return</span> <span class="i">$BitVector</span><span class="i">-&gt;GetNumOfSetBits</span><span class="s">(</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 964 <span class="s">}</span>
+ 965 
+ 966 <span class="c"># Process parameters passed to overloaded operators...</span>
+ 967 <span class="c">#</span>
+ 968 <span class="c"># For uninary operators, $SecondParameter is not defined.</span>
+<a name="_ProcessOverloadedOperatorParameters-"></a> 969 <span class="k">sub </span><span class="m">_ProcessOverloadedOperatorParameters</span> <span class="s">{</span>
+ 970   <span class="k">my</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="cm">,</span> <span class="i">$ParametersOrderStatus</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizesStatus</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 971   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="cm">,</span> <span class="i">$CheckBitVectorSizes</span><span class="s">)</span><span class="sc">;</span>
+ 972 
+ 973   <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="s">)</span> =  <span class="s">(</span><span class="i">$FirstParameter</span><span class="cm">,</span> <span class="i">$SecondParameter</span><span class="s">)</span><span class="sc">;</span>
+ 974   <span class="i">$OrderFlipped</span> = <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$ParametersOrderStatus</span><span class="s">)</span> &amp;&amp; <span class="i">$ParametersOrderStatus</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 975   <span class="i">$CheckBitVectorSizes</span> = <span class="s">(</span><span class="k">defined</span> <span class="i">$CheckBitVectorSizesStatus</span><span class="s">)</span> ? <span class="i">$CheckBitVectorSizesStatus</span> <span class="co">:</span> <span class="n">1</span><span class="sc">;</span>
+ 976 
+ 977   <span class="i">_ValidateBitVector</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$This</span><span class="s">)</span><span class="sc">;</span>
+ 978 
+ 979   <span class="i">$OtherIsBitVector</span> = <span class="n">0</span><span class="sc">;</span>
+ 980   <span class="k">if</span> <span class="s">(</span><span class="k">defined</span><span class="s">(</span><span class="i">$Other</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="k">ref</span> <span class="i">$Other</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 981     <span class="c"># Make sure $Other is a vector...</span>
+ 982     <span class="i">_ValidateBitVector</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$Other</span><span class="s">)</span><span class="sc">;</span>
+ 983     <span class="k">if</span> <span class="s">(</span><span class="i">$CheckBitVectorSizes</span><span class="s">)</span> <span class="s">{</span>
+ 984       <span class="i">_ValidateBitVectorSizesAreEqual</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="s">)</span><span class="sc">;</span>
+ 985     <span class="s">}</span>
+ 986     <span class="i">$OtherIsBitVector</span> = <span class="n">1</span><span class="sc">;</span>
+ 987   <span class="s">}</span>
+ 988   <span class="k">return</span> <span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Other</span><span class="cm">,</span> <span class="i">$OrderFlipped</span><span class="cm">,</span> <span class="i">$OtherIsBitVector</span><span class="s">)</span><span class="sc">;</span>
+ 989 <span class="s">}</span>
+ 990 
+ 991 <span class="c"># Is it a bit vector object?</span>
+<a name="_IsBitVector-"></a> 992 <span class="k">sub </span><span class="m">_IsBitVector</span> <span class="s">{</span>
+ 993   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 994 
+ 995   <span class="k">return</span> <span class="s">(</span><span class="i">Scalar::Util::blessed</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> &amp;&amp; <span class="i">$Object</span><span class="i">-&gt;isa</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 996 <span class="s">}</span>
+ 997 
+ 998 <span class="c"># Make sure it&#39;s a bit vector reference...</span>
+<a name="_ValidateBitVector-"></a> 999 <span class="k">sub </span><span class="m">_ValidateBitVector</span> <span class="s">{</span>
+1000   <span class="k">my</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$Vector</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1001 
+1002   <span class="k">if</span> <span class="s">(</span>!<span class="i">_IsBitVector</span><span class="s">(</span><span class="i">$Vector</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1003     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: Object must be a bit vector...&quot;</span><span class="sc">;</span>
+1004   <span class="s">}</span>
+1005 <span class="s">}</span>
+1006 
+1007 <span class="c"># Make sure size of the two bit vectors are equal...</span>
+<a name="_ValidateBitVectorSizesAreEqual-"></a>1008 <span class="k">sub </span><span class="m">_ValidateBitVectorSizesAreEqual</span> <span class="s">{</span>
+1009   <span class="k">my</span><span class="s">(</span><span class="i">$ErrorMsg</span><span class="cm">,</span> <span class="i">$BitVector1</span><span class="cm">,</span> <span class="i">$BitVector2</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1010 
+1011   <span class="k">if</span> <span class="s">(</span><span class="i">$BitVector1</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> != <span class="i">$BitVector2</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+1012     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;${ErrorMsg}: Size of the bit vectors must be same...&quot;</span><span class="sc">;</span>
+1013   <span class="s">}</span>
+1014 <span class="s">}</span>
+1015 
+1016 <span class="c"># Return a string containing vector values...</span>
+<a name="StringifyBitVector-"></a>1017 <span class="k">sub </span><span class="m">StringifyBitVector</span> <span class="s">{</span>
+1018   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+1019   <span class="k">my</span><span class="s">(</span><span class="i">$BitVectorString</span><span class="cm">,</span> <span class="i">$PrintFormat</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="cm">,</span> <span class="i">$BitsValue</span><span class="s">)</span><span class="sc">;</span>
+1020 
+1021   <span class="i">$PrintFormat</span> = <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">ValueFormat</span>}<span class="s">)</span> ? <span class="i">$This</span>-&gt;{<span class="w">ValueFormat</span>} <span class="co">:</span> <span class="i">$ValueFormat</span><span class="sc">;</span>
+1022   <span class="i">$BitOrder</span> = <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">ValueBitOrder</span>}<span class="s">)</span> ? <span class="i">$This</span>-&gt;{<span class="w">ValueBitOrder</span>} <span class="co">:</span> <span class="i">$ValueBitOrder</span><span class="sc">;</span>
+1023   <span class="i">$BitVectorString</span> = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+1024 
+1025   <span class="j">FORMAT:</span> <span class="s">{</span>
+1026       <span class="k">if</span> <span class="s">(</span><span class="i">$PrintFormat</span> =~ <span class="q">/^(Hexadecimal|Hex|HexadecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$BitsValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Hexadecimal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>  <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+1027       <span class="k">if</span> <span class="s">(</span><span class="i">$PrintFormat</span> =~ <span class="q">/^(Octal|Oct|OctalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$BitsValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Octal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>  <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+1028       <span class="k">if</span> <span class="s">(</span><span class="i">$PrintFormat</span> =~ <span class="q">/^(Decimal|Dec|DecimalString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$BitsValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Decimal&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>  <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+1029       <span class="k">if</span> <span class="s">(</span><span class="i">$PrintFormat</span> =~ <span class="q">/^(RawBinary|RawBin|RawBinaryString)$/i</span><span class="s">)</span> <span class="s">{</span> <span class="i">$BitsValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;RawBinary&#39;</span><span class="s">)</span><span class="sc">;</span>  <span class="k">last</span> <span class="j">FORMAT</span><span class="sc">;</span> <span class="s">}</span>
+1030       <span class="c"># Default is bninary format...</span>
+1031       <span class="i">$BitsValue</span> = <span class="i">$This</span><span class="i">-&gt;_GetBitsAsString</span><span class="s">(</span><span class="q">&#39;Binary&#39;</span><span class="cm">,</span> <span class="i">$BitOrder</span><span class="s">)</span><span class="sc">;</span>
+1032   <span class="s">}</span>
+1033   <span class="i">$BitVectorString</span> = <span class="q">&quot;&lt;Size: &quot;</span>. <span class="i">$This</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span> . <span class="q">&quot;;BitOrder: $BitOrder; Value: &quot;</span> . <span class="i">$BitsValue</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+1034 
+1035   <span class="k">return</span> <span class="i">$BitVectorString</span><span class="sc">;</span>
+1036 <span class="s">}</span>
+1037 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

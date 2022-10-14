@@ -1,0 +1,214 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:ExtractFromTextFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromSequenceFiles.html" title="ExtractFromSequenceFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FilterSDFiles.html" title="FilterSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>ExtractFromTextFiles.pl</strong></td><td width="33%" align="right"><a href="././code/ExtractFromTextFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/ExtractFromTextFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/ExtractFromTextFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/ExtractFromTextFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/ExtractFromTextFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>ExtractFromTextFiles.pl - Extract specific data from TextFile(s)</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>ExtractFromTextFiles.pl TextFile(s)...</p>
+<p>ExtractFromTextFiles.pl [<strong>-c, --colmode</strong> colnum | collabel] [<strong>--categorycol </strong> number | string]
+[<strong>--columns</strong> &quot;colnum,[colnum]...&quot; | &quot;collabel,[collabel]...&quot;] [<strong>-h, --help</strong>]
+[<strong>--indelim</strong> <em>comma | semicolon</em>] [<strong>-m, --mode </strong> <em>columns | rows | categories</em>]
+[<strong>-o, --overwrite</strong>] [<strong>--outdelim</strong> <em>comma | tab | semicolon</em>] [<strong>-q, --quote</strong> <em>yes | no</em>]
+[<strong>--rows</strong> &quot;colid,value,criteria...&quot; | &quot;colid,value...&quot; | &quot;colid,mincolvalue,maxcolvalue&quot; | &quot;rownum,rownum,...&quot; | colid | &quot;minrownum,maxrownum&quot;]
+[ <strong>--rowsmode</strong> rowsbycolvalue | rowsbycolvaluelist | rowsbycolvaluerange | rowbymincolvalue | rowbymaxcolvalue | rownums | rownumrange]
+[<strong>-r, --root</strong> <em>rootname</em>] [<strong>-w, --workingdir</strong> <em>dirname</em>] TextFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Extract column(s)/row(s) data from <em>TextFile(s)</em> identified by column numbers or labels. Or categorize
+data using a specified column category. During categorization, a summary text file is
+generated containing category name and count; an additional text file, containing data for
+for each category, is also generated. The file names are separated by space. The
+valid file extensions are <em>.csv</em> and <em>.tsv</em> for comma/semicolon and tab delimited
+text files respectively. All other file names are ignored. All the text files in a
+current directory can be specified by <em>*.csv</em>, <em>*.tsv</em>, or the current directory
+name. The <strong>--indelim</strong> option determines the format of <em>TextFile(s)</em>. Any file
+which doesn't correspond to the format indicated by <strong>--indelim</strong> option is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-c, --colmode</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>Specify how columns are identified in <em>TextFile(s)</em>: using column number or column
+label. Possible values: <em>colnum or collabel</em>. Default value: <em>colnum</em>.</p>
+</dd>
+<dt><strong><strong>--categorycol </strong> <em>number | string</em></strong></dt>
+<dd>
+<p>Column used to categorize data. Default value: First column.</p>
+<p>For <em>colnum</em> value of <strong>-c, --colmode</strong> option, input value is a column number.
+Example: <em>1</em>.</p>
+<p>For <em>collabel</em> value of <strong>-c, --colmode</strong> option, input value is a column label.
+Example: <em>Mol_ID</em>.</p>
+</dd>
+<dt><strong><strong>--columns</strong> <em>&quot;colnum,[colnum]...&quot; | &quot;collabel,[collabel]...&quot;</em></strong></dt>
+<dd>
+<p>List of comma delimited columns to extract. Default value: First column.</p>
+<p>For <em>colnum</em> value of <strong>-c, --colmode</strong> option, input values format is:
+<em>colnum,colnum,...</em>. Example: <em>1,3,5</em></p>
+<p>For <em>collabel</em> value of <strong>-c, --colmode</strong> option, input values format is:
+<em>collabel,collabel,..</em>. Example: <em>Mol_ID,MolWeight</em></p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-m, --mode </strong> <em>columns | rows | categories</em></strong></dt>
+<dd>
+<p>Specify what to extract from <em>TextFile(s)</em>. Possible values: <em>columns, rows,
+or categories</em>. Default value: <em>columns</em>.</p>
+<p>For <em>columns</em> mode, data for appropriate columns specified by <strong>--columns</strong> option
+is extracted from <em>TextFile(s)</em> and placed into new text files.</p>
+<p>For <em>rows</em> mode, appropriate rows specified in conjuction with <strong>--rowsmode</strong> and
+<strong>rows</strong> options are extracted from <em>TextFile(s)</em> and placed into new text files.</p>
+<p>For <em>categories</em> mode, coulmn specified by <strong>--categorycol</strong> is
+used to categorize data, and a summary text file is generated
+containing category name and count;  an additional text file, containing data for
+for each category, is also generated.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>--outdelim</strong> <em>comma | tab | semicolon</em>.</strong></dt>
+<dd>
+<p>Output text file delimiter. Possible values: <em>comma, tab, or semicolon</em>.
+Default value: <em>comma</em></p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Put quotes around column values in output text file. Possible values: <em>yes or
+no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New file name is generated using the root: &lt;Root&gt;.&lt;Ext&gt;. Default for new file
+names: &lt;TextFile&gt;CategoriesSummary.&lt;Ext&gt;, &lt;TextFile&gt;ExtractedColumns.&lt;Ext&gt;, and
+&lt;TextFile&gt;ExtractedRows.&lt;Ext&gt; for <em>categories</em>, <em>columns</em>, and <em>rows</em> mode
+respectively. And &lt;TextFile&gt;Category&lt;CategoryName&gt;.&lt;Ext&gt;
+for each category retrieved from each text file. The output file type determines &lt;Ext&gt;
+value: csv and tsv for CSV, and TSV files respectively.</p>
+<p>This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>--rows</strong> <em>&quot;colid,value,criteria...&quot; | &quot;colid,value...&quot; | &quot;colid,mincolvalue,maxcolvalue&quot; | &quot;rownum,rownum,...&quot; | colid | &quot;minrownum,maxrownum&quot;</em></strong></dt>
+<dd>
+<p>This value is <strong>--rowsmode</strong> specific. In general, it's a list of comma separated column ids and
+associated mode specific value. Based on Column ids specification, column label or number, is
+controlled by <strong>-c, --colmode</strong> option.</p>
+<p>First line containing column labels is always written out. And value comparisons assume
+numerical column data.</p>
+<p>For <em>rowsbycolvalue</em> mode, input value format contains these triplets:
+<em>colid,value, criteria...</em>. Possible values for criteria: <em>le, ge or eq</em>.
+Examples:</p>
+<div class="OptionsBox">
+    MolWt,450,le
+<br/>    MolWt,450,le,LogP,5,le,SumNumNO,10,le,SumNHOH,5,le</div>
+<p>For <em>rowsbycolvaluelist</em> mode, input value format is: <em>colid,value...</em>. Examples:</p>
+<div class="OptionsBox">
+    Mol_ID,20
+<br/>    Mol_ID,20,1002,1115</div>
+<p>For <em>rowsbycolvaluerange</em> mode, input value format is: <em>colid,mincolvalue,maxcolvalue</em>. Examples:</p>
+<div class="OptionsBox">
+    MolWt,100,450</div>
+<p>For <em>rowbymincolvalue, rowbymaxcolvalue</em> modes, input value format is: <em>colid</em>.</p>
+<p>For <em>rownum</em> mode, input value format is: <em>rownum</em>. Default value: <em>2</em>.</p>
+<p>For <em>rownumrange</em> mode, input value format is: <em>minrownum, maxrownum</em>. Examples:</p>
+<div class="OptionsBox">
+    10,40</div>
+</dd>
+<dt><strong><strong>--rowsmode</strong> <em>rowsbycolvalue | rowsbycolvaluelist | rowsbycolvaluerange | rowbymincolvalue | rowbymaxcolvalue | rownums | rownumrange</em></strong></dt>
+<dd>
+<p>Specify how to extract rows from <em>TextFile(s)</em>. Possible values: <em>rowsbycolvalue, rowsbycolvaluelist, rowsbycolvaluerange,
+rowbymincolvalue, rowbymaxcolvalue, rownum, rownumrange</em>. Default value: <em>rownum</em>.</p>
+<p>Use <strong>--rows</strong> option to list rows criterion used for extraction of rows from
+<em>TextFile(s)</em>.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To extract first column from a text file and generate a new CSV text file NewSample1.csv,
+type:</p>
+<div class="ExampleBox">
+    % ExtractFromTextFiles.pl -r NewSample1 -o Sample1.csv</div>
+<p>To extract columns Mol_ID, MolWeight, and NAME from Sample1.csv and generate a new
+textfile NewSample1.tsv with no quotes, type:</p>
+<div class="ExampleBox">
+    % ExtractFromTextFiles.pl -m columns -c collabel --columns &quot;Mol_ID,
+      MolWeight,NAME&quot; --outdelim tab --quote no -r NewSample1
+      -o Sample1.csv</div>
+<p>To extract rows containing values for MolWeight column of less than 450 from
+Sample1.csv and generate a new textfile NewSample1.csv, type:</p>
+<div class="ExampleBox">
+    % ExtractFromTextFiles.pl -m rows --rowsmode rowsbycolvalue
+      -c collabel --rows MolWeight,450,le -r NewSample1
+      -o Sample1.csv</div>
+<p>To extract rows containing values for MolWeight column between 400 and 500 from
+Sample1.csv and generate a new textfile NewSample1.csv, type:</p>
+<div class="ExampleBox">
+    % ExtractFromTextFiles.pl -m rows --rowsmode rowsbycolvaluerange
+      -c collabel --rows MolWeight,450,500 -r NewSample1
+      -o Sample1.csv</div>
+<p>To extract a row containing minimum value for column MolWeight from Sample1.csv and generate
+a new textfile NewSample1.csv, type:</p>
+<div class="ExampleBox">
+    % ExtractFromTextFiles.pl -m rows --rowsmode rowbymincolvalue
+      -c collabel --rows MolWeight -r NewSample1
+      -o Sample1.csv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp<a href="./MergeTextFilesWithSD.html">MergeTextFilesWithSD.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>,&nbsp<a href="./SplitTextFiles.html">SplitTextFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./ExtractFromSequenceFiles.html" title="ExtractFromSequenceFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./FilterSDFiles.html" title="FilterSDFiles.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>ExtractFromTextFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

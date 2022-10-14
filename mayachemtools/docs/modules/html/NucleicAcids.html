@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:NucleicAcids.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MoleculeFileIO.html" title="MoleculeFileIO.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ObjectProperty.html" title="ObjectProperty.html">Next</a></td><td width="34%" align="middle"><strong>NucleicAcids.pm</strong></td><td width="33%" align="right"><a href="././code/NucleicAcids.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/NucleicAcids.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/NucleicAcids.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/NucleicAcids.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/NucleicAcids.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>NucleicAcids</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use NucleicAcids;</p>
+<p>use NucleicAcids qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>NucleicAcids</strong> module the provides the following functions:</p>
+<p>GetNucleicAcidPropertiesData, GetNucleicAcidPropertiesNames,
+GetNucleicAcids, GetNucleicAcidsByType, IsNucleicAcid, IsNucleicAcidProperty,
+IsNucleicAcidType</p>
+<p>
+</p>
+<h2>Functions</h2>
+<dl>
+<dt><strong><a name="getnucleicacids" class="item"><strong>GetNucleicAcids</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    (@Names) = GetNucleicAcids([$NameType]);
+<br/>    $NamesRef = GetNucleicAcids([$NameType]);</div>
+<p>Returns an array or a reference to an array containing names of nucleic acids
+as a code or nucleic acid name controlled by optional parameter <em>NameType</em>. By
+default, nucleic acids names are returned as the code. Possible values for
+<em>NameType</em>: <em>Code or Name</em>.</p>
+</dd>
+<dt><strong><a name="getnucleicacidsbytype" class="item"><strong>GetNucleicAcidsByType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    (@Names) = GetNucleicAcidsByType([$Type, $NameType]);
+<br/>    $NamesRef = GetNucleicAcidsByType([$Type, $NameType]);</div>
+<p>Returns an array or a reference to an array containing names of nucleic acids
+specified by parameter <em>Type</em> as a code or name controlled by optional
+parameter <em>NameType</em>. Default values for <em>Type</em>: <em>Nucleoside</em>. Default value for
+<em>NameType</em>: <em>Code</em>. Possible values for <em>Type</em>: <em>Nucleobase, Nucleoside, Deoxynucleoside,
+Nucleotide, Deoxynucleotide</em>. Possible values for <em>NameType</em>: <em>Code or Name</em>.</p>
+</dd>
+<dt><strong><a name="getnucleicacidpropertiesdata" class="item"><strong>GetNucleicAcidPropertiesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DataHashRef = GetNucleicAcidPropertiesData($NucleicAcidID);</div>
+<p>Returns a reference to hash containing property names and values for a specified
+<em>NucleicAcidID</em>.</p>
+</dd>
+<dt><strong><a name="getnucleicacidpropertyname" class="item"><strong>GetNucleicAcidPropertyName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = GetNucleicAcid&lt;PropertyName&gt;($NucleicAcidID);</div>
+<p>Returns nucleic acid property value for a specified <em>NucleicAcidID</em>. This function is
+implemented on-the-fly using Perl's AUTOLOAD functionality.</p>
+</dd>
+<dt><strong><a name="getnucleicacidpropertiesnames" class="item"><strong>GetNucleicAcidPropertiesNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Names = GetNucleicAcidPropertiesNames([$Mode]);
+<br/>    $NamesRef = GetNucleicAcidPropertiesNames([$Mode]);</div>
+<p>Returns an array or a reference to an array containing names of properties for
+nucleic acids. Order of nucleic acids properties is controlled by optional parameter
+<em>Mode</em>. Possible values for <em>Mode</em>: <em>Alphabetical or ByGroup</em>; Default: <em>ByGroup</em>.</p>
+</dd>
+<dt><strong><a name="isnucleicacid" class="item"><strong>IsNucleicAcid</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsNucleicAcid($NucleicAcidID);</div>
+<p>Returns 1 or 0 based on whether it's a known nucleic acid ID.</p>
+</dd>
+<dt><strong><a name="isnucleicacidproperty" class="item"><strong>IsNucleicAcidProperty</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsNucleicAcid($PropertyName);</div>
+<p>Returns 1 or 0 based on whether it's a known nucleic acid property name.</p>
+</dd>
+<dt><strong><a name="isnucleicacidtype" class="item"><strong>IsNucleicAcidType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsNucleicAcidType();</div>
+<p>Returns 1 or 0 based on whether it's a known nucleic acid type.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AminoAcids.html">AminoAcids.pm</a>,&nbsp<a href="./PeriodicTable.html">PeriodicTable.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MoleculeFileIO.html" title="MoleculeFileIO.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ObjectProperty.html" title="ObjectProperty.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>NucleicAcids.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

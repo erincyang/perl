@@ -1,0 +1,213 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Graph::GraphMatrix.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./CyclesDetection.html" title="CyclesDetection.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Path.html" title="Path.html">Next</a></td><td width="34%" align="middle"><strong>Graph::GraphMatrix.pm</strong></td><td width="33%" align="right"><a href="././code/GraphMatrix.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/GraphMatrix.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/GraphMatrix.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/GraphMatrix.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/GraphMatrix.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>GraphMatrix</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Graph::GraphMatrix;</p>
+<p>use Graph::GraphMatrix qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>GraphMatrix</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#generateadjacencymatrix">GenerateAdjacencyMatrix</a>, <a href="#generateadmittancematrix">GenerateAdmittanceMatrix</a>, <a href="#generatedegreematrix">GenerateDegreeMatrix</a>
+, <a href="#generatedistancematrix">GenerateDistanceMatrix</a>, <a href="#generateincidencematrix">GenerateIncidenceMatrix</a>, <a href="#generatekirchhoffmatrix">GenerateKirchhoffMatrix</a>
+, <a href="#generatelaplacianmatrix">GenerateLaplacianMatrix</a>, <a href="#generatenormalizedlaplacianmatrix">GenerateNormalizedLaplacianMatrix</a>
+, <a href="#generatesiedeladjacencymatrix">GenerateSiedelAdjacencyMatrix</a>, <a href="#getcolumnids">GetColumnIDs</a>, <a href="#getmatrix">GetMatrix</a>, <a href="#getmatrixtype">GetMatrixType</a>, <a href="#getrowids">GetRowIDs</a>
+, <a href="#stringifygraphmatrix">StringifyGraphMatrix</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewGraphMatrix = new Graph::GraphMatrix($Graph);</div>
+<p>Using specified <em>Graph</em>, <strong>new</strong> method creates a new <strong>GraphMatrix</strong> and returns
+newly created <strong>GraphMatrix</strong>.</p>
+</dd>
+<dt><strong><a name="generateadjacencymatrix" class="item"><strong>GenerateAdjacencyMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AdjacencyGraphMatrix = $GraphMatrix-&gt;GenerateAdjacencyMatrix();</div>
+<p>Generates a new <em>AdjacencyGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>AdjacencyGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the adjacency matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . 1    if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 0    if i != j and vertex Vi is not adjacent to vertex Vj</div>
+</dd>
+<dt><strong><a name="generateadmittancematrix" class="item"><strong>GenerateAdmittanceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AdmittanceGraphMatrix = $GraphMatrix-&gt;GenerateAdmittanceMatrix();</div>
+<p>Generates a new <em>AdmittanceGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>AdmittanceGraphMatrix</em>.</p>
+<p><strong>AdmittanceMatrix</strong> is another name for <strong>LaplacianMatrix</strong>.</p>
+</dd>
+<dt><strong><a name="generatedegreematrix" class="item"><strong>GenerateDegreeMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DegreeGraphMatrix = $GraphMatrix-&gt;GenerateDegreeMatrix();</div>
+<p>Generates a new <em>DegreeGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>DegreeGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the degree matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi
+<br/>    . 0         otherwise</div>
+</dd>
+<dt><strong><a name="generatedistancematrix" class="item"><strong>GenerateDistanceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DistanceGraphMatrix = $GraphMatrix-&gt;GenerateDistanceMatrix();</div>
+<p>Generates a new <em>DistanceGraphMatrix</em> for specified <strong>Graph</strong> using Floyd-Marshall
+algorithm [Ref 67] and returns <em>DistanceGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the distance matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . d    if i != j and d is the shortest distance between vertex Vi and vertex Vj</div>
+<p>In the final matrix, value of constant <strong>BigNumber</strong> defined in <strong>Constants.pm</strong> module
+corresponds to vertices with no edges.</p>
+</dd>
+<dt><strong><a name="generateincidencematrix" class="item"><strong>GenerateIncidenceMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $IncidenceGraphMatrix = $GraphMatrix-&gt;GenerateIncidenceMatrix();</div>
+<p>Generates a new <em>IncidenceGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>IncidenceGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices and e edges, the incidence matrix for G is a n x e matrix
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 1    if vertex Vi and the edge Ej are incident; in other words, Vi and Ej are related
+<br/>    . 0    otherwise</div>
+</dd>
+<dt><strong><a name="generatekirchhoffmatrix" class="item"><strong>GenerateKirchhoffMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $KirchhoffGraphMatrix = $GraphMatrix-&gt;GenerateKirchhoffMatrix();</div>
+<p>Generates a new <em>KirchhoffGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>KirchhoffGraphMatrix</em>.</p>
+<p><strong>KirchhoffMatrix</strong> is another name for <strong>LaplacianMatrix</strong>.</p>
+</dd>
+<dt><strong><a name="generatelaplacianmatrix" class="item"><strong>GenerateLaplacianMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $LaplacianGraphMatrix = $GraphMatrix-&gt;GenerateLaplacianMatrix();</div>
+<p>Generates a new <em>LaplacianGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>LaplacianGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the Laplacian matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . deg(Vi)   if i == j and deg(Vi) is the degree of vertex Vi
+<br/>    . -1        if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 0         otherwise</div>
+<p>The Laplacian matrix is the difference between the degree matrix and adjacency matrix.</p>
+</dd>
+<dt><strong><a name="generatenormalizedlaplacianmatrix" class="item"><strong>GenerateNormalizedLaplacianMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NormalizedLaplacianGraphMatrix = $GraphMatrix-&gt;GenerateNormalizedLaplacianMatrix();</div>
+<p>Generates a new <em>NormalizedLaplacianGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>NormalizedLaplacianGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the normalized Laplacian matrix L for G is a n x n square
+matrix and its elements Lij are:</p>
+<div class="OptionsBox">
+    .  1                           if i == j and deg(Vi) != 0
+<br/>    .  -1/SQRT(deg(Vi) * deg(Vj))  if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    .  0                           otherwise</div>
+</dd>
+<dt><strong><a name="generatesiedeladjacencymatrix" class="item"><strong>GenerateSiedelAdjacencyMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SiedelAdjacencyGraphMatrix = $GraphMatrix-&gt;GenerateSiedelAdjacencyMatrix();</div>
+<p>Generates a new <em>SiedelAdjacencyGraphMatrix</em> for specified <strong>Graph</strong> and returns
+<em>SiedelAdjacencyGraphMatrix</em>.</p>
+<p>For a simple graph G with n vertices, the Siedal adjacency matrix for G is a n x n square matrix and
+its elements Mij are:</p>
+<div class="OptionsBox">
+    . 0    if i == j
+<br/>    . -1   if i != j and vertex Vi is adjacent to vertex Vj
+<br/>    . 1    if i != j and vertex Vi is not adjacent to vertex Vj</div>
+</dd>
+<dt><strong><a name="getcolumnids" class="item"><strong>GetColumnIDs</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @ColumnIDs = $GraphMatrix-&gt;GetColumnIDs();</div>
+<p>Returns an array containing any specified column IDs for <em>GraphMatrix</em>.</p>
+</dd>
+<dt><strong><a name="getmatrix" class="item"><strong>GetMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Matrix = $GraphMatrix-&gt;GetMatrix();</div>
+<p>Returns <em>Matrix</em> object corresponding to <em>GraphMatrix</em> object.</p>
+</dd>
+<dt><strong><a name="getmatrixtype" class="item"><strong>GetMatrixType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MatrixType = $GraphMatrix-&gt;GetMatrixType();</div>
+<p>Returns <strong>MatrixType</strong> of <em>GraphMatrix</em>.</p>
+</dd>
+<dt><strong><a name="getrowids" class="item"><strong>GetRowIDs</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @RowIDs = $GraphMatrix-&gt;GetRowIDs();</div>
+<p>Returns an array containing any specified rowIDs IDs for <em>GraphMatrix</em>.</p>
+</dd>
+<dt><strong><a name="stringifygraphmatrix" class="item"><strong>StringifyGraphMatrix</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $GraphMatrix-&gt;StringifyGraphMatrix();</div>
+<p>Returns a string containing information about <em>GraphMatrix</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./Constants.html">Constants.pm</a>,&nbsp<a href="./Graph.html">Graph.pm</a>,&nbsp<a href="./Matrix.html">Matrix.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./CyclesDetection.html" title="CyclesDetection.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Path.html" title="Path.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Graph::GraphMatrix.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

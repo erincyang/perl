@@ -1,0 +1,39 @@
+#
+# $RCSfile: PackageInfo.csv,v $
+# $Date: 2017/01/13 17:21:07 $
+# $Revision: 1.30 $
+#
+# Author: Manish Sud <msud@san.rr.com>
+#
+# Copyright (C) 2017 Manish Sud. All rights reserved.
+#
+# This file is part of MayaChemTools.
+#
+# MayaChemTools is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option) any
+# later version.
+#
+# MayaChemTools is distributed in the hope that it will be useful, but without
+# any warranty; without even the implied warranty of merchantability of fitness
+# for a particular purpose.  See the GNU Lesser General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with MayaChemTools; if not, see <http://www.gnu.org/licenses/> or
+# write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,
+# Boston, MA, 02111-1307, USA.
+#
+# Notes:
+#     o Package key/value information is available through PackageInfo.pm module.
+#
+#
+"KeyName","KeyValue"
+"PackageName","MayaChemTools"
+"ReleaseDate","Jan 13, 2017"
+"VersionNumber","9.2"
+"DevSoftwareEnvironment","Cygwin; Windows XP"
+"DevHardwareEnvironment","An ancient Sony VAIO laptop; Pentium M 1.5 MHz processor; 512 MB RAM"
+"Editor","GNU Emacs"
+"DocumentationGeneration","Custom Perl script using these external tools: pod2man, pod2text, pod2html, perldoc, pod2pdf and perltidy"
+"Dependencies","Perl v5.8 or higher; DBI, DBD-mysql, DBD-Oracle, DBD-Pg to use database scripts"

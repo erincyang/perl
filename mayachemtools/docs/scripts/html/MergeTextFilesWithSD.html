@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MergeTextFilesWithSD.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MergeTextFiles.html" title="MergeTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ModifyNewLineChar.html" title="ModifyNewLineChar.html">Next</a></td><td width="34%" align="middle"><strong>MergeTextFilesWithSD.pl</strong></td><td width="33%" align="right"><a href="././code/MergeTextFilesWithSD.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/MergeTextFilesWithSD.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/MergeTextFilesWithSD.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/MergeTextFilesWithSD.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/MergeTextFilesWithSD.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>MergeTextFilesWithSD.pl - Merge CSV or TSV TextFile(s) into SDFile</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>MergeTextFilesWithSD.pl  SDFile TextFile(s)...</p>
+<p>MergeTextFilesWithSD.pl  [<strong>-h, --help</strong>] [<strong>--indelim</strong> comma | semicolon]
+[<strong>-c, --columns</strong> colnum,...;... | collabel,...;...] [<strong>-k, --keys</strong> colkeynum;... | colkeylabel;...]
+[<strong>-m, --mode</strong> colnum | collabel] [<strong>-o, --overwrite</strong>] [<strong>-r, --root</strong> rootname]
+[<strong>-s, --sdkey</strong> sdfieldname] [<strong>-w, --workingdir</strong> dirname] SDFile TextFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Merge multiple CSV or TSV <em>TextFile(s)</em> into <em>SDFile</em>. Unless <strong>-k --keys</strong>
+option is used, data rows from all <em>TextFile(s)</em> are added to <em>SDFile</em> in a
+sequential order, and the number of compounds in <em>SDFile</em> is used to determine
+how many rows of data are added from <em>TextFile(s)</em>.</p>
+<p>Multiple <em>TextFile(s)</em> names are separated by spaces. The valid file extensions are <em>.csv</em> and
+<em>.tsv</em> for comma/semicolon and tab delimited text files respectively. All other file names
+are ignored. All the text files in a current directory can be specified by <em>*.csv</em>,
+<em>*.tsv</em>, or the current directory name. The <strong>--indelim</strong> option determines the
+format of <em>TextFile(s)</em>. Any file which doesn't correspond to the format indicated
+by <strong>--indelim</strong> option is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-c, --columns</strong> <em>colnum,...;... | collabel,...;...</em></strong></dt>
+<dd>
+<p>This value is mode specific. It is a list of columns to merge into <em>SDFile</em>
+specified by column numbers or labels for each text file delimited by &quot;;&quot;.
+All <em>TextFile(s)</em> are merged into <em>SDFile</em>.</p>
+<p>Default value: <em>all;all;...</em>. By default, all columns from TextFile(s) are
+merged into <em>SDFile</em>.</p>
+<p>For <em>colnum</em> mode, input value format is: <em>colnum,...;colnum,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;1,2;1,3,4;7,8,9&quot;</div>
+<p>For <em>collabel</em> mode, input value format is: <em>collabel,...;collabel,...;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;MW,SumNO;SumNHOH,ClogP,PSA;MolName,Mol_Id,Extreg&quot;</div>
+</dd>
+<dt><strong><strong>-k, --keys</strong> <em>colkeynum;... | colkeylabel;...</em></strong></dt>
+<dd>
+<p>This value is mode specific. It specifies column keys to use for merging
+<em>TextFile(s)</em> into <em>SDFile</em>. The column keys, delimited by &quot;;&quot;, are specified by column
+numbers or labels for <em>TextFile(s)</em>.</p>
+<p>By default, data rows from <em>TextFile(s)</em> are merged into <em>SDFile</em> in the order they appear.</p>
+<p>For <em>colnum</em> mode, input value format is:<em>colkeynum, colkeynum;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;1;3;7&quot;</div>
+<p>For <em>collabel</em> mode, input value format is:<em>colkeylabel, colkeylabel;...</em>. Example:</p>
+<div class="OptionsBox">
+    &quot;Mol_Id;Mol_Id;Cmpd_Id&quot;</div>
+</dd>
+<dt><strong><strong>-m, --mode</strong> <em>colnum | collabel</em></strong></dt>
+<dd>
+<p>Specify how to merge <em>TextFile(s)</em> into <em>SDFile</em>: using column numbers or column labels.
+Possible values: <em>colnum or collabel</em>. Default value: <em>colnum</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New SD file name is generated using the root: &lt;Root&gt;.sdf. Default file name:
+&lt;InitialSDFileName&gt;MergedWith&lt;FirstTextFileName&gt;1To&lt;Count&gt;.sdf.</p>
+</dd>
+<dt><strong><strong>-s, --sdkey</strong> <em>sdfieldname</em></strong></dt>
+<dd>
+<p><em>SDFile</em> data field name used as a key to merge data from TextFile(s). By default,
+data rows from <em>TextFile(s)</em> are merged into <em>SDFile</em> in the order they appear.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To merge Sample1.csv and Sample2.csv into Sample.sdf and generate
+NewSample.sdf, type:</p>
+<div class="ExampleBox">
+    % MergeTextFileswithSD.pl -r NewSample -o Sample.sdf
+      Sample1.csv Sample2.csv</div>
+<p>To merge all Sample*.tsv into Sample.sdf and generate NewSample.sdf file, type:</p>
+<div class="ExampleBox">
+    % MergeTextFilesWithSD.pl -r NewSample -o Sample.sdf
+      Sample*.tsv</div>
+<p>To merge column numbers &quot;1,2&quot; and &quot;3,4,5&quot; from Sample2.csv and Sample3.csv
+into Sample.sdf and to generate NewSample.sdf, type:</p>
+<div class="ExampleBox">
+    % MergeTextFilesWithSD.pl -r NewSample -m colnum -c &quot;1,2;3,4,5&quot;
+      -o Sample.sdf Sample1.csv Sample2.csv</div>
+<p>To merge column &quot;Mol_ID,Formula,MolWeight&quot; and &quot;Mol_ID,ChemBankID,NAME&quot;
+from Sample1.csv and Sample2.csv into Sample.sdf using &quot;Mol_ID&quot; as SD and column keys
+to generate NewSample.sdf, type:</p>
+<div class="ExampleBox">
+    % MergeTextFilesWithSD.pl -r NewSample -s Mol_ID -k &quot;Mol_ID;Mol_ID&quot;
+      -m collabel -c &quot;Mol_ID,Formula,MolWeight;Mol_ID,ChemBankID,NAME&quot;
+      -o Sample1.sdf Sample1.csv Sample2.csv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./ExtractFromSDFiles.html">ExtractFromSDFiles.pl</a>,&nbsp<a href="./FilterSDFiles.html">FilterSDFiles.pl</a>,&nbsp<a href="./InfoSDFiles.html">InfoSDFiles.pl</a>,&nbsp<a href="./JoinSDFiles.html">JoinSDFiles.pl</a>,&nbsp<a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp
+<a href="./MergeTextFiles.html">MergeTextFiles.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>,&nbsp<a href="./SplitSDFiles.html">SplitSDFiles.pl</a>,&nbsp<a href="./SplitTextFiles.html">SplitTextFiles.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MergeTextFiles.html" title="MergeTextFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./ModifyNewLineChar.html" title="ModifyNewLineChar.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MergeTextFilesWithSD.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

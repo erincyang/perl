@@ -1,0 +1,357 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MolecularDescriptors::MolecularDescriptorsGenerator.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MolecularDescriptors.html" title="MolecularDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularVolumeDescriptors.html" title="MolecularVolumeDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>MolecularDescriptors::MolecularDescriptorsGenerator.pm</strong></td><td width="33%" align="right"><a href="././code/MolecularDescriptorsGenerator.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/MolecularDescriptorsGenerator.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/MolecularDescriptorsGenerator.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/MolecularDescriptorsGenerator.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/MolecularDescriptorsGenerator.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>MolecularDescriptorsGenerator</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use MolecularDescriptors::MolecularDescriptorsGenerator;</p>
+<p>use MolecularDescriptors::MolecularDescriptorsGenerator qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>MolecularDescriptorsGenerator</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#generatedescriptors">GenerateDescriptors</a>, <a href="#getavailableclassanddescriptornames">GetAvailableClassAndDescriptorNames</a>
+, <a href="#getavailableclassnamefordescriptorname">GetAvailableClassNameForDescriptorName</a>, <a href="#getavailabledescriptorclassnames">GetAvailableDescriptorClassNames</a>
+, <a href="#getavailabledescriptornames">GetAvailableDescriptorNames</a>, <a href="#getavailabledescriptornamesfordescriptorclass">GetAvailableDescriptorNamesForDescriptorClass</a>
+, <a href="#getdescriptorclassparameters">GetDescriptorClassParameters</a>, <a href="#getdescriptornames">GetDescriptorNames</a>, <a href="#getdescriptornamesandvalues">GetDescriptorNamesAndValues</a>
+, <a href="#getdescriptorvaluebyname">GetDescriptorValueByName</a>, <a href="#getdescriptorvalues">GetDescriptorValues</a>, <a href="#getruleof3descriptornames">GetRuleOf3DescriptorNames</a>
+, <a href="#getruleof5descriptornames">GetRuleOf5DescriptorNames</a>, <a href="#isdescriptorclassnameavailable">IsDescriptorClassNameAvailable</a>
+, <a href="#isdescriptornameavailable">IsDescriptorNameAvailable</a>, <a href="#isdescriptorsgenerationsuccessful">IsDescriptorsGenerationSuccessful</a>
+, <a href="#setdescriptorclassparameters">SetDescriptorClassParameters</a>, <a href="#setdescriptornames">SetDescriptorNames</a>, <a href="#setmode">SetMode</a>, <a href="#setmolecule">SetMolecule</a>
+, <a href="#stringifymoleculardescriptorsgenerator">StringifyMolecularDescriptorsGenerator</a>
+</p><p><strong>MolecularDescriptorsGenerator</strong> is derived from is derived from <strong>ObjectProperty</strong>
+base class that provides methods not explicitly defined in <strong>MolecularDescriptorsGenerator</strong>
+or <strong>ObjectProperty</strong> classes using Perl's AUTOLOAD functionality. These methods are
+generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p><strong>MolecularDescriptorsGenerator</strong> is designed to provide a plug-in environment for
+molecular descriptors development. The molecular descriptor class modules available
+in <strong>MolecularDescriptors</strong> directory under <strong>MayaChemTools/lib</strong> directory are
+automatically detected and loaded into the system. The descriptor names provided
+by each descriptor class module through its <strong>GetDescriptorNames</strong> function are
+retrieved and are made available for calculations of their values for a specified
+molecule.</p>
+<p>Any combination of available descriptor names can be specified during calculation
+of descriptor values using <strong>GenerateDescriptors</strong> method. The current release of
+MayaChemTools supports generation of four sets of descriptors: All available
+descriptors, rule of 5 or 3 descriptors, or a specified set of descriptor names.</p>
+<p>RuleOf5 [ Ref 91 ] descriptor names are: MolecularWeight, HydrogenBondDonors,
+HydrogenBondAcceptors, SLogP. RuleOf5 states: MolecularWeight &lt;= 500,
+HydrogenBondDonors &lt;= 5, HydrogenBondAcceptors &lt;= 10, and logP &lt;= 5.</p>
+<p>RuleOf3 [ Ref 92 ] descriptor names are: MolecularWeight, RotatableBonds,
+HydrogenBondDonors, HydrogenBondAcceptors, SLogP, TPSA. RuleOf3 states:
+MolecularWeight &lt;= 300, RotatableBonds &lt;= 3, HydrogenBondDonors &lt;= 3,
+HydrogenBondAcceptors &lt;= 3, logP &lt;= 3, and TPSA &lt;= 60.</p>
+<p>Before calculation of a specified set of descriptors by <strong>GenerateDescriptors</strong>
+method, a set of descriptor calculation control parameters for a specific descriptor
+class name can be set using <strong>SetDescriptorClassParameters</strong> method. The specified
+control parameter names and values are simply passed on to specified descriptor
+class during instantiation of descriptor class object without performing any validation
+of parameter names and associated values. It's up to the appropriate descriptor class methods
+to validate these parameters and values. In addition to specified parameter names and
+values, the parameter hash must also contain descriptor class name as key and
+value pair with DescriptorClassName as key with class name as value.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewMolecularDescriptorsGenerator = new MolecularDescriptors::
+                                        MolecularDescriptorsGenerator(
+                                        %NamesAndValues);</div>
+<p>Using specified <em>MolecularDescriptorsGenerator</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>MolecularDescriptorsGenerator</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Mode = 'All'
+<br/>    @{$This-&gt;{DescriptorNames}} = ()
+<br/>    %{$This-&gt;{DescriptorClassParameters}} = ()
+<br/>    @{$This-&gt;{DescriptorClassNames}} = ()
+<br/>    %{$This-&gt;{DescriptorClassObjects}} = ()
+<br/>    @{$This-&gt;{DescriptorValues}} = ()</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator = new MolecularDescriptors::
+                                     MolecularDescriptorsGenerator(
+                              'Molecule' =&gt; $Molecule);</div>
+<div class="OptionsBox">
+    @DescriptorNames = qw(MolecularWeight HydrogenBondDonors Fsp3Carbons)
+<br/>    $MolecularDescriptorsGenerator = new MolecularDescriptors::
+                                     MolecularDescriptorsGenerator(
+                              'Mode' =&gt; 'Specify',
+                              'DescriptorNames' =&gt; \@DescriptorNames);</div>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetDescriptorClassParameters(
+                              'DescriptorClassName' =&gt; 'WeightAndMassDescriptors',
+                              'WeightPrecision' =&gt; 2,
+                              'MassPrecision' =&gt; 2);</div>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetDescriptorClassParameters(
+                              'DescriptorClassName' =&gt; 'HydrogenBondsDescriptors',
+                              'HydrogenBondsType' =&gt; 'HBondsType1');</div>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetMolecule($Molecule);
+<br/>    $MolecularDescriptorsGenerator-&gt;GenerateDescriptors();
+<br/>    print &quot;MolecularDescriptorsGenerator: $MolecularDescriptorsGenerator\n&quot;;</div>
+</dd>
+<dt><strong><a name="generatedescriptors" class="item"><strong>GenerateDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;GenerateDescriptors();</div>
+<p>Calculates descriptor values for specified descriptors and returns <em>MolecularDescriptorsGenerator</em>.</p>
+<p>Descriptor class objects are instantiated only once at first invocation. During
+subsequent calls to <strong>GenerateDescriptors</strong> method, descriptor values are
+initialized and <strong>GenerateDescriptors</strong> method provided by descriptor class is
+used to calculate descriptor values for specified descriptors.</p>
+</dd>
+<dt><strong><a name="getavailableclassanddescriptornames" class="item"><strong>GetAvailableClassAndDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %ClassAndDescriptorNames = $MolecularDescriptorsGenerator-&gt;
+                              GetAvailableClassAndDescriptorNames();
+<br/>    %ClassAndDescriptorNames = MolecularDescriptors::
+                               MolecularDescriptorsGenerator::
+                               GetAvailableClassAndDescriptorNames();</div>
+<p>Returns available descriptors class and descriptors names as a hash containing key
+and value pairs corresponding to class name and an array of descriptor names
+available for the class.</p>
+</dd>
+<dt><strong><a name="getavailableclassnamefordescriptorname" class="item"><strong>GetAvailableClassNameForDescriptorName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DescriptorClassName = $MolecularDescriptorsGenerator-&gt;
+                      GetAvailableClassNameForDescriptorName($DescriptorName);</div>
+<div class="OptionsBox">
+    $DescriptorClassName = MolecularDescriptors::MolecularDescriptorsGenerator::
+                      GetAvailableClassNameForDescriptorName($DescriptorName);</div>
+<p>Returns available descriptor class name for a descriptor name.</p>
+</dd>
+<dt><strong><a name="getavailabledescriptorclassnames" class="item"><strong>GetAvailableDescriptorClassNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Return = $MolecularDescriptorsGenerator-&gt;GetAvailableDescriptorClassNames();</div>
+<div class="OptionsBox">
+    @DescriptorClassNames = $MolecularDescriptorsGenerator-&gt;
+                              GetAvailableDescriptorClassNames();
+<br/>    @DescriptorClassNames = MolecularDescriptors::
+                              MolecularDescriptorsGenerator::
+                              GetAvailableDescriptorClassNames();</div>
+<p>Returns available descriptor class names as an array or number of available descriptor
+class names in scalar context.</p>
+</dd>
+<dt><strong><a name="getavailabledescriptornames" class="item"><strong>GetAvailableDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularDescriptorsGenerator-&gt;
+                              GetAvailableDescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::
+                              MolecularDescriptorsGenerator::
+                              GetAvailableDescriptorNames();</div>
+<p>Returns available descriptor names as an array or number of available descriptor
+names in scalar context.</p>
+</dd>
+<dt><strong><a name="getavailabledescriptornamesfordescriptorclass" class="item"><strong>GetAvailableDescriptorNamesForDescriptorClass</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularDescriptorsGenerator-&gt;
+          GetAvailableDescriptorNamesForDescriptorClass($DescriptorClassName);
+<br/>    @DescriptorNames = MolecularDescriptors::
+                       MolecularDescriptorsGenerator::
+          GetAvailableDescriptorNamesForDescriptorClass($DescriptorClassName);</div>
+<p>Returns available descriptors names for a descriptor class as an array or number
+of available descriptor names in scalar context.</p>
+</dd>
+<dt><strong><a name="getdescriptorclassparameters" class="item"><strong>GetDescriptorClassParameters</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $DescriptorClassParametersRef = $MolecularDescriptorsGenerator-&gt;
+                              GetDescriptorClassParameters();
+<br/>    $DescriptorClassParametersRef = MolecularDescriptors::
+                                    MolecularDescriptorsGenerator::
+                                    GetDescriptorClassParameters();</div>
+<p>Returns descriptor name parameters as a reference to hash of hashes with hash
+keys corresponding to class name and class parameter name with hash value
+as class parameter value.</p>
+</dd>
+<dt><strong><a name="getdescriptornames" class="item"><strong>GetDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularDescriptorsGenerator-&gt;GetDescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::MolecularDescriptorsGenerator::
+                       GetDescriptorNames();</div>
+<p>Returns all available descriptor names as an array or number of available descriptors
+in scalar context.</p>
+</dd>
+<dt><strong><a name="getdescriptornamesandvalues" class="item"><strong>GetDescriptorNamesAndValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    %NamesAndValues = $MolecularDescriptorsGenerator-&gt;
+                              GetDescriptorNamesAndValues();</div>
+<p>Returns calculated molecular descriptor names and values as a hash with descriptor
+names and values as hash key and value pairs.</p>
+</dd>
+<dt><strong><a name="getdescriptorvaluebyname" class="item"><strong>GetDescriptorValueByName</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Value = $MolecularDescriptorsGenerator-&gt;
+                              GetDescriptorValueByName($Name);</div>
+<p>Returns calculated descriptor values for a specified descriptor name.</p>
+</dd>
+<dt><strong><a name="getdescriptorvalues" class="item"><strong>GetDescriptorValues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorValues = $MolecularDescriptorsGenerator-&gt;GetDescriptorValues();</div>
+<p>Returns all calculated descriptor values as an array corresponding to specified
+descriptor names.</p>
+</dd>
+<dt><strong><a name="getruleof3descriptornames" class="item"><strong>GetRuleOf3DescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularDescriptorsGenerator-&gt;
+                       GetRuleOf3DescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::
+                       MolecularDescriptorsGenerator::
+                       GetRuleOf3DescriptorNames();</div>
+<p>Returns rule of 3  descriptor names as an array or number of rule of 3 descriptors in scalar
+context.</p>
+<p>RuleOf3 [ Ref 92 ] descriptor names are: MolecularWeight, RotatableBonds,
+HydrogenBondDonors, HydrogenBondAcceptors, SLogP, TPSA. RuleOf3 states:
+MolecularWeight &lt;= 300, RotatableBonds &lt;= 3, HydrogenBondDonors &lt;= 3,
+HydrogenBondAcceptors &lt;= 3, logP &lt;= 3, and TPSA &lt;= 60.</p>
+</dd>
+<dt><strong><a name="getruleof5descriptornames" class="item"><strong>GetRuleOf5DescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $MolecularDescriptorsGenerator-&gt;
+                              GetRuleOf5DescriptorNames();
+<br/>    @DescriptorNames = $MolecularDescriptorsGenerator::
+                             GetRuleOf5DescriptorNames();</div>
+<p>Returns rule of 5  descriptor names as an array or number of rule of 4 descriptors in scalar
+context.</p>
+<p>RuleOf5 [ Ref 91 ] descriptor names are: MolecularWeight, HydrogenBondDonors,
+HydrogenBondAcceptors, SLogP. RuleOf5 states: MolecularWeight &lt;= 500,
+HydrogenBondDonors &lt;= 5, HydrogenBondAcceptors &lt;= 10, and logP &lt;= 5.</p>
+</dd>
+<dt><strong><a name="isdescriptorclassnameavailable" class="item"><strong>IsDescriptorClassNameAvailable</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $MolecularDescriptorsGenerator-&gt;
+                              IsDescriptorClassNameAvailable($ClassName);
+<br/>    $Status = MolecularDescriptors::
+                              MolecularDescriptorsGenerator::
+                              IsDescriptorClassNameAvailable($ClassName);</div>
+<p>Returns 1 or 0 based on whether specified descriptor class name is available.</p>
+</dd>
+<dt><strong><a name="isdescriptornameavailable" class="item"><strong>IsDescriptorNameAvailable</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $MolecularDescriptorsGenerator-&gt;
+                              IsDescriptorNameAvailable($DescriptorName);
+<br/>    $Status = MolecularDescriptors::
+                              MolecularDescriptorsGenerator::
+                              IsDescriptorNameAvailable($DescriptorName);</div>
+<p>Returns 1 or 0 based on whether specified descriptor name is available.</p>
+</dd>
+<dt><strong><a name="isdescriptorsgenerationsuccessful" class="item"><strong>IsDescriptorsGenerationSuccessful</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $MolecularDescriptorsGenerator-&gt;
+                              IsDescriptorsGenerationSuccessful();</div>
+<p>Returns 1 or 0 based on whether descriptors generation is successful.</p>
+</dd>
+<dt><strong><a name="setdescriptorclassparameters" class="item"><strong>SetDescriptorClassParameters</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetDescriptorClassParameters(
+                              %NamesAndValues);</div>
+<p>Sets descriptor calculation control parameters for a specified descriptor class name
+and returns <em>MolecularDescriptorsGenerator</em>.</p>
+<p>The specified parameter names and values are simply passed on to specified descriptor
+class during instantiation of descriptor class object without any performing any validation
+of parameter names and associated values. It's up to the appropriate descriptor class methods
+to validate these parameters and values.</p>
+<p>In addition to specified parameter names and values, the parameter hash must also contain
+descriptor class name as key and value pair with DescriptorClassName as key with class
+name as value.</p>
+</dd>
+<dt><strong><a name="setdescriptornames" class="item"><strong>SetDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetDescriptorNames(@Names);
+<br/>    $MolecularDescriptorsGenerator-&gt;SetDescriptorNames(\@Names);</div>
+<p>Sets descriptor names to use for generating descriptor values using an array
+or reference to an array and returns <em>MolecularDescriptorsGenerator</em>.</p>
+</dd>
+<dt><strong><a name="setmode" class="item"><strong>SetMode</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetMode($Mode);</div>
+<p>Sets descriptors generation mode and returns <em>MolecularDescriptorsGenerator</em>.
+Possible <em>Mode</em> values: <em>All, RuleOf5, RuleOf3, Specify</em>.</p>
+</dd>
+<dt><strong><a name="setmolecule" class="item"><strong>SetMolecule</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $MolecularDescriptorsGenerator-&gt;SetMolecule($Molecule);</div>
+<p>Sets molecule to use during calculation of molecular descriptors and returns
+<em>MolecularDescriptorsGenerator</em>.</p>
+</dd>
+<dt><strong><a name="stringifymoleculardescriptorsgenerator" class="item"><strong>StringifyMolecularDescriptorsGenerator</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $MolecularDescriptorsGenerator-&gt;StringifyMolecularDescriptorsGenerator();</div>
+<p>Returns a string containing information about <em>MolecularDescriptorsGenerator</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./MolecularDescriptors.html">MolecularDescriptors.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MolecularDescriptors.html" title="MolecularDescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularVolumeDescriptors.html" title="MolecularVolumeDescriptors.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MolecularDescriptors::MolecularDescriptorsGenerator.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

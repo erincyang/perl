@@ -1,0 +1,140 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:MolecularDescriptors::WeightAndMassDescriptors.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TPSADescriptors.html" title="TPSADescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularFormula.html" title="MolecularFormula.html">Next</a></td><td width="34%" align="middle"><strong>MolecularDescriptors::WeightAndMassDescriptors.pm</strong></td><td width="33%" align="right"><a href="././code/WeightAndMassDescriptors.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/WeightAndMassDescriptors.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/WeightAndMassDescriptors.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/WeightAndMassDescriptors.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/WeightAndMassDescriptors.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>WeightAndMassDescriptors</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use MolecularDescriptors::WeightAndMassDescriptors;</p>
+<p>use MolecularDescriptors::WeightAndMassDescriptors qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>WeightAndMassDescriptors</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#generatedescriptors">GenerateDescriptors</a>, <a href="#getdescriptornames">GetDescriptorNames</a>, <a href="#stringifyweightandmassdescriptors">StringifyWeightAndMassDescriptors</a>
+</p><p><strong>WeightAndMassDescriptors</strong> is derived from <strong>MolecularDescriptors</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>WeightAndMassDescriptors</strong>, <strong>MolecularDescriptors</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p><strong>WeightAndMassDescriptors</strong> calculates molecular weight and exact mass descriptors using
+methods available in <strong>Molecule</strong> class.</p>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewWeightAndMassDescriptors = new MolecularDescriptors::
+                                   WeightAndMassDescriptors(
+                                   %NamesAndValues);</div>
+<p>Using specified <em>WeightAndMassDescriptors</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>WeightAndMassDescriptors</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'WeightAndMass'
+<br/>    WeightPrecision = 2;
+<br/>    MassPrecision = 4;</div>
+<div class="OptionsBox">
+    @DescriptorNames = ('MolecularWeight', 'ExactMass')
+<br/>    @DescriptorValues = ('None', 'None')</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors = new MolecularDescriptors::
+                                WeightAndMassDescriptors(
+                                'Molecule' =&gt; $Molecule);</div>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors = new MolecularDescriptors::
+                                WeightAndMassDescriptors();</div>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors-&gt;SetMolecule($Molecule);
+<br/>    $WeightAndMassDescriptors-&gt;GenerateDescriptors();
+<br/>    print &quot;WeightAndMassDescriptors: $WeightAndMassDescriptors\n&quot;;</div>
+</dd>
+<dt><strong><a name="generatedescriptors" class="item"><strong>GenerateDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors-&gt;GenerateDescriptors();</div>
+<p>Calculates molecular weight and exact mass of a molecule and returns
+<em>WeightAndMassDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="getdescriptornames" class="item"><strong>GetDescriptorNames</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @DescriptorNames = $WeightAndMassDescriptors-&gt;GetDescriptorNames();
+<br/>    @DescriptorNames = MolecularDescriptors::WeightAndMassDescriptors::
+                       GetDescriptorNames();</div>
+<p>Returns all available descriptor names as an array.</p>
+</dd>
+<dt><strong><a name="setmassprecision" class="item"><strong>SetMassPrecision</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors-&gt;SetMassPrecision($Precision);</div>
+<p>Sets precision for calculated exact mass value and returns
+<em>WeightAndMassDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="setweightprecision" class="item"><strong>SetWeightPrecision</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $WeightAndMassDescriptors-&gt;SetWeightPrecision($Precision);</div>
+<p>Sets precision for calculated molecular weight value and returns
+<em>WeightAndMassDescriptors</em>.</p>
+</dd>
+<dt><strong><a name="stringifyweightandmassdescriptors" class="item"><strong>StringifyWeightAndMassDescriptors</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $WeightAndMassDescriptors-&gt;StringifyWeightAndMassDescriptors();</div>
+<p>Returns a string containing information about <em>WeightAndMassDescriptors</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./MolecularDescriptors.html">MolecularDescriptors.pm</a>,&nbsp<a href="./MolecularDescriptorsGenerator.html">MolecularDescriptorsGenerator.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./TPSADescriptors.html" title="TPSADescriptors.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./MolecularFormula.html" title="MolecularFormula.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>MolecularDescriptors::WeightAndMassDescriptors.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

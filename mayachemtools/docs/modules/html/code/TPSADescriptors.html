@@ -1,0 +1,322 @@
+<html>
+<head>
+<title>MayaChemTools:Code:MolecularDescriptors::TPSADescriptors.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-MolecularDescriptors::TPSADescriptors-"></a>   1 <span class="k">package </span><span class="i">MolecularDescriptors::TPSADescriptors</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: TPSADescriptors.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:45 $</span>
+   5 <span class="c"># $Revision: 1.20 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Scalar::Util</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">MathUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">Atom</span><span class="sc">;</span>
+  36 <span class="k">use</span> <span class="w">Molecule</span><span class="sc">;</span>
+  37 <span class="k">use</span> <span class="w">MolecularDescriptors::MolecularDescriptors</span><span class="sc">;</span>
+  38 <span class="k">use</span> <span class="w">AtomTypes::TPSAAtomTypes</span><span class="sc">;</span>
+  39 
+  40 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  41 
+  42 <span class="i">@ISA</span> = <span class="q">qw(MolecularDescriptors::MolecularDescriptors Exporter)</span><span class="sc">;</span>
+  43 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  44 <span class="i">@EXPORT_OK</span> = <span class="q">qw(GetDescriptorNames)</span><span class="sc">;</span>
+  45 
+  46 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  47 
+  48 <span class="c"># Setup class variables...</span>
+  49 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="cm">,</span> <span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+  50 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  51 
+  52 <span class="c"># Overload Perl functions...</span>
+  53 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyTPSADescriptors&#39;</span><span class="sc">;</span>
+  54 
+  55 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  56 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  57   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  58 
+  59   <span class="c"># Initialize object...</span>
+  60   <span class="k">my</span> <span class="i">$This</span> = <span class="i">$Class</span><span class="i">-&gt;SUPER::new</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  61   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  62   <span class="i">$This</span><span class="i">-&gt;_InitializeTPSADescriptors</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  63 
+  64   <span class="i">$This</span><span class="i">-&gt;_InitializeTPSADescriptorsProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  65 
+  66   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  67 <span class="s">}</span>
+  68 
+  69 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a>  70 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+  71   <span class="c">#Class name...</span>
+  72   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+  73 
+  74   <span class="c"># Descriptor names...</span>
+  75   <span class="i">@DescriptorNames</span> = <span class="s">(</span><span class="q">&#39;TPSA&#39;</span><span class="s">)</span><span class="sc">;</span>
+  76 
+  77 <span class="s">}</span>
+  78 
+  79 <span class="c"># Get descriptor names as an array.</span>
+  80 <span class="c">#</span>
+  81 <span class="c"># This functionality can be either invoked as a class function or an</span>
+  82 <span class="c"># object method.</span>
+  83 <span class="c">#</span>
+<a name="GetDescriptorNames-"></a>  84 <span class="k">sub </span><span class="m">GetDescriptorNames</span> <span class="s">{</span>
+  85   <span class="k">return</span> <span class="i">@DescriptorNames</span><span class="sc">;</span>
+  86 <span class="s">}</span>
+  87 
+  88 <span class="c"># Initialize object data...</span>
+  89 <span class="c">#</span>
+<a name="_InitializeTPSADescriptors-"></a>  90 <span class="k">sub </span><span class="m">_InitializeTPSADescriptors</span> <span class="s">{</span>
+  91   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  92 
+  93   <span class="c"># Type of MolecularDescriptor...</span>
+  94   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="q">&#39;TPSA&#39;</span><span class="sc">;</span>
+  95 
+  96   <span class="c"># By default, TPSA atom contributions from Phosphorus and Sulfur atoms</span>
+  97   <span class="c"># are not included during TPSA calculations. [ Ref 91 ]</span>
+  98   <span class="c">#</span>
+  99   <span class="i">$This</span>-&gt;{<span class="w">IgnorePhosphorus</span>} = <span class="n">1</span><span class="sc">;</span>
+ 100   <span class="i">$This</span>-&gt;{<span class="w">IgnoreSulfur</span>} = <span class="n">1</span><span class="sc">;</span>
+ 101 
+ 102   <span class="c"># TPSA atom types assigned to appropriate atoms...</span>
+ 103   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 104 
+ 105   <span class="c"># Intialize descriptor names and values...</span>
+ 106   <span class="i">$This</span><span class="i">-&gt;_InitializeDescriptorNamesAndValues</span><span class="s">(</span><span class="i">@DescriptorNames</span><span class="s">)</span><span class="sc">;</span>
+ 107 
+ 108   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 109 <span class="s">}</span>
+ 110 
+ 111 <span class="c"># Initialize object properties...</span>
+ 112 <span class="c">#</span>
+<a name="_InitializeTPSADescriptorsProperties-"></a> 113 <span class="k">sub </span><span class="m">_InitializeTPSADescriptorsProperties</span> <span class="s">{</span>
+ 114   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 115 
+ 116   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 117   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 118     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 119     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 120   <span class="s">}</span>
+ 121 
+ 122   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 123 <span class="s">}</span>
+ 124 
+ 125 <span class="c"># Calculate Topological Polar Surface Area (TPSA) value [ Ref 90-91 ] for molecule...</span>
+ 126 <span class="c">#</span>
+ 127 <span class="c"># Methodology:</span>
+ 128 <span class="c">#   . Assign TPSA atom types [ Ref 90-91 ] to Nitrogen and Oxygen</span>
+ 129 <span class="c">#     atoms with optional assignment to Phosphorus and Sulfur atoms.</span>
+ 130 <span class="c">#   . Calculate TPSA value adding contribution of appropriate atom types.</span>
+ 131 <span class="c">#</span>
+<a name="GenerateDescriptors-"></a> 132 <span class="k">sub </span><span class="m">GenerateDescriptors</span> <span class="s">{</span>
+ 133   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 134 
+ 135   <span class="c"># Initialize descriptor values...</span>
+ 136   <span class="i">$This</span><span class="i">-&gt;_InitializeDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 137 
+ 138   <span class="c"># Check availability of molecule...</span>
+ 139   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="s">)</span> <span class="s">{</span>
+ 140     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDescriptors: $This-&gt;{Type} molecular descriptors generation didn&#39;t succeed: Molecule data is not available: Molecule object hasn&#39;t been set...&quot;</span><span class="sc">;</span>
+ 141     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 142   <span class="s">}</span>
+ 143 
+ 144   <span class="c"># Cache appropriate molecule data...</span>
+ 145   <span class="i">$This</span><span class="i">-&gt;_SetupMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 146 
+ 147   <span class="c"># Assign TPSA atom types...</span>
+ 148   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span><span class="i">-&gt;_AssignAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 149     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDescriptors: $This-&gt;{Type} molecular descriptors generation didn&#39;t succeed: Couldn&#39;t assign valid TPSA atom types to appropriate atoms...&quot;</span><span class="sc">;</span>
+ 150     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 151   <span class="s">}</span>
+ 152 
+ 153   <span class="c"># Calculate descriptor values...</span>
+ 154   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span><span class="i">-&gt;_CalculateDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 155     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateDescriptors: $This-&gt;{Type} molecular descriptors generation didn&#39;t succeed: Couldn&#39;t calculate TPSA values corresponding to assigned TPSA atom types...&quot;</span><span class="sc">;</span>
+ 156     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 157   <span class="s">}</span>
+ 158 
+ 159   <span class="c"># Set final descriptor values...</span>
+ 160   <span class="i">$This</span><span class="i">-&gt;_SetFinalDescriptorValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 161 
+ 162   <span class="c"># Clear cached molecule data...</span>
+ 163   <span class="i">$This</span><span class="i">-&gt;_ClearMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 164 
+ 165   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 166 <span class="s">}</span>
+ 167 
+ 168 <span class="c"># Assign TPSA atom types..</span>
+ 169 <span class="c">#</span>
+<a name="_AssignAtomTypes-"></a> 170 <span class="k">sub </span><span class="m">_AssignAtomTypes</span> <span class="s">{</span>
+ 171   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 172   <span class="k">my</span><span class="s">(</span><span class="i">$TPSAAtomTypes</span><span class="cm">,</span> <span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="s">)</span><span class="sc">;</span>
+ 173 
+ 174   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 175 
+ 176   <span class="c"># Assign atom types...</span>
+ 177   <span class="i">$TPSAAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::TPSAAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnorePhosphorus&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">IgnorePhosphorus</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreSulfur&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">IgnoreSulfur</span>}<span class="s">)</span><span class="sc">;</span>
+ 178   <span class="i">$TPSAAtomTypes</span><span class="i">-&gt;AssignAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 179 
+ 180   <span class="c"># Make sure TPSA atom types assignment is successful...</span>
+ 181   <span class="k">if</span> <span class="s">(</span>!<span class="i">$TPSAAtomTypes</span><span class="i">-&gt;IsAtomTypesAssignmentSuccessful</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 182     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 183   <span class="s">}</span>
+ 184 
+ 185   <span class="c"># Collect assigned atom types...</span>
+ 186   <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 187     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 188     <span class="i">$This</span>-&gt;{<span class="w">AtomTypes</span>}{<span class="i">$AtomID</span>} = <span class="i">$TPSAAtomTypes</span><span class="i">-&gt;GetAtomType</span><span class="s">(</span><span class="i">$Atom</span><span class="s">)</span><span class="sc">;</span>
+ 189   <span class="s">}</span>
+ 190 
+ 191   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 192 <span class="s">}</span>
+ 193 
+ 194 <span class="c"># Calculate TPSA value...</span>
+ 195 <span class="c">#</span>
+<a name="_CalculateDescriptorValues-"></a> 196 <span class="k">sub </span><span class="m">_CalculateDescriptorValues</span> <span class="s">{</span>
+ 197   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 198   <span class="k">my</span><span class="s">(</span><span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$TPSA</span><span class="cm">,</span> <span class="i">$TPSAContribution</span><span class="cm">,</span> <span class="i">$TPSADataRef</span><span class="cm">,</span> <span class="i">$AtomType</span><span class="s">)</span><span class="sc">;</span>
+ 199 
+ 200   <span class="i">$TPSA</span> = <span class="n">0</span><span class="sc">;</span>
+ 201 
+ 202   <span class="c"># Get TPSA atom types data...</span>
+ 203   <span class="i">$TPSADataRef</span> = <span class="i">AtomTypes::TPSAAtomTypes::GetTPSAAtomTypesData</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 204 
+ 205   <span class="j">ATOM:</span> <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 206     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 207     <span class="i">$AtomType</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypes</span>}{<span class="i">$AtomID</span>}<span class="sc">;</span>
+ 208 
+ 209     <span class="c"># Ignore inappropriate atoms...</span>
+ 210     <span class="k">if</span> <span class="s">(</span><span class="i">$AtomType</span> =~ <span class="q">/^None$/i</span><span class="s">)</span> <span class="s">{</span>
+ 211       <span class="k">next</span> <span class="j">ATOM</span><span class="sc">;</span>
+ 212     <span class="s">}</span>
+ 213 
+ 214     <span class="i">$TPSAContribution</span> = <span class="n">0.0</span><span class="sc">;</span>
+ 215 
+ 216     <span class="k">if</span> <span class="s">(</span><span class="i">$AtomType</span> =~ <span class="q">/^(N|O)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 217       <span class="c"># TPSA contributions for Nitrogen and Oxygen atoms not explicity defined using atom</span>
+ 218       <span class="c"># environments in Table 1 [ Ref 90 ]</span>
+ 219       <span class="k">if</span> <span class="s">(</span><span class="i">$AtomType</span> =~ <span class="q">/^N$/i</span><span class="s">)</span> <span class="s">{</span>
+ 220         <span class="c"># N = 30.5 - X*8.2 + H*1.5 or 0.0 for negative value</span>
+ 221         <span class="i">$TPSAContribution</span> = <span class="n">30.5</span> - <span class="i">$Atom</span><span class="i">-&gt;GetAtomicInvariantValue</span><span class="s">(</span><span class="q">&#39;X&#39;</span><span class="s">)</span> * <span class="n">8.2</span> + <span class="i">$Atom</span><span class="i">-&gt;GetAtomicInvariantValue</span><span class="s">(</span><span class="q">&#39;H&#39;</span><span class="s">)</span> * <span class="n">1.5</span><span class="sc">;</span>
+ 222       <span class="s">}</span>
+ 223       <span class="k">elsif</span> <span class="s">(</span><span class="i">$AtomType</span> =~ <span class="q">/^O$/i</span><span class="s">)</span> <span class="s">{</span>
+ 224         <span class="c"># O = 28.5 - X*8.6 + H*1.5 or 0.0 for negative value</span>
+ 225         <span class="i">$TPSAContribution</span> = <span class="n">28.5</span> - <span class="i">$Atom</span><span class="i">-&gt;GetAtomicInvariantValue</span><span class="s">(</span><span class="q">&#39;X&#39;</span><span class="s">)</span> * <span class="n">8.6</span> + <span class="i">$Atom</span><span class="i">-&gt;GetAtomicInvariantValue</span><span class="s">(</span><span class="q">&#39;H&#39;</span><span class="s">)</span> * <span class="n">1.5</span><span class="sc">;</span>
+ 226       <span class="s">}</span>
+ 227       <span class="k">if</span> <span class="s">(</span><span class="i">$TPSAContribution</span> &lt; <span class="n">0.0</span><span class="s">)</span> <span class="s">{</span>
+ 228         <span class="i">$TPSAContribution</span> = <span class="n">0.0</span><span class="sc">;</span>
+ 229       <span class="s">}</span>
+ 230     <span class="s">}</span>
+ 231     <span class="k">elsif</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$TPSADataRef</span>-&gt;{<span class="w">DataCol3</span>}{<span class="i">$AtomType</span>}<span class="s">)</span> <span class="s">{</span>
+ 232       <span class="c"># Data for TPSA contribution is in column number 3...</span>
+ 233       <span class="i">$TPSAContribution</span> = <span class="i">$TPSADataRef</span>-&gt;{<span class="w">DataCol3</span>}{<span class="i">$AtomType</span>}<span class="sc">;</span>
+ 234     <span class="s">}</span>
+ 235     <span class="k">else</span> <span class="s">{</span>
+ 236       <span class="c"># No TPSA data for assigned atom type...</span>
+ 237       <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 238     <span class="s">}</span>
+ 239     <span class="i">$TPSA</span> += <span class="i">$TPSAContribution</span><span class="sc">;</span>
+ 240   <span class="s">}</span>
+ 241 
+ 242   <span class="c"># Track the calculated values...</span>
+ 243   <span class="i">$This</span>-&gt;{<span class="w">TPSA</span>} = <span class="i">MathUtil::round</span><span class="s">(</span><span class="i">$TPSA</span><span class="cm">,</span> <span class="n">2</span><span class="s">)</span><span class="sc">;</span>
+ 244 
+ 245   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 246 <span class="s">}</span>
+ 247 
+ 248 <span class="c"># Setup final descriptor values...</span>
+ 249 <span class="c">#</span>
+<a name="_SetFinalDescriptorValues-"></a> 250 <span class="k">sub </span><span class="m">_SetFinalDescriptorValues</span> <span class="s">{</span>
+ 251   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 252 
+ 253   <span class="i">$This</span>-&gt;{<span class="w">DescriptorsGenerated</span>} = <span class="n">1</span><span class="sc">;</span>
+ 254 
+ 255   <span class="i">$This</span><span class="i">-&gt;SetDescriptorValues</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">TPSA</span>}<span class="s">)</span><span class="sc">;</span>
+ 256 
+ 257   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 258 <span class="s">}</span>
+ 259 
+ 260 <span class="c"># Cache  appropriate molecule data...</span>
+ 261 <span class="c">#</span>
+<a name="_SetupMoleculeDataCache-"></a> 262 <span class="k">sub </span><span class="m">_SetupMoleculeDataCache</span> <span class="s">{</span>
+ 263   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 264 
+ 265   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="i">$This</span><span class="i">-&gt;GetMolecule</span><span class="s">(</span><span class="s">)</span><span class="i">-&gt;GetAtoms</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 266 
+ 267   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 268 <span class="s">}</span>
+ 269 
+ 270 <span class="c"># Clear cached molecule data...</span>
+ 271 <span class="c">#</span>
+<a name="_ClearMoleculeDataCache-"></a> 272 <span class="k">sub </span><span class="m">_ClearMoleculeDataCache</span> <span class="s">{</span>
+ 273   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 274 
+ 275   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 276 
+ 277   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 278 <span class="s">}</span>
+ 279 
+ 280 <span class="c"># Return a string containg data for TPSADescriptors object...</span>
+ 281 <span class="c">#</span>
+<a name="StringifyTPSADescriptors-"></a> 282 <span class="k">sub </span><span class="m">StringifyTPSADescriptors</span> <span class="s">{</span>
+ 283   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 284   <span class="k">my</span><span class="s">(</span><span class="i">$TPSADescriptorsString</span><span class="s">)</span><span class="sc">;</span>
+ 285 
+ 286   <span class="c"># Type of MolecularDescriptors...</span>
+ 287   <span class="i">$TPSADescriptorsString</span> = <span class="q">&quot;MolecularDescriptorType: $This-&gt;{Type}; IgnorePhosphorus: &quot;</span> . <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">IgnorePhosphorus</span>} ? <span class="q">&quot;Yes&quot;</span> <span class="co">:</span> <span class="q">&quot;No&quot;</span><span class="s">)</span> . <span class="q">&quot;; IgnoreSulfur: &quot;</span> .  <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">IgnoreSulfur</span>} ? <span class="q">&quot;Yes&quot;</span> <span class="co">:</span> <span class="q">&quot;No&quot;</span><span class="s">)</span><span class="sc">;</span>
+ 288 
+ 289   <span class="c"># Setup molecular descriptor information...</span>
+ 290   <span class="i">$TPSADescriptorsString</span> .= <span class="q">&quot;; &quot;</span> . <span class="i">$This</span><span class="i">-&gt;_StringifyDescriptorNamesAndValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 291 
+ 292   <span class="k">return</span> <span class="i">$TPSADescriptorsString</span><span class="sc">;</span>
+ 293 <span class="s">}</span>
+ 294 
+ 295 <span class="c"># Is it a TPSADescriptors object?</span>
+<a name="_IsTPSADescriptors-"></a> 296 <span class="k">sub </span><span class="m">_IsTPSADescriptors</span> <span class="s">{</span>
+ 297   <span class="k">my</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 298 
+ 299   <span class="k">return</span> <span class="s">(</span><span class="i">Scalar::Util::blessed</span><span class="s">(</span><span class="i">$Object</span><span class="s">)</span> &amp;&amp; <span class="i">$Object</span><span class="i">-&gt;isa</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 300 <span class="s">}</span>
+ 301 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

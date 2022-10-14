@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:AtomTypes::SLogPAtomTypes.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MMFF94AtomTypes.html" title="MMFF94AtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SYBYLAtomTypes.html" title="SYBYLAtomTypes.html">Next</a></td><td width="34%" align="middle"><strong>AtomTypes::SLogPAtomTypes.pm</strong></td><td width="33%" align="right"><a href="././code/SLogPAtomTypes.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SLogPAtomTypes.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SLogPAtomTypes.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SLogPAtomTypes.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SLogPAtomTypes.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SLogPAtomTypes</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use AtomTypes::SLogPAtomTypes;</p>
+<p>use AtomTypes::SLogPAtomTypes qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>SLogPAtomTypes</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#assignatomtypes">AssignAtomTypes</a>, <a href="#getallpossibleslogpatomtypes">GetAllPossibleSLogPAtomTypes</a>
+, <a href="#getallpossibleslogpnonhydrogenatomtypes">GetAllPossibleSLogPNonHydrogenAtomTypes</a>, <a href="#getslogpatomtypesdata">GetSLogPAtomTypesData</a>
+, <a href="#stringifyslogpatomtypes">StringifySLogPAtomTypes</a>
+</p><p>The following functions are available:</p>
+<p>GetAllPossibleSLogPAtomTypes,
+GetAllPossibleSLogPNonHydrogenAtomTypes, GetSLogPAtomTypesData</p>
+<p><strong>SLogPAtomTypes</strong> is derived from <strong>AtomTypes</strong> class which in turn
+is  derived from <strong>ObjectProperty</strong> base class that provides methods not explicitly defined
+in <strong>SLogPAtomTypes</strong>, <strong>AtomTypes</strong> or <strong>ObjectProperty</strong> classes using Perl's
+AUTOLOAD functionality. These methods are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>The data file SLogPAomTypes.csv distributed with MayaChemTools release contains
+all possible SLogP [ Ref 89 ] atom types.</p>
+<p>Examples of SLogP atom types:</p>
+<div class="OptionsBox">
+    C1, C2, C3, N1, N2, O1, O2 and so on</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewSLogPAtomTypes = new AtomTypes::SLogPAtomTypes(%NamesAndValues);</div>
+<p>Using specified <em>SLogPAtomTypes</em> property names and values hash, <strong>new</strong>
+method creates a new object and returns a reference to newly created <strong>SLogPAtomTypes</strong>
+object. By default, the following properties are initialized:</p>
+<div class="OptionsBox">
+    Molecule = ''
+<br/>    Type = 'SLogP'
+<br/>    IgnoreHydrogens = 0</div>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $SLogPAtomTypes = new AtomTypes::SLogPAtomTypes(
+                              'Molecule' =&gt; $Molecule,
+                              'IgnoreHydrogens' =&gt; 0);</div>
+</dd>
+<dt><strong><a name="assignatomtypes" class="item"><strong>AssignAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $SLogPAtomTypes-&gt;AssignAtomTypes();</div>
+<p>Assigns SLogP atom types to all the atoms in a molecule and returns
+<em>SLogPAtomTypes</em>.</p>
+</dd>
+<dt><strong><a name="getallpossibleslogpatomtypes" class="item"><strong>GetAllPossibleSLogPAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AllAtomTypesDataRef = $SLogPAtomTypes-&gt;
+                           GetAllPossibleSLogPAtomTypes();
+<br/>    $AllAtomTypesDataRef = AtomTypes::SLogPAtomTypes::
+                           GetAllPossibleSLogPAtomTypes();</div>
+<p>Returns all possible SLogP atom types corresponding to hydrogen and non-hydrogen
+atoms as an array reference.</p>
+</dd>
+<dt><strong><a name="getallpossibleslogpnonhydrogenatomtypes" class="item"><strong>GetAllPossibleSLogPNonHydrogenAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AtomTypesDataRef = $SLogPAtomTypes-&gt;
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                        GetAllPossibleSLogPNonHydrogenAtomTypes();
+<br/>    $AtomTypesDataRef = AtomTypes::SLogPAtomTypes::
+                        GetAllPossibleSLogPNonHydrogenAtomTypes();</div>
+<p>Returns all possible SLogP atom types corresponding to non-hydrogen atoms as
+an array reference.</p>
+</dd>
+<dt><strong><a name="getslogpatomtypesdata" class="item"><strong>GetSLogPAtomTypesData</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $AtomTypesDataMapRef = $SLogPAtomTypes-&gt;GetSLogPAtomTypesData();
+<br/>    $AtomTypesDataMapRef = AtomTypes::SLogPAtomTypes::GetSLogPAtomTypesData();</div>
+<p>Returns SLogP atom types and associated data loaded from SLogP data file as
+a reference to hash with the following hash data format:</p>
+<div class="OptionsBox">
+    @{$SLogPAtomTypesDataMap{AtomTypes}} - Array of all possible atom
+                              types for all atoms
+<br/>    @{$SLogPAtomTypesDataMap{NonHydrogenAtomTypes}} - Array of all
+                              possible atom types for non-hydrogen atoms
+<br/>    @{$SLogPAtomTypesDataMap-&gt;{ColLabels}} - Array of column labels
+<br/>    %{$SLogPAtomTypesDataMap-&gt;{DataCol&lt;Num&gt;}} - Hash keys pair:
+                                                DataCol&lt;Num&gt;, AtomType</div>
+</dd>
+<dt><strong><a name="stringifyslogpatomtypes" class="item"><strong>StringifySLogPAtomTypes</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $String = $SLogPAtomTypes-&gt;StringifySLogPAtomTypes();</div>
+<p>Returns a string containing information about <em>SLogPAtomTypes</em> object.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./AtomTypes.html">AtomTypes.pm</a>,&nbsp<a href="./AtomicInvariantsAtomTypes.html">AtomicInvariantsAtomTypes.pm</a>,&nbsp<a href="./DREIDINGAtomTypes.html">DREIDINGAtomTypes.pm</a>,&nbsp
+<a href="./EStateAtomTypes.html">EStateAtomTypes.pm</a>,&nbsp<a href="./FunctionalClassAtomTypes.html">FunctionalClassAtomTypes.pm</a>,&nbsp<a href="./MMFF94AtomTypes.html">MMFF94AtomTypes.pm</a>,&nbsp
+<a href="./SYBYLAtomTypes.html">SYBYLAtomTypes.pm</a>,&nbsp<a href="./TPSAAtomTypes.html">TPSAAtomTypes.pm</a>,&nbsp<a href="./UFFAtomTypes.html">UFFAtomTypes.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./MMFF94AtomTypes.html" title="MMFF94AtomTypes.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./SYBYLAtomTypes.html" title="SYBYLAtomTypes.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>AtomTypes::SLogPAtomTypes.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

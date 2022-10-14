@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:SplitTextFiles.pl</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SplitSDFiles.html" title="SplitSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextFilesToHTML.html" title="TextFilesToHTML.html">Next</a></td><td width="34%" align="middle"><strong>SplitTextFiles.pl</strong></td><td width="33%" align="right"><a href="././code/SplitTextFiles.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/SplitTextFiles.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/SplitTextFiles.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/SplitTextFiles.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/SplitTextFiles.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>SplitTextFiles.pl - Split CSV or TSV TextFile(s) into multiple text files</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>SplitTextFiles.pl TextFile(s)...</p>
+<p>SplitTextFiles.pl [<strong>-f, --fast</strong>] [<strong>-h, --help</strong>] [<strong>--indelim</strong> comma | semicolon]
+[<strong>-l, --label</strong> yes | no] [<strong>-n, --numfiles</strong> number] [<strong>-o, --overwrite</strong>]
+[<strong>--outdelim</strong> comma | tab | semicolon] [<strong>-q, --quote</strong> yes | no]
+[<strong>-r, --root</strong> rootname] [<strong>-w, --workingdir</strong> dirname] TextFile(s)...</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p>Split CSV or TSV <em>TextFile(s)</em> into multiple text files. Each new text file contains
+a subset of similar number of lines from the initial file. The file names are separated
+by space. The valid file extensions are <em>.csv</em> and <em>.tsv</em> for comma/semicolon and
+tab delimited text files respectively. All other file names are ignored. All the text
+files in a current directory can be specified by <em>*.csv</em>, <em>*.tsv</em>, or the current
+directory name. The <strong>--indelim</strong> option determines the format of <em>TextFile(s)</em>.
+Any file which doesn't correspond to the format indicated by <strong>--indelim</strong> option
+is ignored.</p>
+<p>
+</p>
+<h2>OPTIONS</h2>
+<dl>
+<dt><strong><strong>-f, --fast</strong></strong></dt>
+<dd>
+<p>In this mode, <strong>--indelim, --outdelim</strong>, and <strong>-q --quote</strong> options are ignored. The
+format of input and output file(s) are assumed to be similar. And the text lines
+from input <em>TextFile(s)</em> are just transferred to output file(s) without any processing.</p>
+</dd>
+<dt><strong><strong>-h, --help</strong></strong></dt>
+<dd>
+<p>Print this help message.</p>
+</dd>
+<dt><strong><strong>--indelim</strong> <em>comma | semicolon</em></strong></dt>
+<dd>
+<p>Input delimiter for CSV <em>TextFile(s)</em>. Possible values: <em>comma or semicolon</em>.
+Default value: <em>comma</em>. For TSV files, this option is ignored and <em>tab</em> is used as a
+delimiter.</p>
+</dd>
+<dt><strong><strong>-l, --label</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>First line contains column labels. Possible values: <em>yes or no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-n, --numfiles</strong> <em>number</em></strong></dt>
+<dd>
+<p>Number of new files to generate for each TextFile(s). Default: <em>2</em>.</p>
+</dd>
+<dt><strong><strong>-o, --overwrite</strong></strong></dt>
+<dd>
+<p>Overwrite existing files.</p>
+</dd>
+<dt><strong><strong>--outdelim</strong> <em>comma | tab | semicolon</em></strong></dt>
+<dd>
+<p>Output text file delimiter. Possible values: <em>comma, tab, or semicolon</em>.
+Default value: <em>comma</em></p>
+</dd>
+<dt><strong><strong>-q, --quote</strong> <em>yes | no</em></strong></dt>
+<dd>
+<p>Put quotes around column values in output text file. Possible values: <em>yes or
+no</em>. Default value: <em>yes</em>.</p>
+</dd>
+<dt><strong><strong>-r, --root</strong> <em>rootname</em></strong></dt>
+<dd>
+<p>New text file names are generated using the root: &lt;Root&gt;Part&lt;Count&gt;.&lt;Ext&gt;.
+Default new file names: &lt;InitialTextFileName&gt;Part&lt;Count&gt;.&lt;Ext&gt;. The csv, and tsv
+&lt;Ext&gt; values are used for comma/semicolon, and tab delimited text files
+respectively.This option is ignored for multiple input files.</p>
+</dd>
+<dt><strong><strong>-w, --workingdir</strong> <em>dirname</em></strong></dt>
+<dd>
+<p>Location of working directory. Default: current directory.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>EXAMPLES</h2>
+<p>To split each CSV text files into 4 different text files type:</p>
+<div class="ExampleBox">
+    % SplitTextFiles.pl -n 5 -o Sample1.csv Sample2.csv
+    <br/>% SplitTextFiles.pl -n 5 -o *.csv</div>
+<p>To split Sample1.tsv into 10 different CSV text files, type:</p>
+<div class="ExampleBox">
+    % SplitTextFiles.pl -n 10 --outdelim comma -o Sample1.tsv</div>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./JoinTextFiles.html">JoinTextFiles.pl</a>,&nbsp<a href="./MergeTextFiles.html">MergeTextFiles.pl</a>,&nbsp<a href="./ModifyTextFilesFormat.html">ModifyTextFilesFormat.pl</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./SplitSDFiles.html" title="SplitSDFiles.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./TextFilesToHTML.html" title="TextFilesToHTML.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>SplitTextFiles.pl</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:Bond.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./BitVector.html" title="BitVector.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Constants.html" title="Constants.html">Next</a></td><td width="34%" align="middle"><strong>Bond.pm</strong></td><td width="33%" align="right"><a href="././code/Bond.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/Bond.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/Bond.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/Bond.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/Bond.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>Bond</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use Bond;</p>
+<p>use Bond qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>Bond</strong> class provides the following methods:</p>
+<p> <a href="#new">new</a>, <a href="#copy">Copy</a>, <a href="#deletebond">DeleteBond</a>, <a href="#getatoms">GetAtoms</a>, <a href="#getbondbeginatom">GetBondBeginAtom</a>, <a href="#getbondendatom">GetBondEndAtom</a>
+, <a href="#getbondfromatom">GetBondFromAtom</a>, <a href="#getbondtoatom">GetBondToAtom</a>, <a href="#getbondedatom">GetBondedAtom</a>, <a href="#getcommonatom">GetCommonAtom</a>, <a href="#getlargestring">GetLargestRing</a>
+, <a href="#getnumofrings">GetNumOfRings</a>, <a href="#getnumofringswithevensize">GetNumOfRingsWithEvenSize</a>, <a href="#getnumofringswithoddsize">GetNumOfRingsWithOddSize</a>
+, <a href="#getnumofringswithsize">GetNumOfRingsWithSize</a>, <a href="#getnumofringswithsizegreaterthan">GetNumOfRingsWithSizeGreaterThan</a>
+, <a href="#getnumofringswithsizelessthan">GetNumOfRingsWithSizeLessThan</a>, <a href="#getrings">GetRings</a>, <a href="#getringswithevensize">GetRingsWithEvenSize</a>
+, <a href="#getringswithoddsize">GetRingsWithOddSize</a>, <a href="#getringswithsize">GetRingsWithSize</a>, <a href="#getringswithsizegreaterthan">GetRingsWithSizeGreaterThan</a>
+, <a href="#getringswithsizelessthan">GetRingsWithSizeLessThan</a>, <a href="#getsizeoflargestring">GetSizeOfLargestRing</a>, <a href="#getsizeofsmallestring">GetSizeOfSmallestRing</a>
+, <a href="#getsmallestring">GetSmallestRing</a>, <a href="#isaromatic">IsAromatic</a>, <a href="#isbondstereochemistryspecified">IsBondStereochemistrySpecified</a>, <a href="#isbondtypespecified">IsBondTypeSpecified</a>
+, <a href="#iscis">IsCis</a>, <a href="#iscisortrans">IsCisOrTrans</a>, <a href="#iscoordinate">IsCoordinate</a>, <a href="#isdative">IsDative</a>, <a href="#isdouble">IsDouble</a>, <a href="#isdown">IsDown</a>, <a href="#isdownward">IsDownward</a>, <a href="#ishash">IsHash</a>
+, <a href="#isinring">IsInRing</a>, <a href="#isinringofsize">IsInRingOfSize</a>, <a href="#isionic">IsIonic</a>, <a href="#isnotinring">IsNotInRing</a>, <a href="#isonlyinonering">IsOnlyInOneRing</a>, <a href="#isquadruple">IsQuadruple</a>
+, <a href="#isquintuple">IsQuintuple</a>, <a href="#issextuple">IsSextuple</a>, <a href="#issingle">IsSingle</a>, <a href="#istautomeric">IsTautomeric</a>, <a href="#istrans">IsTrans</a>, <a href="#istriple">IsTriple</a>, <a href="#isup">IsUp</a>
+, <a href="#isupordown">IsUpOrDown</a>, <a href="#isupward">IsUpward</a>, <a href="#iswedge">IsWedge</a>, <a href="#iswedgeorhash">IsWedgeOrHash</a>, <a href="#setatoms">SetAtoms</a>, <a href="#setbondorder">SetBondOrder</a>
+, <a href="#setbondstereochemistry">SetBondStereochemistry</a>, <a href="#setbondtype">SetBondType</a>, <a href="#stringifybond">StringifyBond</a>, <a href="#switchbondfromandtoatoms">SwitchBondFromAndToAtoms</a>
+</p><p><strong>Bond</strong> class is derived from <strong>ObjectProperty</strong> base class which provides methods not explicitly
+defined in <strong>Atom</strong> or <strong>ObjectProperty</strong> class using Perl's AUTOLOAD functionality. These methods
+are generated on-the-fly for a specified object property:</p>
+<div class="OptionsBox">
+    Set&lt;PropertyName&gt;(&lt;PropertyValue&gt;);
+<br/>    $PropertyValue = Get&lt;PropertyName&gt;();
+<br/>    Delete&lt;PropertyName&gt;();</div>
+<p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="new" class="item"><strong>new</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NewBond = new Bond([%PropertyNameAndValues]);</div>
+<p>Using specified <em>Bond</em> property names and values hash, <strong>new</strong> method creates a new object
+and returns a reference to newly created <strong>Bond</strong> object. By default, following properties are
+initialized:</p>
+<div class="OptionsBox">
+    ID = SequentialObjectID
+<br/>    @Atoms = ();
+<br/>    BondType = &quot;&quot;
+<br/>    BondOrder = &quot;&quot;</div>
+<p>Except for <em>ID</em> property, all other default properties and other additional properties can
+be set during invocation of this method.</p>
+<p>Examples:</p>
+<div class="OptionsBox">
+    $Bond = new Bond();
+<br/>    $DoubleBond = new Bond('Atoms' =&gt; [$Atom2, $Atom1],
+                           'BondOrder' =&gt; 2);</div>
+</dd>
+<dt><strong><a name="copy" class="item"><strong>Copy</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BondCopy = $Bond-&gt;Copy();</div>
+<p>Copy <em>Bond</em> and its associated data using <strong>Storable::dclone</strong> and return a new
+<strong>Bond</strong> object.</p>
+</dd>
+<dt><strong><a name="deletebond" class="item"><strong>DeleteBond</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond-&gt;DeleteBond();</div>
+<p>Delete <em>Bond</em> between atoms in from a molecule.</p>
+</dd>
+<dt><strong><a name="getatoms" class="item"><strong>GetAtoms</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @BondedAtoms = $Bond-&gt;GetAtoms();</div>
+<p>Returns an array containing <em>Atoms</em> invoved in <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getbondedatom" class="item"><strong>GetBondedAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BondedAtom = $Bond-&gt;GetBondedAtom($Atom);</div>
+<p>Returns <strong>BondedAtom</strong> bonded to <em>Atom</em> in  <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getbondbeginatom" class="item"><strong>GetBondBeginAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BeginAtom = $Bond-&gt;GetBondBeginAtom();</div>
+<p>Returns <strong>BeginAtom</strong> corresponding to bond starting atom in <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getbondendatom" class="item"><strong>GetBondEndAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $EndAtom = $Bond-&gt;GetBondEndAtom();</div>
+<p>Returns <strong>EndAtom</strong> corresponding to bond ending atom in <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getbondfromatom" class="item"><strong>GetBondFromAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $FromAtom = $Bond-&gt;GetBondFromAtom();</div>
+<p>Returns <strong>FromAtom</strong> corresponding to bond starting atom in <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getbondtoatom" class="item"><strong>GetBondToAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ToAotm = $Bond-&gt;GetBondToAtom();</div>
+<p>Returns <strong>ToAtom</strong> corresponding to bond ending atom in <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="getcommonatom" class="item"><strong>GetCommonAtom</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $CommonAtom = $Bond-&gt;GetCommonAtom($OtherBond);</div>
+<p>Returns <strong>Atom</strong> common to both <em>Bond</em> and <em>$OtherBond</em>.</p>
+</dd>
+<dt><strong><a name="getlargestring" class="item"><strong>GetLargestRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @RingAtoms = $Bond-&gt;GetLargestRing();</div>
+<p>Returns an array of ring <em>Atoms</em> corresponding to the largest ring containing <em>Bond</em>.
+in a molecule</p>
+</dd>
+<dt><strong><a name="getnumofrings" class="item"><strong>GetNumOfRings</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRings();</div>
+<p>Returns number of rings containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getnumofringswithevensize" class="item"><strong>GetNumOfRingsWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRingsWithEvenSize();</div>
+<p>Returns number of rings with even size containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getnumofringswithoddsize" class="item"><strong>GetNumOfRingsWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRingsWithOddSize();</div>
+<p>Returns number of rings with odd size containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getnumofringswithsize" class="item"><strong>GetNumOfRingsWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRingsWithSize($RingSize);</div>
+<p>Returns number of rings with specific <em>RingSize</em> containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getnumofringswithsizegreaterthan" class="item"><strong>GetNumOfRingsWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRingsWithSizeGreaterThan($RingSize);</div>
+<p>Returns number of rings with size greater than specific <em>RingSize</em> containing
+<em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getnumofringswithsizelessthan" class="item"><strong>GetNumOfRingsWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $NumOfRings = $Bond-&gt;GetNumOfRingsWithSizeLessThan($RingSize);</div>
+<p>Returns number of rings with size less than specific <em>RingSize</em> containing <em>Bond</em>
+in a molecule.</p>
+</dd>
+<dt><strong><a name="getrings" class="item"><strong>GetRings</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRings();</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding
+to all rings containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getringswithevensize" class="item"><strong>GetRingsWithEvenSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRingsWithEvenSize();</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding to all rings with even size
+containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getringswithoddsize" class="item"><strong>GetRingsWithOddSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRingsWithOddSize();</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding to all rings with odd size
+containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getringswithsize" class="item"><strong>GetRingsWithSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRingsWithSize($RingSize);</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding to all rings with specific
+<em>RingSize </em>containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getringswithsizegreaterthan" class="item"><strong>GetRingsWithSizeGreaterThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRingsWithSizeGreaterThan($RingSize);</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding to all rings with size
+greater than specific <em>RingSize </em>containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getringswithsizelessthan" class="item"><strong>GetRingsWithSizeLessThan</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @Rings = $Bond-&gt;GetRingsWithSizeLessThan($RingSize);</div>
+<p>Returns an array of references to arrays containing ring atoms corressponding to all rings with size
+less than specific <em>RingSize </em>containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getsizeoflargestring" class="item"><strong>GetSizeOfLargestRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Bond-&gt;GetSizeOfLargestRing();</div>
+<p>Returns size of the largest ring containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getsizeofsmallestring" class="item"><strong>GetSizeOfSmallestRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Size = $Bond-&gt;GetSizeOfSmallestRing();</div>
+<p>Returns size of the smallest ring containing <em>Bond</em> in a molecule.</p>
+</dd>
+<dt><strong><a name="getsmallestring" class="item"><strong>GetSmallestRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    @RingAtoms = $Bond-&gt;GetSmallestRing();</div>
+<p>Returns an array of ring <em>Atoms</em> corresponding to the largest ring containing <em>Bond</em>
+in a molecule.</p>
+</dd>
+<dt><strong><a name="isaromatic" class="item"><strong>IsAromatic</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsAromatic();</div>
+<p>Returns 1 or 0 based on whether it's an aromatic <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isbondstereochemistryspecified" class="item"><strong>IsBondStereochemistrySpecified</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsBondStereochemistrySpecified();</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em>'s sterochemistry is specified.</p>
+</dd>
+<dt><strong><a name="isbondtypespecified" class="item"><strong>IsBondTypeSpecified</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsBondTypeSpecified();</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em>'s type is specified.</p>
+</dd>
+<dt><strong><a name="iscis" class="item"><strong>IsCis</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsCis();</div>
+<p>Returns 1 or 0 based on whether it's a cis <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="iscisortrans" class="item"><strong>IsCisOrTrans</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsCisOrTrans();</div>
+<p>Returns 1 or 0 based on whether it's a cis or trans <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="iscoordinate" class="item"><strong>IsCoordinate</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsCoordinate();</div>
+<p>Returns 1 or 0 based on whether it's a coordinate or dative  <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isdative" class="item"><strong>IsDative</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsDative();</div>
+<p>Returns 1 or 0 based on whether it's a coordinate or dative  <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isdouble" class="item"><strong>IsDouble</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status =$Bond-&gt;IsDouble();</div>
+<p>Returns 1 or 0 based on whether it's a double <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isdown" class="item"><strong>IsDown</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsDown();</div>
+<p>Returns 1 or 0 based on whether it's a hash or down single <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isdownward" class="item"><strong>IsDownward</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Return = $Bond-&gt;IsDownward();</div>
+<p>Returns 1 or 0 based on whether it's a downward <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="ishash" class="item"><strong>IsHash</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsHash();</div>
+<p>Returns 1 or 0 based on whether it's a hash or down single <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isinring" class="item"><strong>IsInRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsInRing();</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em> is present in a ring.</p>
+</dd>
+<dt><strong><a name="isinringofsize" class="item"><strong>IsInRingOfSize</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsInRingOfSize($Size);</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em> is present in a ring of specific <em>Size</em>.</p>
+</dd>
+<dt><strong><a name="isionic" class="item"><strong>IsIonic</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsIonic();</div>
+<p>Returns 1 or 0 based on whether it's an ionic <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isnotinring" class="item"><strong>IsNotInRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsNotInRing();</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em> is not present in a ring.</p>
+</dd>
+<dt><strong><a name="isonlyinonering" class="item"><strong>IsOnlyInOneRing</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsOnlyInOneRing();</div>
+<p>Returns 1 or 0 based on whether <em>Bond</em> is only present in one ring.</p>
+</dd>
+<dt><strong><a name="isquadruple" class="item"><strong>IsQuadruple</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsQuadruple();</div>
+<p>Returns 1 or 0 based on whether it's a quadruple <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isquintuple" class="item"><strong>IsQuintuple</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsQuintuple();</div>
+<p>Returns 1 or 0 based on whether it's a quintuple <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="issextuple" class="item"><strong>IsSextuple</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsSextuple();</div>
+<p>Returns 1 or 0 based on whether it's a sextuple <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="issingle" class="item"><strong>IsSingle</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status =$Bond-&gt;IsSingle();</div>
+<p>Returns 1 or 0 based on whether it's a single <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="istriple" class="item"><strong>IsTriple</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status =$Bond-&gt;IsTriple();</div>
+<p>Returns 1 or 0 based on whether it's a triple <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="istautomeric" class="item"><strong>IsTautomeric</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsTautomeric();</div>
+<p>Returns 1 or 0 based on whether it's a <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="istrans" class="item"><strong>IsTrans</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsTrans();</div>
+<p>Returns 1 or 0 based on whether it's a trans <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isup" class="item"><strong>IsUp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsUp();</div>
+<p>Returns 1 or 0 based on whether it's a up <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isupordown" class="item"><strong>IsUpOrDown</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsUpOrDown();</div>
+<p>Returns 1 or 0 based on whether it's an up or down <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="isupward" class="item"><strong>IsUpward</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsUpward();</div>
+<p>Returns 1 or 0 based on whether it's an upward <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="iswedge" class="item"><strong>IsWedge</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsWedge();</div>
+<p>Returns 1 or 0 based on whether it's a wedge <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="iswedgeorhash" class="item"><strong>IsWedgeOrHash</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = $Bond-&gt;IsWedgeOrHash();</div>
+<p>Returns 1 or 0 based on whether it's a wedge or hash <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="setatoms" class="item"><strong>SetAtoms</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond-&gt;SetAtoms($AtomsRef);
+<br/>    $Bond-&gt;SetAtoms(@Atoms);</div>
+<p>Set atoms of <em>Bond</em> to atoms in <em>Atoms</em> array or in a reference to an array of atoms
+and return <em>Bond</em>.</p>
+</dd>
+<dt><strong><a name="setbondorder" class="item"><strong>SetBondOrder</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond-&gt;SetBondOrder($BondOrder);</div>
+<p>Sets bond order of <em>Bond</em> to specified <em>BondOrder</em> and returns <em>Bond</em>. Possible bond order
+values: 1 = Single, 1.5 = Aromatic, 2 = Double, 3 = Triple, 4 = Quadruple, 5 = Quintuple,
+6 = Sextuple, 7 = Septuple</p>
+<p>Notes:</p>
+<div class="OptionsBox">
+    . BondType property is automatically assigned using default BondType
+      values for specified BondOrder.
+<br/>    . BondType values can also be explicit set.
+<br/>    . To make bonds aromatic in a ring, explicitly set &quot;Aromatic&quot;
+      property for bond/atoms and make sure appropriate BondOrder
+      values are assigned.
+<br/>    . Dative or coordinate bond types are treated as single bond types with
+      explicit formal charge of + and - on first and second bond atoms.</div>
+</dd>
+<dt><strong><a name="setbondtype" class="item"><strong>SetBondType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond-&gt;SetBondType($BondType);</div>
+<p>Sets bond type for <em>Bond</em> to specified <em>BondType</em> and returns <em>Bond</em>. Possible bond type
+values for different bond orders are:</p>
+<div class="OptionsBox">
+    0: None, Ionic, Unspecified
+<br/>    1 : Single, Dative, Coordinate, SingleOrDouble, SingleOrAromatic, Tautomeric
+<br/>    2 : Double, SingleOrDouble, DoubleOrAromatic, Tautomeric
+<br/>    3 : Triple
+<br/>    4 : Quadruple
+<br/>    5 : Quintuple
+<br/>    6 : Sextuple
+<br/>    7 : Septuple
+<br/>    1.5 : Aromatic, Resonance, SingleOrAromatic, DoubleOrAromatic</div>
+<p>Notes:</p>
+<div class="OptionsBox">
+    o BondType Any is valid for all BondOrders.
+<br/>    o BondOrder property is automatically assigned using default BondOrder
+      values for specified BondType.</div>
+<p>Possible bond stereochemistry values for different bond orders are:</p>
+<div class="OptionsBox">
+    0 : None, Unspecified
+<br/>    1 : Wedge, Up, Hash, Down, Wavy, WedgeOrHash, UpOrDown, Upward, Downward,
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;        None, Unspecified
+<br/>    2 : Cis, Trans, Z, E, DoubleCross, CisOrTrans, None, Unspecified</div>
+</dd>
+<dt><strong><a name="setbondstereochemistry" class="item"><strong>SetBondStereochemistry</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond = $Bond-&gt;SetBondStereochemistry($BondStereochemistry);</div>
+<p>Sets bond stereochemistry of <em>Bond</em> to specified <em>BondStereochemistry</em> and
+returns <em>Bond</em>. Possible <em>BondStereoChemistry</em> values for different bond orders
+are:</p>
+<p>BondOrder: 1</p>
+<div class="OptionsBox">
+    None, Unspecified: Not a stereo bond or unspecified</div>
+<div class="OptionsBox">
+    Wedge, Up : Wedge end pointing up
+<br/>    Hash, Down: Wedge end pointing down
+<br/>    Wavy, WedgeOrHash, UpOrDown: Wedge end up or down</div>
+<div class="OptionsBox">
+    Upward: Single bond around cis/trans double bonds pointing upward
+<br/>    Downward: Single bond around cis/trans double bonds pointing upward</div>
+<p>Notes:</p>
+<div class="OptionsBox">
+    o Wedge starts at begin atom of a bond making wedge pointed end always
+      at this atom.
+<br/>    o Upward/downward bonds start at atoms involved in cis/trans double bonds.</div>
+<p>BondOrder: 2</p>
+<div class="OptionsBox">
+    None, Unspecified: Not a stereo bond or unspecified</div>
+<div class="OptionsBox">
+    Z, cis: Similar groups on same side of double bond
+<br/>    E, trans: Similar groups on different side of double bond</div>
+<div class="OptionsBox">
+    CisOrTrans, DoubleCross: cis or trans</div>
+</dd>
+<dt><strong><a name="stringifybond" class="item"><strong>StringifyBond</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $BondString = $Bond-&gt;StringifyBond();</div>
+<p>Returns a string containing information about <em>bond</em> object.</p>
+</dd>
+<dt><strong><a name="switchbondfromandtoatoms" class="item"><strong>SwitchBondFromAndToAtoms</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Bond = $Bond-&gt;SwitchBondFromAndToAtoms();</div>
+<p>Swaps bond from and to atoms in <em>Bond</em> and returns <em>Bond</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./Atom.html">Atom.pm</a>,&nbsp<a href="./Molecule.html">Molecule.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./BitVector.html" title="BitVector.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./Constants.html" title="Constants.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>Bond.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>

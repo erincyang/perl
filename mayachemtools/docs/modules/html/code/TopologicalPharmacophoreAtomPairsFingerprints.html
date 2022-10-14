@@ -1,0 +1,1050 @@
+<html>
+<head>
+<title>MayaChemTools:Code:Fingerprints::TopologicalPharmacophoreAtomPairsFingerprints.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../../css/MayaChemToolsCode.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<pre>
+<a name="package-Fingerprints::TopologicalPharmacophoreAtomPairsFingerprints-"></a>   1 <span class="k">package </span><span class="i">Fingerprints::TopologicalPharmacophoreAtomPairsFingerprints</span><span class="sc">;</span>
+   2 <span class="c">#</span>
+   3 <span class="c"># $RCSfile: TopologicalPharmacophoreAtomPairsFingerprints.pm,v $</span>
+   4 <span class="c"># $Date: 2017/01/12 18:59:25 $</span>
+   5 <span class="c"># $Revision: 1.36 $</span>
+   6 <span class="c">#</span>
+   7 <span class="c"># Author: Manish Sud &lt;msud@san.rr.com&gt;</span>
+   8 <span class="c">#</span>
+   9 <span class="c"># Copyright (C) 2017 Manish Sud. All rights reserved.</span>
+  10 <span class="c">#</span>
+  11 <span class="c"># This file is part of MayaChemTools.</span>
+  12 <span class="c">#</span>
+  13 <span class="c"># MayaChemTools is free software; you can redistribute it and/or modify it under</span>
+  14 <span class="c"># the terms of the GNU Lesser General Public License as published by the Free</span>
+  15 <span class="c"># Software Foundation; either version 3 of the License, or (at your option) any</span>
+  16 <span class="c"># later version.</span>
+  17 <span class="c">#</span>
+  18 <span class="c"># MayaChemTools is distributed in the hope that it will be useful, but without</span>
+  19 <span class="c"># any warranty; without even the implied warranty of merchantability of fitness</span>
+  20 <span class="c"># for a particular purpose.  See the GNU Lesser General Public License for more</span>
+  21 <span class="c"># details.</span>
+  22 <span class="c">#</span>
+  23 <span class="c"># You should have received a copy of the GNU Lesser General Public License</span>
+  24 <span class="c"># along with MayaChemTools; if not, see &lt;http://www.gnu.org/licenses/&gt; or</span>
+  25 <span class="c"># write to the Free Software Foundation Inc., 59 Temple Place, Suite 330,</span>
+  26 <span class="c"># Boston, MA, 02111-1307, USA.</span>
+  27 <span class="c">#</span>
+  28 
+  29 <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+  30 <span class="k">use</span> <span class="w">Carp</span><span class="sc">;</span>
+  31 <span class="k">use</span> <span class="w">Exporter</span><span class="sc">;</span>
+  32 <span class="k">use</span> <span class="w">Fingerprints::Fingerprints</span><span class="sc">;</span>
+  33 <span class="k">use</span> <span class="w">TextUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  34 <span class="k">use</span> <span class="w">MathUtil</span> <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  35 <span class="k">use</span> <span class="w">Molecule</span><span class="sc">;</span>
+  36 <span class="k">use</span> <span class="w">AtomTypes::FunctionalClassAtomTypes</span><span class="sc">;</span>
+  37 
+  38 <span class="k">use</span> <span class="w">vars</span> <span class="q">qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS)</span><span class="sc">;</span>
+  39 
+  40 <span class="i">@ISA</span> = <span class="q">qw(Fingerprints::Fingerprints Exporter)</span><span class="sc">;</span>
+  41 <span class="i">@EXPORT</span> = <span class="q">qw()</span><span class="sc">;</span>
+  42 <span class="i">@EXPORT_OK</span> = <span class="q">qw()</span><span class="sc">;</span>
+  43 
+  44 <span class="i">%EXPORT_TAGS</span> = <span class="s">(</span><span class="w">all</span>  <span class="cm">=&gt;</span> <span class="s">[</span><span class="i">@EXPORT</span><span class="cm">,</span> <span class="i">@EXPORT_OK</span><span class="s">]</span><span class="s">)</span><span class="sc">;</span>
+  45 
+  46 <span class="c"># Setup class variables...</span>
+  47 <span class="k">my</span><span class="s">(</span><span class="i">$ClassName</span><span class="s">)</span><span class="sc">;</span>
+  48 <span class="i">_InitializeClass</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  49 
+  50 <span class="c"># Overload Perl functions...</span>
+  51 <span class="k">use</span> <span class="w">overload</span> <span class="q">&#39;&quot;&quot;&#39;</span> <span class="cm">=&gt;</span> <span class="q">&#39;StringifyTopologicalPharmacophoreAtomPairsFingerprints&#39;</span><span class="sc">;</span>
+  52 
+  53 <span class="c"># Class constructor...</span>
+<a name="new-"></a>  54 <span class="k">sub </span><span class="m">new</span> <span class="s">{</span>
+  55   <span class="k">my</span><span class="s">(</span><span class="i">$Class</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  56 
+  57   <span class="c"># Initialize object...</span>
+  58   <span class="k">my</span> <span class="i">$This</span> = <span class="i">$Class</span><span class="i">-&gt;SUPER::new</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  59   <span class="k">bless</span> <span class="i">$This</span><span class="cm">,</span> <span class="k">ref</span><span class="s">(</span><span class="i">$Class</span><span class="s">)</span> || <span class="i">$Class</span><span class="sc">;</span>
+  60   <span class="i">$This</span><span class="i">-&gt;_InitializeTopologicalPharmacophoreAtomPairsFingerprints</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+  61 
+  62   <span class="i">$This</span><span class="i">-&gt;_InitializeTopologicalPharmacophoreAtomPairsFingerprintsProperties</span><span class="s">(</span><span class="i">%NamesAndValues</span><span class="s">)</span><span class="sc">;</span>
+  63 
+  64   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+  65 <span class="s">}</span>
+  66 
+  67 <span class="c"># Initialize object data...</span>
+  68 <span class="c">#</span>
+<a name="_InitializeTopologicalPharmacophoreAtomPairsFingerprints-"></a>  69 <span class="k">sub </span><span class="m">_InitializeTopologicalPharmacophoreAtomPairsFingerprints</span> <span class="s">{</span>
+  70   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+  71 
+  72   <span class="c"># Type of fingerprint...</span>
+  73   <span class="i">$This</span>-&gt;{<span class="w">Type</span>} = <span class="q">&#39;TopologicalPharmacophoreAtomPairs&#39;</span><span class="sc">;</span>
+  74 
+  75   <span class="c"># Type of vector...</span>
+  76   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="q">&#39;FingerprintsVector&#39;</span><span class="sc">;</span>
+  77 
+  78   <span class="c"># AtomPairsSetSizeToUse...</span>
+  79   <span class="c">#</span>
+  80   <span class="c"># ArbitrarySize - Corrresponds to atom pairs with non-zero count</span>
+  81   <span class="c"># FixedSize - Corresponds to all atom pairs with zero and non-zero count</span>
+  82   <span class="c">#</span>
+  83   <span class="c"># Possible values: ArbitrarySize or FixedSize. Default: ArbitrarySize</span>
+  84   <span class="c">#</span>
+  85   <span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  86 
+  87   <span class="c"># Type of FingerprintsVector...</span>
+  88   <span class="c">#</span>
+  89   <span class="c"># OrderedNumericalValues - For ArbitrarySize value of AtomPairsSetSizeToUse</span>
+  90   <span class="c"># NumericalValues - For FixedSize value of AtomPairsSetSizeToUse</span>
+  91   <span class="c">#</span>
+  92   <span class="c"># Possible values: OrderedNumericalValues or NumericalValues. Default: NumericalValues</span>
+  93   <span class="c">#</span>
+  94   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="q">&#39;&#39;</span><span class="sc">;</span>
+  95 
+  96   <span class="c"># Vector values precision for real values which might be generated after</span>
+  97   <span class="c"># normalization and fuzzification...</span>
+  98   <span class="i">$This</span>-&gt;{<span class="w">ValuesPrecision</span>} = <span class="n">2</span><span class="sc">;</span>
+  99 
+ 100   <span class="c"># Minimum and maximum bond distance between pharmacophore atom paris...</span>
+ 101   <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} = <span class="n">1</span><span class="sc">;</span>
+ 102   <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>} = <span class="n">10</span><span class="sc">;</span>
+ 103 
+ 104   <span class="c"># Initialize atom types and weight information...</span>
+ 105   <span class="i">$This</span><span class="i">-&gt;_InitializePharmacophoreAtomTypesAndWeightInformation</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 106 
+ 107   <span class="c"># Normalization methodology to use for scaling the occurance count of pharmacophore atom</span>
+ 108   <span class="c"># pairs at various distances.</span>
+ 109   <span class="c">#</span>
+ 110   <span class="c"># Possible values: None, ByHeavyAtomsCount, ByAtomTypesCount. Default: None</span>
+ 111   <span class="c">#</span>
+ 112   <span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} = <span class="q">&#39;None&#39;</span><span class="sc">;</span>
+ 113 
+ 114   <span class="c"># Initialize fuzzification parameters...</span>
+ 115   <span class="c">#</span>
+ 116   <span class="i">$This</span><span class="i">-&gt;_InitializeFuzzificationInformation</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 117 
+ 118   <span class="c"># Pharmacophore types assigned to each heavy atom...</span>
+ 119   <span class="c">#</span>
+ 120   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 121 
+ 122   <span class="c"># Assigned Atom types count of each type in the molecule...</span>
+ 123   <span class="c">#</span>
+ 124   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 125 
+ 126   <span class="c"># All pharmacophore atom pairs between minimum and maximum distance...</span>
+ 127   <span class="c">#</span>
+ 128   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 129   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 130 <span class="s">}</span>
+ 131 
+ 132 <span class="c"># Inialize pharmacophore atom types and weight information...</span>
+ 133 <span class="c">#</span>
+<a name="_InitializePharmacophoreAtomTypesAndWeightInformation-"></a> 134 <span class="k">sub </span><span class="m">_InitializePharmacophoreAtomTypesAndWeightInformation</span> <span class="s">{</span>
+ 135   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 136 
+ 137   <span class="c"># Default pharmacophore atom types to use for atom pairs fingerprint generation</span>
+ 138   <span class="c"># are: HBD, HBA, PI, NI, H</span>
+ 139   <span class="c">#</span>
+ 140   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 141   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}} = <span class="k">sort</span> <span class="s">(</span><span class="q">&#39;HBD&#39;</span><span class="cm">,</span> <span class="q">&#39;HBA&#39;</span><span class="cm">,</span> <span class="q">&#39;PI&#39;</span><span class="cm">,</span> <span class="q">&#39;NI&#39;</span><span class="cm">,</span> <span class="q">&#39;H&#39;</span><span class="s">)</span><span class="sc">;</span>
+ 142 
+ 143   <span class="c"># Weight of the various pharmacophore atom types to use for their contribution to atom</span>
+ 144   <span class="c"># pair interaction. It allows to increase the importance of specific pharmacophore atom</span>
+ 145   <span class="c"># types in the generted fingerprints.</span>
+ 146   <span class="c">#</span>
+ 147   <span class="c"># A value of 0 eliminates the contribution by a particular pharmacophore atom</span>
+ 148   <span class="c"># type and 2 doubles its contribution.</span>
+ 149   <span class="c">#</span>
+ 150   <span class="k">my</span><span class="s">(</span><span class="i">$AtomType</span><span class="cm">,</span> <span class="i">%AvailableAtomTypes</span><span class="s">)</span><span class="sc">;</span>
+ 151 
+ 152   <span class="i">%AvailableAtomTypes</span> = <span class="i">AtomTypes::FunctionalClassAtomTypes::GetAvailableFunctionalClasses</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 153 
+ 154   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 155   <span class="k">for</span> <span class="i">$AtomType</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%AvailableAtomTypes</span><span class="s">)</span> <span class="s">{</span>
+ 156     <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType</span>} = <span class="n">1</span><span class="sc">;</span>
+ 157   <span class="s">}</span>
+ 158   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 159 <span class="s">}</span>
+ 160 
+ 161 <span class="c"># Initialize fuzzification information...</span>
+ 162 <span class="c">#</span>
+<a name="_InitializeFuzzificationInformation-"></a> 163 <span class="k">sub </span><span class="m">_InitializeFuzzificationInformation</span> <span class="s">{</span>
+ 164   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 165 
+ 166   <span class="c"># To fuzz or not to fuzz atom pairs count. Default: No fuzzication</span>
+ 167   <span class="c">#</span>
+ 168   <span class="i">$This</span>-&gt;{<span class="w">FuzzifyAtomPairsCount</span>} = <span class="n">0</span><span class="sc">;</span>
+ 169 
+ 170   <span class="c"># When to fuzz atom pair count...</span>
+ 171   <span class="c">#</span>
+ 172   <span class="c"># Possible values: BeforeNormalization or AfterNormalization. Default: AfterNormalization</span>
+ 173   <span class="c">#</span>
+ 174   <span class="i">$This</span>-&gt;{<span class="w">FuzzificationMode</span>} = <span class="q">&#39;AfterNormalization&#39;</span><span class="sc">;</span>
+ 175 
+ 176   <span class="c"># How to fuzz atom pair count...</span>
+ 177   <span class="c">#</span>
+ 178   <span class="c"># Possible values: FuzzyBinning or FuzzyBinSmoothing. Default: FuzzyBinning</span>
+ 179   <span class="c">#</span>
+ 180   <span class="i">$This</span>-&gt;{<span class="w">FuzzificationMethodology</span>} = <span class="q">&#39;FuzzyBinning&#39;</span><span class="sc">;</span>
+ 181 
+ 182   <span class="c"># By how much to fuzz atom pairs count...</span>
+ 183   <span class="c">#</span>
+ 184   <span class="i">$This</span>-&gt;{<span class="w">FuzzFactor</span>} = <span class="n">0.15</span><span class="sc">;</span>
+ 185 
+ 186   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 187 <span class="s">}</span>
+ 188 
+ 189 <span class="c"># Initialize class ...</span>
+<a name="_InitializeClass-"></a> 190 <span class="k">sub </span><span class="m">_InitializeClass</span> <span class="s">{</span>
+ 191   <span class="c">#Class name...</span>
+ 192   <span class="i">$ClassName</span> = <span class="w">__PACKAGE__</span><span class="sc">;</span>
+ 193 <span class="s">}</span>
+ 194 
+ 195 <span class="c"># Initialize object properties....</span>
+<a name="_InitializeTopologicalPharmacophoreAtomPairsFingerprintsProperties-"></a> 196 <span class="k">sub </span><span class="m">_InitializeTopologicalPharmacophoreAtomPairsFingerprintsProperties</span> <span class="s">{</span>
+ 197   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%NamesAndValues</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 198 
+ 199   <span class="k">my</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$MethodName</span><span class="s">)</span><span class="sc">;</span>
+ 200   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$Name</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="k">each</span>  <span class="i">%NamesAndValues</span><span class="s">)</span> <span class="s">{</span>
+ 201     <span class="i">$MethodName</span> = <span class="q">&quot;Set${Name}&quot;</span><span class="sc">;</span>
+ 202     <span class="i">$This</span><span class="i">-&gt;$MethodName</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="sc">;</span>
+ 203   <span class="s">}</span>
+ 204 
+ 205   <span class="c"># Make sure molecule object was specified...</span>
+ 206   <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$NamesAndValues</span>{<span class="w">Molecule</span>}<span class="s">)</span> <span class="s">{</span>
+ 207     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;New: Object can&#39;t be instantiated without specifying molecule...&quot;</span><span class="sc">;</span>
+ 208   <span class="s">}</span>
+ 209 
+ 210   <span class="i">$This</span><span class="i">-&gt;_InitializeTopologicalPharmacophoreAtomPairsFingerprintsVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 211 
+ 212   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 213 <span class="s">}</span>
+ 214 
+ 215 <span class="c"># Initialize fingerprints vector...</span>
+ 216 <span class="c">#</span>
+<a name="_InitializeTopologicalPharmacophoreAtomPairsFingerprintsVector-"></a> 217 <span class="k">sub </span><span class="m">_InitializeTopologicalPharmacophoreAtomPairsFingerprintsVector</span> <span class="s">{</span>
+ 218   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 219 
+ 220   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>}<span class="s">)</span> <span class="s">{</span>
+ 221     <span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>} =  <span class="q">&#39;ArbitrarySize&#39;</span><span class="sc">;</span>
+ 222   <span class="s">}</span>
+ 223 
+ 224   <span class="c"># Vector type and type of values...</span>
+ 225   <span class="i">$This</span>-&gt;{<span class="w">VectorType</span>} = <span class="q">&#39;FingerprintsVector&#39;</span><span class="sc">;</span>
+ 226 
+ 227   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>} =~ <span class="q">/^FixedSize$/i</span><span class="s">)</span> <span class="s">{</span>
+ 228     <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="q">&#39;OrderedNumericalValues&#39;</span><span class="sc">;</span>
+ 229   <span class="s">}</span>
+ 230   <span class="k">else</span> <span class="s">{</span>
+ 231     <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVectorType</span>} = <span class="q">&#39;NumericalValues&#39;</span><span class="sc">;</span>
+ 232   <span class="s">}</span>
+ 233 
+ 234   <span class="i">$This</span><span class="i">-&gt;_InitializeFingerprintsVector</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 235 <span class="s">}</span>
+ 236 
+ 237 <span class="c"># Set atom parits set size to use...</span>
+ 238 <span class="c">#</span>
+<a name="SetAtomPairsSetSizeToUse-"></a> 239 <span class="k">sub </span><span class="m">SetAtomPairsSetSizeToUse</span> <span class="s">{</span>
+ 240   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 241 
+ 242   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>}<span class="s">)</span> <span class="s">{</span>
+ 243     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomPairsSetSizeToUse: Can&#39;t change size:  It&#39;s already set...&quot;</span><span class="sc">;</span>
+ 244   <span class="s">}</span>
+ 245 
+ 246   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> !~ <span class="q">/^(ArbitrarySize|FixedSize)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 247     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomPairsSetSizeToUse: Unknown AtomPairsSetSizeToUse value: $Value; Supported values: ArbitrarySize or FixedSize&quot;</span><span class="sc">;</span>
+ 248   <span class="s">}</span>
+ 249 
+ 250   <span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 251 
+ 252   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 253 <span class="s">}</span>
+ 254 
+ 255 <span class="c"># Disable change of AvailableAtomTypes...</span>
+ 256 <span class="c">#</span>
+<a name="SetAvailableAtomTypes-"></a> 257 <span class="k">sub </span><span class="m">SetAvailableAtomTypes</span> <span class="s">{</span>
+ 258   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 259 
+ 260   <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetAvailableAtomTypes: AvailableAtomTypes value can&#39;t be set...&quot;</span><span class="sc">;</span>
+ 261 
+ 262   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 263 <span class="s">}</span>
+ 264 
+ 265 <span class="c"># Set atom types to use for atom pairs...</span>
+ 266 <span class="c">#</span>
+<a name="SetAtomTypesToUse-"></a> 267 <span class="k">sub </span><span class="m">SetAtomTypesToUse</span> <span class="s">{</span>
+ 268   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">@Values</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 269   <span class="k">my</span><span class="s">(</span><span class="i">$FirstValue</span><span class="cm">,</span> <span class="i">$TypeOfFirstValue</span><span class="cm">,</span> <span class="i">$AtomType</span><span class="cm">,</span> <span class="i">$SpecifiedAtomType</span><span class="cm">,</span> <span class="i">@SpecifiedAtomTypes</span><span class="cm">,</span> <span class="i">@AtomTypesToUse</span><span class="s">)</span><span class="sc">;</span>
+ 270 
+ 271   <span class="k">if</span> <span class="s">(</span>!<span class="i">@Values</span><span class="s">)</span> <span class="s">{</span>
+ 272     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;SetAtomTypesToUse: No values specified...&quot;</span><span class="sc">;</span>
+ 273     <span class="k">return</span><span class="sc">;</span>
+ 274   <span class="s">}</span>
+ 275 
+ 276   <span class="i">$FirstValue</span> = <span class="i">$Values</span>[<span class="n">0</span>]<span class="sc">;</span>
+ 277   <span class="i">$TypeOfFirstValue</span> = <span class="k">ref</span> <span class="i">$FirstValue</span><span class="sc">;</span>
+ 278 
+ 279   <span class="i">@SpecifiedAtomTypes</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 280   <span class="i">@AtomTypesToUse</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 281 
+ 282   <span class="k">if</span> <span class="s">(</span><span class="i">$TypeOfFirstValue</span> =~ <span class="q">/^ARRAY/</span><span class="s">)</span> <span class="s">{</span>
+ 283     <span class="k">push</span> <span class="i">@SpecifiedAtomTypes</span><span class="cm">,</span> <span class="i">@</span>{<span class="i">$FirstValue</span>}<span class="sc">;</span>
+ 284   <span class="s">}</span>
+ 285   <span class="k">else</span> <span class="s">{</span>
+ 286     <span class="k">push</span> <span class="i">@SpecifiedAtomTypes</span><span class="cm">,</span> <span class="i">@Values</span><span class="sc">;</span>
+ 287   <span class="s">}</span>
+ 288 
+ 289   <span class="c"># Make sure specified AtomTypes are valid...</span>
+ 290   <span class="k">for</span> <span class="i">$SpecifiedAtomType</span> <span class="s">(</span><span class="i">@SpecifiedAtomTypes</span><span class="s">)</span> <span class="s">{</span>
+ 291     <span class="k">if</span> <span class="s">(</span>!<span class="i">AtomTypes::FunctionalClassAtomTypes::IsFunctionalClassAvailable</span><span class="s">(</span><span class="i">$SpecifiedAtomType</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 292       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomTypesToUse: Specified atom type, $SpecifiedAtomType, is not supported...\n &quot;</span><span class="sc">;</span>
+ 293     <span class="s">}</span>
+ 294     <span class="i">$AtomType</span> = <span class="i">$SpecifiedAtomType</span><span class="sc">;</span>
+ 295     <span class="k">push</span> <span class="i">@AtomTypesToUse</span><span class="cm">,</span> <span class="i">$AtomType</span><span class="sc">;</span>
+ 296   <span class="s">}</span>
+ 297 
+ 298   <span class="c"># Set atom types to use...</span>
+ 299   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 300   <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="cm">,</span> <span class="k">sort</span> <span class="i">@AtomTypesToUse</span><span class="sc">;</span>
+ 301 
+ 302   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 303 <span class="s">}</span>
+ 304 
+ 305 <span class="c"># Set vector values precision for real values which might be generated after</span>
+ 306 <span class="c"># normalization and fuzzification...</span>
+ 307 <span class="c">#</span>
+<a name="SetValuesPrecision-"></a> 308 <span class="k">sub </span><span class="m">SetValuesPrecision</span> <span class="s">{</span>
+ 309   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 310 
+ 311   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsPositiveInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 312     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetValuesPrecision: ValuesPrecision value, $Value, is not valid:  It must be a positive integer...&quot;</span><span class="sc">;</span>
+ 313   <span class="s">}</span>
+ 314   <span class="i">$This</span>-&gt;{<span class="w">ValuesPrecision</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 315 
+ 316   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 317 <span class="s">}</span>
+ 318 
+ 319 <span class="c"># Set minimum distance for pharmacophore atom pairs...</span>
+ 320 <span class="c">#</span>
+<a name="SetMinDistance-"></a> 321 <span class="k">sub </span><span class="m">SetMinDistance</span> <span class="s">{</span>
+ 322   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 323 
+ 324   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 325     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMinDistance: MinDistance value, $Value, is not valid:  It must be an integer...&quot;</span><span class="sc">;</span>
+ 326   <span class="s">}</span>
+ 327   <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 328 
+ 329   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 330 <span class="s">}</span>
+ 331 
+ 332 <span class="c"># Set maximum distance for pharmacophore atom pairs...</span>
+ 333 <span class="c">#</span>
+<a name="SetMaxDistance-"></a> 334 <span class="k">sub </span><span class="m">SetMaxDistance</span> <span class="s">{</span>
+ 335   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 336 
+ 337   <span class="k">if</span> <span class="s">(</span>!<span class="i">TextUtil::IsPositiveInteger</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 338     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetMaxDistance: MaxDistance value, $Value, is not valid:  It must be a positive integer...&quot;</span><span class="sc">;</span>
+ 339   <span class="s">}</span>
+ 340   <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 341 
+ 342   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 343 <span class="s">}</span>
+ 344 
+ 345 <span class="c"># Set normalization methodology to use for scaling the occurance count of pharmacophore atom</span>
+ 346 <span class="c"># pairs over distance range beween minimum and maximum distance.</span>
+ 347 <span class="c">#</span>
+<a name="SetNormalizationMethodology-"></a> 348 <span class="k">sub </span><span class="m">SetNormalizationMethodology</span> <span class="s">{</span>
+ 349   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 350 
+ 351   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> !~ <span class="q">/^(ByHeavyAtomsCount|ByAtomTypesCount|None)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 352     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetNormalizationMethodology: NormalizationMethodology value, $Value, is not valid. Supported values: None, ByHeavyAtomsCount or ByAtomTypesCount...&quot;</span><span class="sc">;</span>
+ 353   <span class="s">}</span>
+ 354 
+ 355   <span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 356 
+ 357   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 358 <span class="s">}</span>
+ 359 
+ 360 <span class="c"># Set weight of the various pharmacophore atom types to use for their contribution to atom</span>
+ 361 <span class="c"># pair interaction using atom types label and value hash.</span>
+ 362 <span class="c">#</span>
+ 363 <span class="c"># It allows to increase the importance of specific pharmacophore atom</span>
+ 364 <span class="c"># types in the generted fingerprints.</span>
+ 365 <span class="c">#</span>
+ 366 <span class="c"># A value of 0 eliminates the contribution by a particular pharmacophore atom</span>
+ 367 <span class="c"># type and 2 doubles its contribution.</span>
+ 368 <span class="c">#</span>
+<a name="SetAtomTypesWeight-"></a> 369 <span class="k">sub </span><span class="m">SetAtomTypesWeight</span> <span class="s">{</span>
+ 370   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">%AtomTypesWeight</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 371   <span class="k">my</span><span class="s">(</span><span class="i">$AtomType</span><span class="cm">,</span> <span class="i">$Weight</span><span class="s">)</span><span class="sc">;</span>
+ 372 
+ 373   <span class="k">while</span> <span class="s">(</span><span class="s">(</span><span class="i">$AtomType</span><span class="cm">,</span> <span class="i">$Weight</span><span class="s">)</span> = <span class="k">each</span> <span class="i">%AtomTypesWeight</span><span class="s">)</span> <span class="s">{</span>
+ 374     <span class="k">if</span> <span class="s">(</span>!<span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType</span>}<span class="s">)</span> <span class="s">{</span>
+ 375       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomTypesWeight: AtomTypeWeight for $AtomType couldn&#39;t be set: Unknown atom type...&quot;</span><span class="sc">;</span>
+ 376     <span class="s">}</span>
+ 377     <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">TextUtil::IsFloat</span><span class="s">(</span><span class="i">$Weight</span><span class="s">)</span> &amp;&amp; <span class="s">(</span><span class="i">$Weight</span> &gt;= <span class="n">0</span><span class="s">)</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 378       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetAtomTypesWeight: Specified weight value, $Weight, for AtomType, $AtomType, muts be &gt;= 0...&quot;</span><span class="sc">;</span>
+ 379     <span class="s">}</span>
+ 380     <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType</span>}  = <span class="i">$Weight</span><span class="sc">;</span>
+ 381   <span class="s">}</span>
+ 382 <span class="s">}</span>
+ 383 
+ 384 <span class="c"># Set fuzzification methodology to use for fuzzifying atom pairs count...</span>
+ 385 <span class="c">#</span>
+<a name="SetFuzzificationMethodology-"></a> 386 <span class="k">sub </span><span class="m">SetFuzzificationMethodology</span> <span class="s">{</span>
+ 387   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 388 
+ 389   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> !~ <span class="q">/^(FuzzyBinning|FuzzyBinSmoothing)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 390     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFuzzificationMethodology: FuzzificationMethodology value, $Value, is not valid. Supported values: FuzzyBinning or FuzzyBinSmoothing...&quot;</span><span class="sc">;</span>
+ 391   <span class="s">}</span>
+ 392 
+ 393   <span class="i">$This</span>-&gt;{<span class="w">FuzzificationMethodology</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 394 
+ 395   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 396 <span class="s">}</span>
+ 397 
+ 398 <span class="c"># Set fuzzification mode for fuzzifying atom pairs count...</span>
+ 399 <span class="c">#</span>
+<a name="SetFuzzificationMode-"></a> 400 <span class="k">sub </span><span class="m">SetFuzzificationMode</span> <span class="s">{</span>
+ 401   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 402 
+ 403   <span class="k">if</span> <span class="s">(</span><span class="i">$Value</span> !~ <span class="q">/^(BeforeNormalization|AfterNormalization)$/i</span><span class="s">)</span> <span class="s">{</span>
+ 404     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFuzzificationMode: FuzzificationMode value, $Value, is not valid. Supported values: BeforeNormalization or AfterNormalization...&quot;</span><span class="sc">;</span>
+ 405   <span class="s">}</span>
+ 406 
+ 407   <span class="i">$This</span>-&gt;{<span class="w">FuzzificationMode</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 408 
+ 409   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 410 <span class="s">}</span>
+ 411 
+ 412 <span class="c"># Set fuzz factor values used for fuzzifying atom pairs count...</span>
+ 413 <span class="c">#</span>
+<a name="SetFuzzFactor-"></a> 414 <span class="k">sub </span><span class="m">SetFuzzFactor</span> <span class="s">{</span>
+ 415   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="cm">,</span> <span class="i">$Value</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 416 
+ 417   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzificationMethodology</span>} =~ <span class="q">/^FuzzyBinning$/i</span><span class="s">)</span> <span class="s">{</span>
+ 418     <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">TextUtil::IsFloat</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span> &amp;&amp; <span class="i">$Value</span> &gt;=<span class="n">0</span> &amp;&amp; <span class="i">$Value</span> &lt;= <span class="n">1.0</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 419       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFuzzFactor: Specified fuzz factor value, $Value, must be &gt;= 0 and &lt;= 1...&quot;</span><span class="sc">;</span>
+ 420     <span class="s">}</span>
+ 421   <span class="s">}</span>
+ 422   <span class="k">elsif</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzificationMethodology</span>} =~ <span class="q">/^FuzzyBinSmoothing$/i</span><span class="s">)</span> <span class="s">{</span>
+ 423     <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">TextUtil::IsFloat</span><span class="s">(</span><span class="i">$Value</span><span class="s">)</span> &amp;&amp; <span class="i">$Value</span> &gt;=<span class="n">0</span> &amp;&amp; <span class="i">$Value</span> &lt;= <span class="n">0.5</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 424       <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFuzzFactor: Specified fuzz factor value, $Value, must be &gt;= 0 and &lt;= 0.5...&quot;</span><span class="sc">;</span>
+ 425     <span class="s">}</span>
+ 426   <span class="s">}</span>
+ 427   <span class="k">else</span> <span class="s">{</span>
+ 428     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;SetFuzzFactor: Fuzz factor value can&#39;t be changed: Uknown FuzzificationMethodology: $This-&gt;{FuzzificationMethodology}...&quot;</span><span class="sc">;</span>
+ 429   <span class="s">}</span>
+ 430 
+ 431   <span class="i">$This</span>-&gt;{<span class="w">FuzzFactor</span>} = <span class="i">$Value</span><span class="sc">;</span>
+ 432 
+ 433   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 434 <span class="s">}</span>
+ 435 
+ 436 <span class="c"># Generate fingerprints description...</span>
+ 437 <span class="c">#</span>
+<a name="GetDescription-"></a> 438 <span class="k">sub </span><span class="m">GetDescription</span> <span class="s">{</span>
+ 439   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 440 
+ 441   <span class="c"># Is description explicity set?</span>
+ 442   <span class="k">if</span> <span class="s">(</span><span class="k">exists</span> <span class="i">$This</span>-&gt;{<span class="w">Description</span>}<span class="s">)</span> <span class="s">{</span>
+ 443     <span class="k">return</span> <span class="i">$This</span>-&gt;{<span class="w">Description</span>}<span class="sc">;</span>
+ 444   <span class="s">}</span>
+ 445 
+ 446   <span class="c"># Generate fingerprints description...</span>
+ 447 
+ 448   <span class="k">return</span> <span class="q">&quot;$This-&gt;{Type}:$This-&gt;{AtomPairsSetSizeToUse}:MinDistance$This-&gt;{MinDistance}:MaxDistance$This-&gt;{MaxDistance}&quot;</span><span class="sc">;</span>
+ 449 <span class="s">}</span>
+ 450 
+ 451 <span class="c"># Generate topological pharmacophore atom pairs [ Ref 60-62, Ref 65, Ref 68 ] fingerprints...</span>
+ 452 <span class="c">#</span>
+ 453 <span class="c"># Methodology:</span>
+ 454 <span class="c">#   . Generate a distance matrix.</span>
+ 455 <span class="c">#   . Assign pharmacophore atom types to all the atoms.</span>
+ 456 <span class="c">#   . Initialize pharmacophore atom pairs basis set for all unique pairs between</span>
+ 457 <span class="c">#     minimum and maximum distance.</span>
+ 458 <span class="c">#   . Using distance matrix and pharmacophore atom types, count occurance of</span>
+ 459 <span class="c">#     unique atom pairs between specified distance range - It corresponds to the</span>
+ 460 <span class="c">#     correlation-vector for the atom pairs.</span>
+ 461 <span class="c">#       . Weigh contribution of each atom type to atom pair interaction by its specified</span>
+ 462 <span class="c">#         weight during occurance count.</span>
+ 463 <span class="c">#       . Assign count to appropriate distance bin for a specific atom pair</span>
+ 464 <span class="c">#</span>
+ 465 <span class="c">#   . Normalize occurance count of pharmacophore atom pairs by heavy atom count</span>
+ 466 <span class="c">#     or sum of AtomTypeCounts of each pharmacophore atom type in the atom pair</span>
+ 467 <span class="c">#     at a specific distance.</span>
+ 468 <span class="c">#</span>
+ 469 <span class="c">#   . Fuzzify occurance count of pharmacophore atom pairs using FuzzyBinning or</span>
+ 470 <span class="c">#     FuzzySmothing methodology.</span>
+ 471 <span class="c">#</span>
+ 472 <span class="c"># Notes:</span>
+ 473 <span class="c">#   . Hydrogen atoms are ignored during the fingerprint generation.</span>
+ 474 <span class="c">#</span>
+<a name="GenerateFingerprints-"></a> 475 <span class="k">sub </span><span class="m">GenerateFingerprints</span> <span class="s">{</span>
+ 476   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 477 
+ 478   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 479     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;GenerateTopologicalPharmacophoreAtomPairsFingerprints: No fingerpritns generated: MinDistance, $This-&gt;{MinDistance}, must be &lt;= MaxDistance, $This-&gt;{MaxDistance}...&quot;</span><span class="sc">;</span>
+ 480   <span class="s">}</span>
+ 481 
+ 482   <span class="c"># Cache appropriate molecule data...</span>
+ 483   <span class="i">$This</span><span class="i">-&gt;_SetupMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 484 
+ 485   <span class="c"># Generate distance matrix...</span>
+ 486   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span><span class="i">-&gt;_SetupDistanceMatrix</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 487     <span class="w">carp</span> <span class="q">&quot;Warning: ${ClassName}-&gt;GenerateFingerprints: Fingerprints generation didn&#39;t succeed: Couldn&#39;t generate distance matrix...&quot;</span><span class="sc">;</span>
+ 488     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 489   <span class="s">}</span>
+ 490 
+ 491   <span class="c"># Assign pharmacohore atom types to all heavy atoms...</span>
+ 492   <span class="i">$This</span><span class="i">-&gt;_AssignPharmacophoreAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 493 
+ 494   <span class="c"># Initialize values of all possible pharmacohore atom pairs...</span>
+ 495   <span class="i">$This</span><span class="i">-&gt;_InitializePharmacophoreAtomPairs</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 496 
+ 497   <span class="c"># Count atom pairs...</span>
+ 498   <span class="i">$This</span><span class="i">-&gt;_CountPharmacohoreAtomPairs</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 499 
+ 500   <span class="c"># Fuzzify atom pairs count...</span>
+ 501   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzificationMode</span>} =~ <span class="q">/^BeforeNormalization$/i</span><span class="s">)</span> <span class="s">{</span>
+ 502     <span class="i">$This</span><span class="i">-&gt;_FuzzifyPharmacohoreAtomPairsCount</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 503   <span class="s">}</span>
+ 504 
+ 505   <span class="c"># Normalize atom pairs count...</span>
+ 506   <span class="i">$This</span><span class="i">-&gt;_NormalizePharmacohoreAtomPairsCount</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 507 
+ 508   <span class="c"># Fuzzify atom pairs count...</span>
+ 509   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzificationMode</span>} =~ <span class="q">/^AfterNormalization$/i</span><span class="s">)</span> <span class="s">{</span>
+ 510     <span class="i">$This</span><span class="i">-&gt;_FuzzifyPharmacohoreAtomPairsCount</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 511   <span class="s">}</span>
+ 512 
+ 513   <span class="c"># Set final fingerprints...</span>
+ 514   <span class="i">$This</span><span class="i">-&gt;_SetFinalFingerprints</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 515 
+ 516   <span class="c"># Clear cached molecule data...</span>
+ 517   <span class="i">$This</span><span class="i">-&gt;_ClearMoleculeDataCache</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 518 
+ 519   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 520 <span class="s">}</span>
+ 521 
+ 522 <span class="c"># Setup distance matrix...</span>
+ 523 <span class="c">#</span>
+<a name="_SetupDistanceMatrix-"></a> 524 <span class="k">sub </span><span class="m">_SetupDistanceMatrix</span> <span class="s">{</span>
+ 525   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 526 
+ 527   <span class="i">$This</span>-&gt;{<span class="w">DistanceMatrix</span>} = <span class="i">$This</span><span class="i">-&gt;GetMolecule</span><span class="s">(</span><span class="s">)</span><span class="i">-&gt;GetDistanceMatrix</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 528 
+ 529   <span class="k">if</span> <span class="s">(</span>!<span class="i">$This</span>-&gt;{<span class="w">DistanceMatrix</span>}<span class="s">)</span> <span class="s">{</span>
+ 530     <span class="k">return</span> <span class="k">undef</span><span class="sc">;</span>
+ 531   <span class="s">}</span>
+ 532 
+ 533   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 534 <span class="s">}</span>
+ 535 
+ 536 <span class="c"># Assign pharmacohore atom types to all heavy atoms and count each atom</span>
+ 537 <span class="c"># types assigned...</span>
+ 538 <span class="c">#</span>
+<a name="_AssignPharmacophoreAtomTypes-"></a> 539 <span class="k">sub </span><span class="m">_AssignPharmacophoreAtomTypes</span> <span class="s">{</span>
+ 540   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 541   <span class="k">my</span><span class="s">(</span><span class="i">$Atom</span><span class="cm">,</span> <span class="i">$AtomID</span><span class="cm">,</span> <span class="i">$AtomType</span><span class="cm">,</span> <span class="i">$AssignedAtomType</span><span class="cm">,</span> <span class="i">$FunctionalClassAtomTypes</span><span class="s">)</span><span class="sc">;</span>
+ 542 
+ 543   <span class="c"># Assign topological pharmacophore atom types...</span>
+ 544   <span class="i">$FunctionalClassAtomTypes</span> = <span class="i">new</span> <span class="i">AtomTypes::FunctionalClassAtomTypes</span><span class="s">(</span><span class="q">&#39;Molecule&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">Molecule</span>}<span class="cm">,</span> <span class="q">&#39;IgnoreHydrogens&#39;</span> <span class="cm">=&gt;</span> <span class="n">1</span><span class="cm">,</span> <span class="q">&#39;FunctionalClassesToUse&#39;</span> <span class="cm">=&gt;</span> <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}<span class="s">)</span><span class="sc">;</span>
+ 545   <span class="i">$FunctionalClassAtomTypes</span><span class="i">-&gt;AssignAtomTypes</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 546 
+ 547   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 548 
+ 549   <span class="c"># Initialize assigned atom types count...</span>
+ 550   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 551   <span class="k">for</span> <span class="i">$AtomType</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 552     <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}{<span class="i">$AtomType</span>} = <span class="n">0</span><span class="sc">;</span>
+ 553   <span class="s">}</span>
+ 554 
+ 555   <span class="i">$This</span>-&gt;{<span class="w">HeavyAtomCount</span>} = <span class="n">0</span><span class="sc">;</span>
+ 556 
+ 557   <span class="j">ATOM:</span> <span class="k">for</span> <span class="i">$Atom</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="s">)</span> <span class="s">{</span>
+ 558     <span class="k">if</span> <span class="s">(</span><span class="i">$Atom</span><span class="i">-&gt;IsHydrogen</span><span class="s">(</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 559       <span class="k">next</span> <span class="j">ATOM</span><span class="sc">;</span>
+ 560     <span class="s">}</span>
+ 561     <span class="i">$This</span>-&gt;{<span class="w">HeavyAtomCount</span>} += <span class="n">1</span><span class="sc">;</span>
+ 562 
+ 563     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 564 
+ 565     <span class="c"># Collect all possible pharmacophore atom types which could be assigned to atom...</span>
+ 566     <span class="k">my</span><span class="s">(</span><span class="i">@AtomTypes</span><span class="s">)</span><span class="sc">;</span>
+ 567 
+ 568     <span class="i">@AtomTypes</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 569     <span class="i">$AssignedAtomType</span> = <span class="i">$FunctionalClassAtomTypes</span><span class="i">-&gt;GetAtomType</span><span class="s">(</span><span class="i">$Atom</span><span class="s">)</span><span class="sc">;</span>
+ 570     <span class="k">if</span> <span class="s">(</span><span class="i">$AssignedAtomType</span> &amp;&amp; <span class="i">$AssignedAtomType</span> !~ <span class="q">/^None$/i</span><span class="s">)</span> <span class="s">{</span>
+ 571       <span class="k">push</span> <span class="i">@AtomTypes</span><span class="cm">,</span> <span class="k">split</span> <span class="q">/\./</span><span class="cm">,</span> <span class="i">$AssignedAtomType</span><span class="sc">;</span>
+ 572       <span class="k">for</span> <span class="i">$AtomType</span> <span class="s">(</span><span class="i">@AtomTypes</span><span class="s">)</span> <span class="s">{</span>
+ 573         <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}{<span class="i">$AtomType</span>} += <span class="n">1</span><span class="sc">;</span>
+ 574       <span class="s">}</span>
+ 575     <span class="s">}</span>
+ 576 
+ 577     <span class="c"># Assign phramacophore types to atom...</span>
+ 578     <span class="i">$AtomID</span> = <span class="i">$Atom</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 579     <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID</span>} = \<span class="i">@AtomTypes</span><span class="sc">;</span>
+ 580   <span class="s">}</span>
+ 581   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 582 <span class="s">}</span>
+ 583 
+ 584 <span class="c"># Initialize values of all possible pharmacohore atom pairs...</span>
+ 585 <span class="c">#</span>
+ 586 <span class="c"># Let:</span>
+ 587 <span class="c">#   Dmin = Minimum distance correspoding to number of bonds between two atoms</span>
+ 588 <span class="c">#   Dmax = Maximum distance correspoding to number of bonds between two atoms</span>
+ 589 <span class="c">#   D = Distance correspoding to number of bonds between two atoms</span>
+ 590 <span class="c">#</span>
+ 591 <span class="c">#   P = Number of pharmacophore atom types to consider</span>
+ 592 <span class="c">#   PPDn = Number of possible unique pharmacophore atom pairs at a distance Dn</span>
+ 593 <span class="c">#</span>
+ 594 <span class="c">#   PPT = Total number of possible pharmacophore atom pairs at all distances between Dmin and Dmax</span>
+ 595 <span class="c">#</span>
+ 596 <span class="c"># Then:</span>
+ 597 <span class="c">#</span>
+ 598 <span class="c">#   PPD =  (P * (P - 1))/2 + P</span>
+ 599 <span class="c">#</span>
+ 600 <span class="c">#   PPT = ((Dmax - Dmin) + 1) * ((P * (P - 1))/2 + P)</span>
+ 601 <span class="c">#       = ((Dmax - Dmin) + 1) * PPD</span>
+ 602 <span class="c">#</span>
+ 603 <span class="c">#</span>
+ 604 <span class="c"># So for default values of Dmin = 1, Dmax = 10 and P = 5,</span>
+ 605 <span class="c">#</span>
+ 606 <span class="c">#   PPD =  (5 * (5 - 1))/2 + 5 = 15</span>
+ 607 <span class="c">#   PPT = ((10 - 1) + 1) * 15 = 150</span>
+ 608 <span class="c">#</span>
+ 609 <span class="c"># the pharmacophore atom pairs bais set includes 150 values.</span>
+ 610 <span class="c">#</span>
+<a name="_InitializePharmacophoreAtomPairs-"></a> 611 <span class="k">sub </span><span class="m">_InitializePharmacophoreAtomPairs</span> <span class="s">{</span>
+ 612   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 613   <span class="k">my</span><span class="s">(</span><span class="i">$Distance</span><span class="cm">,</span> <span class="i">$Index1</span><span class="cm">,</span> <span class="i">$Index2</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="s">)</span><span class="sc">;</span>
+ 614 
+ 615   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 616 
+ 617   <span class="k">for</span> <span class="i">$Distance</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} .. <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 618     <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 619 
+ 620     <span class="k">for</span> <span class="i">$Index1</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 621       <span class="i">$AtomType1</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index1</span>]<span class="sc">;</span>
+ 622       <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 623 
+ 624       <span class="k">for</span> <span class="i">$Index2</span> <span class="s">(</span><span class="i">$Index1</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 625         <span class="i">$AtomType2</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index2</span>]<span class="sc">;</span>
+ 626         <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} = <span class="n">0</span><span class="sc">;</span>
+ 627       <span class="s">}</span>
+ 628     <span class="s">}</span>
+ 629   <span class="s">}</span>
+ 630   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 631 <span class="s">}</span>
+ 632 
+ 633 <span class="c"># Count pharmacophore atom pairs between mininum and maximum distance at each</span>
+ 634 <span class="c"># distance using distance matrix and pharmacophore atom types assiged to each heavy</span>
+ 635 <span class="c"># atom.</span>
+ 636 <span class="c">#</span>
+ 637 <span class="c"># Let:</span>
+ 638 <span class="c">#   Px = Pharmacophore atom type x</span>
+ 639 <span class="c">#   Py = Pharmacophore atom type y</span>
+ 640 <span class="c">#   Dn = Distance between Px and Py in specified distance range</span>
+ 641 <span class="c">#</span>
+ 642 <span class="c"># Then:</span>
+ 643 <span class="c">#   Px-Dn-Py = Pharmacophore atom pair ID for atom types Px and Py at distance Dn</span>
+ 644 <span class="c">#</span>
+ 645 <span class="c"># For example: H-D1-H, H-D2-HBA, PI-D5-PI and so on</span>
+ 646 <span class="c">#</span>
+ 647 <span class="c"># Notes:</span>
+ 648 <span class="c">#   . The row and column indices of distance matrix correspond to atom indices.</span>
+ 649 <span class="c">#   . Distance value of BigNumber implies the atom is not connected to any other atom.</span>
+ 650 <span class="c">#   . Due to symmetric nature of distance matrix, only upper or lower triangular matrix</span>
+ 651 <span class="c">#     needs to be processed during identification and count of pharmacophore atom pairs.</span>
+ 652 <span class="c">#</span>
+<a name="_CountPharmacohoreAtomPairs-"></a> 653 <span class="k">sub </span><span class="m">_CountPharmacohoreAtomPairs</span> <span class="s">{</span>
+ 654   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 655   <span class="k">my</span><span class="s">(</span><span class="i">$NumOfRows</span><span class="cm">,</span> <span class="i">$NumOfCols</span><span class="cm">,</span> <span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$DistanceMatrix</span><span class="cm">,</span> <span class="i">$Distance</span><span class="cm">,</span> <span class="i">$AtomID1</span><span class="cm">,</span> <span class="i">$AtomID2</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="cm">,</span> <span class="i">$CountIncrement</span><span class="s">)</span><span class="sc">;</span>
+ 656 
+ 657   <span class="i">$DistanceMatrix</span> = <span class="i">$This</span>-&gt;{<span class="w">DistanceMatrix</span>}<span class="sc">;</span>
+ 658   <span class="s">(</span><span class="i">$NumOfRows</span><span class="cm">,</span> <span class="i">$NumOfCols</span><span class="s">)</span> = <span class="i">$DistanceMatrix</span><span class="i">-&gt;GetSize</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 659   <span class="i">$SkipIndexCheck</span> = <span class="n">0</span><span class="sc">;</span>
+ 660 
+ 661   <span class="j">ROWINDEX:</span> <span class="k">for</span> <span class="i">$RowIndex</span> <span class="s">(</span><span class="n">0</span> .. <span class="s">(</span><span class="i">$NumOfRows</span> - <span class="n">1</span><span class="s">)</span> <span class="s">)</span> <span class="s">{</span>
+ 662     <span class="i">$AtomID1</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomIndexToID</span>}{<span class="i">$RowIndex</span>}<span class="sc">;</span>
+ 663     <span class="k">if</span> <span class="s">(</span> !<span class="s">(</span><span class="s">(</span><span class="k">exists</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID1</span>}<span class="s">)</span> &amp;&amp; <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID1</span>}}<span class="s">)</span><span class="s">)</span> <span class="s">)</span> <span class="s">{</span>
+ 664       <span class="k">next</span> <span class="j">ROWINDEX</span><span class="sc">;</span>
+ 665     <span class="s">}</span>
+ 666 
+ 667     <span class="j">COLINDEX:</span> <span class="k">for</span> <span class="i">$ColIndex</span> <span class="s">(</span><span class="i">$RowIndex</span> .. <span class="s">(</span><span class="i">$NumOfCols</span> - <span class="n">1</span><span class="s">)</span> <span class="s">)</span> <span class="s">{</span>
+ 668       <span class="i">$AtomID2</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomIndexToID</span>}{<span class="i">$ColIndex</span>}<span class="sc">;</span>
+ 669       <span class="k">if</span> <span class="s">(</span> !<span class="s">(</span><span class="s">(</span><span class="k">exists</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID2</span>}<span class="s">)</span> &amp;&amp; <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID2</span>}}<span class="s">)</span><span class="s">)</span> <span class="s">)</span> <span class="s">{</span>
+ 670         <span class="k">next</span> <span class="j">COLINDEX</span><span class="sc">;</span>
+ 671       <span class="s">}</span>
+ 672 
+ 673       <span class="i">$Distance</span> = <span class="i">$DistanceMatrix</span><span class="i">-&gt;GetValue</span><span class="s">(</span><span class="i">$RowIndex</span><span class="cm">,</span> <span class="i">$ColIndex</span><span class="cm">,</span> <span class="i">$SkipIndexCheck</span><span class="s">)</span><span class="sc">;</span>
+ 674       <span class="k">if</span> <span class="s">(</span><span class="i">$Distance</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} || <span class="i">$Distance</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 675         <span class="k">next</span> <span class="j">COLINDEX</span><span class="sc">;</span>
+ 676       <span class="s">}</span>
+ 677 
+ 678       <span class="j">ATOMTYPE1:</span> <span class="k">for</span> <span class="i">$AtomType1</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID1</span>}}<span class="s">)</span> <span class="s">{</span>
+ 679         <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType1</span>} == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 680           <span class="k">next</span> <span class="j">ATOMTYPE1</span><span class="sc">;</span>
+ 681         <span class="s">}</span>
+ 682         <span class="j">ATOMTYPE2:</span> <span class="k">for</span> <span class="i">$AtomType2</span> <span class="s">(</span><span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypes</span>}{<span class="i">$AtomID2</span>}}<span class="s">)</span> <span class="s">{</span>
+ 683           <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType2</span>} == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 684             <span class="k">next</span> <span class="j">ATOMTYPE2</span><span class="sc">;</span>
+ 685           <span class="s">}</span>
+ 686           <span class="i">$CountIncrement</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType1</span>} * <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$AtomType2</span>}<span class="sc">;</span>
+ 687           <span class="k">if</span> <span class="s">(</span><span class="i">$AtomType1</span> <span class="k">le</span> <span class="i">$AtomType2</span><span class="s">)</span> <span class="s">{</span>
+ 688             <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} += <span class="i">$CountIncrement</span><span class="sc">;</span>
+ 689           <span class="s">}</span>
+ 690           <span class="k">else</span> <span class="s">{</span>
+ 691             <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType2</span>}{<span class="i">$AtomType1</span>} += <span class="i">$CountIncrement</span><span class="sc">;</span>
+ 692           <span class="s">}</span>
+ 693         <span class="s">}</span>
+ 694       <span class="s">}</span>
+ 695     <span class="s">}</span>
+ 696   <span class="s">}</span>
+ 697   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 698 <span class="s">}</span>
+ 699 
+ 700 <span class="c"># Normalize the occurance count of pharmacophore atom pairs over the specified distance</span>
+ 701 <span class="c"># range...</span>
+ 702 <span class="c">#</span>
+<a name="_NormalizePharmacohoreAtomPairsCount-"></a> 703 <span class="k">sub </span><span class="m">_NormalizePharmacohoreAtomPairsCount</span> <span class="s">{</span>
+ 704   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 705 
+ 706   <span class="j">METHODOLOGY:</span> <span class="s">{</span>
+ 707     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} =~ <span class="q">/^None$/i</span><span class="s">)</span> <span class="s">{</span>
+ 708       <span class="k">last</span> <span class="j">METHODOLOGY</span><span class="sc">;</span>
+ 709     <span class="s">}</span>
+ 710     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} =~ <span class="q">/^ByHeavyAtomsCount$/i</span><span class="s">)</span> <span class="s">{</span>
+ 711       <span class="i">$This</span><span class="i">-&gt;_NormalizeAtomPairsCountByHeavyAtomsCount</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 712       <span class="k">last</span> <span class="j">METHODOLOGY</span><span class="sc">;</span>
+ 713     <span class="s">}</span>
+ 714     <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} =~ <span class="q">/^ByAtomTypesCount$/i</span><span class="s">)</span> <span class="s">{</span>
+ 715       <span class="i">$This</span><span class="i">-&gt;_NormalizeAtomPairsCountByAtomTypesCount</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 716       <span class="k">last</span> <span class="j">METHODOLOGY</span><span class="sc">;</span>
+ 717     <span class="s">}</span>
+ 718     <span class="w">croak</span> <span class="q">&quot;Error: ${ClassName}-&gt;_NormalizePharmacohoreAtomPairsCount: Unknown NormalizationMethodology: $This-&gt;{NormalizationMethodology}...&quot;</span><span class="sc">;</span>
+ 719   <span class="s">}</span>
+ 720   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 721 <span class="s">}</span>
+ 722 
+ 723 
+ 724 <span class="c"># Normalize the occurance count of pharmacophore atom pairs at various distances by</span>
+ 725 <span class="c"># heavy atom count...</span>
+ 726 <span class="c">#</span>
+<a name="_NormalizeAtomPairsCountByHeavyAtomsCount-"></a> 727 <span class="k">sub </span><span class="m">_NormalizeAtomPairsCountByHeavyAtomsCount</span> <span class="s">{</span>
+ 728   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 729   <span class="k">my</span><span class="s">(</span><span class="i">$Distance</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="s">)</span><span class="sc">;</span>
+ 730 
+ 731   <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">HeavyAtomCount</span>} == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 732     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 733   <span class="s">}</span>
+ 734 
+ 735   <span class="k">for</span> <span class="i">$Distance</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}} <span class="s">)</span> <span class="s">{</span>
+ 736     <span class="k">for</span> <span class="i">$AtomType1</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}} <span class="s">)</span> <span class="s">{</span>
+ 737       <span class="j">ATOMTYPE2:</span> <span class="k">for</span> <span class="i">$AtomType2</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}} <span class="s">)</span> <span class="s">{</span>
+ 738         <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 739           <span class="k">next</span> <span class="j">ATOMTYPE2</span><span class="sc">;</span>
+ 740         <span class="s">}</span>
+ 741         <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} /= <span class="i">$This</span>-&gt;{<span class="w">HeavyAtomCount</span>}<span class="sc">;</span>
+ 742       <span class="s">}</span>
+ 743     <span class="s">}</span>
+ 744   <span class="s">}</span>
+ 745   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 746 <span class="s">}</span>
+ 747 
+ 748 <span class="c"># Normalize the occurance count of pharmacophore atom pairs at various distances by</span>
+ 749 <span class="c"># dividing it using sum of the count of each pharmacophore atom type present in the</span>
+ 750 <span class="c"># molecule for the corresponding atom pair.</span>
+ 751 <span class="c">#</span>
+<a name="_NormalizeAtomPairsCountByAtomTypesCount-"></a> 752 <span class="k">sub </span><span class="m">_NormalizeAtomPairsCountByAtomTypesCount</span> <span class="s">{</span>
+ 753   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 754   <span class="k">my</span><span class="s">(</span><span class="i">$Distance</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="cm">,</span> <span class="i">$AtomType1Count</span><span class="cm">,</span> <span class="i">$AtomType2Count</span><span class="cm">,</span> <span class="i">$NormalizationFactor</span><span class="s">)</span><span class="sc">;</span>
+ 755 
+ 756   <span class="k">for</span> <span class="i">$Distance</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}} <span class="s">)</span> <span class="s">{</span>
+ 757     <span class="k">for</span> <span class="i">$AtomType1</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}} <span class="s">)</span> <span class="s">{</span>
+ 758       <span class="j">ATOMTYPE2:</span> <span class="k">for</span> <span class="i">$AtomType2</span> <span class="s">(</span><span class="k">keys</span> <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}} <span class="s">)</span> <span class="s">{</span>
+ 759         <span class="k">if</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 760           <span class="k">next</span> <span class="j">ATOMTYPE2</span><span class="sc">;</span>
+ 761         <span class="s">}</span>
+ 762         <span class="i">$NormalizationFactor</span> = <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}{<span class="i">$AtomType1</span>} + <span class="i">$This</span>-&gt;{<span class="w">AssignedAtomTypesCount</span>}{<span class="i">$AtomType2</span>}<span class="sc">;</span>
+ 763         <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} /= <span class="i">$NormalizationFactor</span><span class="sc">;</span>
+ 764       <span class="s">}</span>
+ 765     <span class="s">}</span>
+ 766   <span class="s">}</span>
+ 767   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 768 <span class="s">}</span>
+ 769 
+ 770 <span class="c"># Fuzzify pharmacophore atom pairs count...</span>
+ 771 <span class="c">#</span>
+ 772 <span class="c"># Let:</span>
+ 773 <span class="c">#   Px = Pharmacophore atom type x</span>
+ 774 <span class="c">#   Py = Pharmacophore atom type y</span>
+ 775 <span class="c">#</span>
+ 776 <span class="c">#   PPxy = Pharmacophore atom pair between atom type Px and Py</span>
+ 777 <span class="c">#</span>
+ 778 <span class="c">#   PPxyDn = Pharmacophore atom pairs count between atom type Px and Py at distance Dn</span>
+ 779 <span class="c">#   PPxyDn-1 = Pharmacophore atom pairs count between atom type Px and Py at distance Dn - 1</span>
+ 780 <span class="c">#   PPxyDn+1 = Pharmacophore atom pairs count between atom type Px and Py at distance Dn + 1</span>
+ 781 <span class="c">#</span>
+ 782 <span class="c">#   FF = FuzzFactor for FuzzyBinning and FuzzyBinSmoothing</span>
+ 783 <span class="c">#</span>
+ 784 <span class="c"># Then:</span>
+ 785 <span class="c">#</span>
+ 786 <span class="c"># For FuzzyBinning:</span>
+ 787 <span class="c">#</span>
+ 788 <span class="c">#   PPxyDn = PPxyDn (Unchanged)</span>
+ 789 <span class="c">#</span>
+ 790 <span class="c">#   PPxyDn-1 = PPxyDn-1 + PPxyDn * FF</span>
+ 791 <span class="c">#   PPxyDn+1 = PPxyDn+1 + PPxyDn * FF</span>
+ 792 <span class="c">#</span>
+ 793 <span class="c"># For FuzzyBinSmoothing:</span>
+ 794 <span class="c">#</span>
+ 795 <span class="c">#   PPxyDn = PPxyDn - PPxyDn * 2FF for Dmin &lt; Dn &lt; Dmax</span>
+ 796 <span class="c">#   PPxyDn = PPxyDn - PPxyDn * FF for Dn = Dmin or Dmax</span>
+ 797 <span class="c">#</span>
+ 798 <span class="c">#   PPxyDn-1 = PPxyDn-1 + PPxyDn * FF</span>
+ 799 <span class="c">#   PPxyDn+1 = PPxyDn+1 + PPxyDn * FF</span>
+ 800 <span class="c">#</span>
+ 801 <span class="c"># In both fuzzification schemes, a value of 0 for FF implies no fuzzification of occurance counts.</span>
+ 802 <span class="c"># A value of 1 during FuzzyBinning corresponds to maximum fuzzification of occurance counts;</span>
+ 803 <span class="c"># however, a value of 1 during FuzzyBinSmoothing ends up completely distributing the value over</span>
+ 804 <span class="c"># the previous and next distance bins.</span>
+ 805 <span class="c">#</span>
+ 806 <span class="c"># So for default value of FuzzFactor (FF) 0.15, the occurance count of pharmacohore atom pairs</span>
+ 807 <span class="c"># at distance Dn during FuzzyBinning is left unchanged and the counts at distances Dn -1 and Dn + 1</span>
+ 808 <span class="c"># are incremened by PPxyDn * 0.15.</span>
+ 809 <span class="c">#</span>
+ 810 <span class="c"># And during FuzzyBinSmoothing the occurance counts at Distance Dn is scaled back using multiplicate</span>
+ 811 <span class="c"># factor of (1 - 2*0.15) and the occurance counts at distances Dn -1 and Dn + 1 are incremened by</span>
+ 812 <span class="c"># PPxyDn * 0.15. In otherwords, occurance bin count is smoothed out by distributing it over the</span>
+ 813 <span class="c"># previous and next distance value.</span>
+ 814 <span class="c">#</span>
+<a name="_FuzzifyPharmacohoreAtomPairsCount-"></a> 815 <span class="k">sub </span><span class="m">_FuzzifyPharmacohoreAtomPairsCount</span> <span class="s">{</span>
+ 816   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 817   <span class="k">my</span><span class="s">(</span><span class="i">$Index1</span><span class="cm">,</span> <span class="i">$Index2</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="cm">,</span> <span class="i">$CurrentDistance</span><span class="cm">,</span> <span class="i">$CurrentCount</span><span class="cm">,</span> <span class="i">$NextDistance</span><span class="cm">,</span> <span class="i">$NextCount</span><span class="cm">,</span> <span class="i">$PreviousDistance</span><span class="cm">,</span> <span class="i">$ModifyCurrentCount</span><span class="cm">,</span> <span class="i">$ChangeInCountValue</span><span class="s">)</span><span class="sc">;</span>
+ 818 
+ 819   <span class="k">if</span> <span class="s">(</span>!<span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzifyAtomPairsCount</span>} &amp;&amp; <span class="i">$This</span>-&gt;{<span class="w">FuzzFactor</span>} &gt; <span class="n">0</span><span class="s">)</span><span class="s">)</span> <span class="s">{</span>
+ 820     <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 821   <span class="s">}</span>
+ 822 
+ 823   <span class="i">$ModifyCurrentCount</span> = <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzificationMethodology</span>} =~ <span class="q">/^FuzzyBinSmoothing$/i</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 824 
+ 825   <span class="k">for</span> <span class="i">$Index1</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 826     <span class="i">$AtomType1</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index1</span>]<span class="sc">;</span>
+ 827     <span class="k">for</span> <span class="i">$Index2</span> <span class="s">(</span><span class="i">$Index1</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 828       <span class="i">$AtomType2</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index2</span>]<span class="sc">;</span>
+ 829 
+ 830       <span class="i">$CurrentCount</span> = <span class="n">0</span><span class="sc">;</span> <span class="i">$NextCount</span> = <span class="n">0</span><span class="sc">;</span>
+ 831 
+ 832       <span class="i">$NextDistance</span> = <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>}<span class="sc">;</span>
+ 833       <span class="i">$NextCount</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$NextDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>}<span class="sc">;</span>
+ 834 
+ 835       <span class="j">DISTANCE:</span> <span class="k">for</span> <span class="i">$CurrentDistance</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} .. <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 836         <span class="i">$NextDistance</span> = <span class="i">$CurrentDistance</span> + <span class="n">1</span><span class="sc">;</span>
+ 837         <span class="i">$PreviousDistance</span> = <span class="i">$CurrentDistance</span> - <span class="n">1</span><span class="sc">;</span>
+ 838 
+ 839         <span class="i">$CurrentCount</span> = <span class="i">$NextCount</span><span class="sc">;</span>
+ 840         <span class="i">$NextCount</span> = <span class="s">(</span><span class="i">$CurrentDistance</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> ? <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$NextDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 841 
+ 842         <span class="k">if</span> <span class="s">(</span><span class="i">$CurrentCount</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 843           <span class="c"># No contribution to fuzzy binning from this distance...</span>
+ 844           <span class="k">next</span> <span class="j">DISTANCE</span><span class="sc">;</span>
+ 845         <span class="s">}</span>
+ 846 
+ 847         <span class="i">$ChangeInCountValue</span> = <span class="i">$CurrentCount</span> * <span class="i">$This</span>-&gt;{<span class="w">FuzzFactor</span>}<span class="sc">;</span>
+ 848 
+ 849         <span class="k">if</span> <span class="s">(</span><span class="i">$CurrentDistance</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 850           <span class="c"># Increment count at previous distance...</span>
+ 851           <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$PreviousDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} += <span class="i">$ChangeInCountValue</span><span class="sc">;</span>
+ 852         <span class="s">}</span>
+ 853 
+ 854         <span class="k">if</span> <span class="s">(</span><span class="i">$ModifyCurrentCount</span><span class="s">)</span> <span class="s">{</span>
+ 855           <span class="c"># Decrement count at current distance for FuzzyBinSmoothing...</span>
+ 856           <span class="k">if</span> <span class="s">(</span><span class="i">$CurrentDistance</span> &gt; <span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} &amp;&amp; <span class="i">$CurrentDistance</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 857             <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$CurrentDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} -= <span class="n">2</span> * <span class="i">$ChangeInCountValue</span><span class="sc">;</span>
+ 858           <span class="s">}</span>
+ 859           <span class="k">else</span> <span class="s">{</span>
+ 860             <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$CurrentDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} -= <span class="i">$ChangeInCountValue</span><span class="sc">;</span>
+ 861           <span class="s">}</span>
+ 862         <span class="s">}</span>
+ 863 
+ 864         <span class="k">if</span> <span class="s">(</span><span class="i">$CurrentDistance</span> &lt; <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 865           <span class="c"># Increment count at next distance...</span>
+ 866           <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$NextDistance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>} += <span class="i">$ChangeInCountValue</span><span class="sc">;</span>
+ 867         <span class="s">}</span>
+ 868       <span class="s">}</span>
+ 869     <span class="s">}</span>
+ 870   <span class="s">}</span>
+ 871   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 872 <span class="s">}</span>
+ 873 
+ 874 <span class="c"># Set final fingerpritns vector...</span>
+ 875 <span class="c">#</span>
+<a name="_SetFinalFingerprints-"></a> 876 <span class="k">sub </span><span class="m">_SetFinalFingerprints</span> <span class="s">{</span>
+ 877   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 878   <span class="k">my</span><span class="s">(</span><span class="i">$Distance</span><span class="cm">,</span> <span class="i">$Index1</span><span class="cm">,</span> <span class="i">$Index2</span><span class="cm">,</span> <span class="i">$AtomType1</span><span class="cm">,</span> <span class="i">$AtomType2</span><span class="cm">,</span> <span class="i">$Value</span><span class="cm">,</span> <span class="i">$RoundOffValues</span><span class="cm">,</span> <span class="i">$ValuesPrecision</span><span class="cm">,</span> <span class="i">$UseArbitrarySetSize</span><span class="cm">,</span> <span class="i">@Values</span><span class="s">)</span><span class="sc">;</span>
+ 879 
+ 880   <span class="c"># Mark successful generation of fingerprints...</span>
+ 881   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsGenerated</span>} = <span class="n">1</span><span class="sc">;</span>
+ 882 
+ 883   <span class="i">@Values</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 884   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 885 
+ 886   <span class="c"># Do values need to be rounded off?</span>
+ 887   <span class="i">$RoundOffValues</span> = <span class="s">(</span><span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">NormalizationMethodology</span>} !~ <span class="q">/^None$/i</span><span class="s">)</span> || <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">FuzzifyAtomPairsCount</span>}<span class="s">)</span><span class="s">)</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 888   <span class="i">$ValuesPrecision</span> = <span class="i">$This</span>-&gt;{<span class="w">ValuesPrecision</span>}<span class="sc">;</span>
+ 889 
+ 890   <span class="c"># Is it an ArbitraySize atom pairs set size?</span>
+ 891   <span class="i">$UseArbitrarySetSize</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomPairsSetSizeToUse</span>} =~ <span class="q">/^ArbitrarySize$/i</span> ? <span class="n">1</span> <span class="co">:</span> <span class="n">0</span><span class="sc">;</span>
+ 892 
+ 893   <span class="c"># Collect all atom paris count values...</span>
+ 894   <span class="k">for</span> <span class="i">$Distance</span> <span class="s">(</span><span class="i">$This</span>-&gt;{<span class="w">MinDistance</span>} .. <span class="i">$This</span>-&gt;{<span class="w">MaxDistance</span>}<span class="s">)</span> <span class="s">{</span>
+ 895     <span class="k">for</span> <span class="i">$Index1</span> <span class="s">(</span><span class="n">0</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 896       <span class="i">$AtomType1</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index1</span>]<span class="sc">;</span>
+ 897       <span class="j">INDEX2:</span> <span class="k">for</span> <span class="i">$Index2</span> <span class="s">(</span><span class="i">$Index1</span> .. <span class="i">$#</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+ 898         <span class="i">$AtomType2</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}[<span class="i">$Index2</span>]<span class="sc">;</span>
+ 899 
+ 900         <span class="c"># Atom pair count...</span>
+ 901         <span class="i">$Value</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomPairsCount</span>}{<span class="i">$Distance</span>}{<span class="i">$AtomType1</span>}{<span class="i">$AtomType2</span>}<span class="sc">;</span>
+ 902         <span class="k">if</span> <span class="s">(</span><span class="i">$RoundOffValues</span><span class="s">)</span> <span class="s">{</span>
+ 903           <span class="i">$Value</span> = <span class="i">MathUtil::round</span><span class="s">(</span><span class="i">$Value</span><span class="cm">,</span> <span class="i">$This</span>-&gt;{<span class="w">ValuesPrecision</span>}<span class="s">)</span> + <span class="n">0</span><span class="sc">;</span>
+ 904         <span class="s">}</span>
+ 905 
+ 906         <span class="c"># Ignore or not to ignore...</span>
+ 907         <span class="k">if</span> <span class="s">(</span><span class="i">$UseArbitrarySetSize</span> &amp;&amp; <span class="i">$Value</span> == <span class="n">0</span><span class="s">)</span> <span class="s">{</span>
+ 908           <span class="k">next</span> <span class="j">INDEX2</span><span class="sc">;</span>
+ 909         <span class="s">}</span>
+ 910 
+ 911         <span class="k">push</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}}<span class="cm">,</span> <span class="q">&quot;${AtomType1}-D${Distance}-${AtomType2}&quot;</span><span class="sc">;</span>
+ 912         <span class="k">push</span> <span class="i">@Values</span><span class="cm">,</span> <span class="i">$Value</span><span class="sc">;</span>
+ 913       <span class="s">}</span>
+ 914     <span class="s">}</span>
+ 915   <span class="s">}</span>
+ 916 
+ 917   <span class="c"># Add AtomPairsIDs and count values to fingerprint vector...</span>
+ 918   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;AddValueIDs</span><span class="s">(</span>\<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}}<span class="s">)</span><span class="sc">;</span>
+ 919   <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;AddValues</span><span class="s">(</span>\<span class="i">@Values</span><span class="s">)</span><span class="sc">;</span>
+ 920 
+ 921   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 922 <span class="s">}</span>
+ 923 
+ 924 <span class="c"># Get pharmacophore atom pair IDs corresponding to atom pairs count values in</span>
+ 925 <span class="c"># fingerprint vector as an array or reference to an array...</span>
+ 926 <span class="c">#</span>
+ 927 <span class="c"># AtomPairIDs list  is generated during finalization  of fingerprints  and the fingerprint</span>
+ 928 <span class="c"># vector containing count values matches the atom pairs array.</span>
+ 929 <span class="c">#</span>
+ 930 <span class="c">#</span>
+<a name="GetAtomPairIDs-"></a> 931 <span class="k">sub </span><span class="m">GetAtomPairIDs</span> <span class="s">{</span>
+ 932   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 933 
+ 934   <span class="k">return</span> <span class="k">wantarray</span> ? <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}} <span class="co">:</span> \<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomPairsIDs</span>}}<span class="sc">;</span>
+ 935 <span class="s">}</span>
+ 936 
+ 937 <span class="c"># Cache  appropriate molecule data...</span>
+ 938 <span class="c">#</span>
+<a name="_SetupMoleculeDataCache-"></a> 939 <span class="k">sub </span><span class="m">_SetupMoleculeDataCache</span> <span class="s">{</span>
+ 940   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 941 
+ 942   <span class="c"># Get all atoms including hydrogens to correctly map atom indices to atom IDs for</span>
+ 943   <span class="c"># usage of distance matrix. The hydrogen atoms are ignored during processing...</span>
+ 944   <span class="c">#</span>
+ 945   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="i">$This</span><span class="i">-&gt;GetMolecule</span><span class="s">(</span><span class="s">)</span><span class="i">-&gt;GetAtoms</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 946 
+ 947   <span class="c"># Get all atom IDs...</span>
+ 948   <span class="k">my</span><span class="s">(</span><span class="i">@AtomIDs</span><span class="s">)</span><span class="sc">;</span>
+ 949   <span class="i">@AtomIDs</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 950   <span class="i">@AtomIDs</span> =  <span class="k">map</span> <span class="s">{</span> <span class="i">$_</span><span class="i">-&gt;GetID</span><span class="s">(</span><span class="s">)</span> <span class="s">}</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}}<span class="sc">;</span>
+ 951 
+ 952   <span class="c"># Set AtomIndex to AtomID hash...</span>
+ 953   <span class="i">%</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomIndexToID</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 954   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomIndexToID</span>}}{ <span class="s">(</span><span class="n">0</span> .. <span class="i">$#AtomIDs</span><span class="s">)</span> } = <span class="i">@AtomIDs</span><span class="sc">;</span>
+ 955 
+ 956   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 957 <span class="s">}</span>
+ 958 
+ 959 <span class="c"># Clear cached molecule data...</span>
+ 960 <span class="c">#</span>
+<a name="_ClearMoleculeDataCache-"></a> 961 <span class="k">sub </span><span class="m">_ClearMoleculeDataCache</span> <span class="s">{</span>
+ 962   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 963 
+ 964   <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">Atoms</span>}} = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 965 
+ 966   <span class="k">return</span> <span class="i">$This</span><span class="sc">;</span>
+ 967 <span class="s">}</span>
+ 968 
+ 969 
+ 970 <span class="c"># Return a string containg data for TopologicalPharmacophoreAtomPairsFingerprints object...</span>
+<a name="StringifyTopologicalPharmacophoreAtomPairsFingerprints-"></a> 971 <span class="k">sub </span><span class="m">StringifyTopologicalPharmacophoreAtomPairsFingerprints</span> <span class="s">{</span>
+ 972   <span class="k">my</span><span class="s">(</span><span class="i">$This</span><span class="s">)</span> = <span class="i">@_</span><span class="sc">;</span>
+ 973   <span class="k">my</span><span class="s">(</span><span class="i">$FingerprintsString</span><span class="s">)</span><span class="sc">;</span>
+ 974 
+ 975   <span class="c"># Type of fingerprint...</span>
+ 976   <span class="i">$FingerprintsString</span> = <span class="q">&quot;Fingerprint type: $This-&gt;{Type}; AtomPairsSetSizeToUse: $This-&gt;{AtomPairsSetSizeToUse}&quot;</span><span class="sc">;</span>
+ 977 
+ 978   <span class="c"># Min and max distance...</span>
+ 979   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; MinDistance:  $This-&gt;{MinDistance}; MaxDistance: $This-&gt;{MaxDistance}&quot;</span><span class="sc">;</span>
+ 980 
+ 981   <span class="c"># Pharmacophore type labels and description...</span>
+ 982   <span class="k">my</span><span class="s">(</span><span class="i">$AtomType</span><span class="cm">,</span> <span class="i">@AtomTypes</span><span class="cm">,</span> <span class="i">@AtomTypesOrder</span><span class="cm">,</span> <span class="i">%AvailableAtomTypes</span><span class="s">)</span><span class="sc">;</span>
+ 983 
+ 984   <span class="i">@AtomTypesOrder</span> = <span class="i">AtomTypes::FunctionalClassAtomTypes::GetFunctionalClassesOrder</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 985   <span class="i">%AvailableAtomTypes</span> = <span class="i">AtomTypes::FunctionalClassAtomTypes::GetAvailableFunctionalClasses</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 986 
+ 987   <span class="i">@AtomTypes</span> = <span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+ 988   <span class="k">for</span> <span class="i">$AtomType</span> <span class="s">(</span><span class="i">@AtomTypesOrder</span><span class="s">)</span> <span class="s">{</span>
+ 989     <span class="k">push</span> <span class="i">@AtomTypes</span><span class="cm">,</span> <span class="q">&quot;$AtomType: $AvailableAtomTypes{$AtomType}&quot;</span><span class="sc">;</span>
+ 990   <span class="s">}</span>
+ 991 
+ 992   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AtomTypesToUse: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 993   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AtomTypesOrder: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@AtomTypesOrder</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 994   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AvailableAtomTypes: &lt;&quot;</span> . <span class="i">TextUtil::JoinWords</span><span class="s">(</span>\<span class="i">@AtomTypes</span><span class="cm">,</span> <span class="q">&quot;, &quot;</span><span class="cm">,</span> <span class="n">0</span><span class="s">)</span> . <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+ 995 
+ 996   <span class="c"># Normalization method...</span>
+ 997   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; NormalizationMethodology: $This-&gt;{NormalizationMethodology}&quot;</span><span class="sc">;</span>
+ 998 
+ 999   <span class="c"># Weights...</span>
+1000   <span class="k">my</span><span class="s">(</span><span class="i">$FirstLabel</span><span class="cm">,</span> <span class="i">$Label</span><span class="cm">,</span> <span class="i">$Weight</span><span class="s">)</span><span class="sc">;</span>
+1001 
+1002   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; AtomTypesWeight &lt;Labels: Weight&gt;: &lt;&quot;</span><span class="sc">;</span>
+1003   <span class="i">$FirstLabel</span> = <span class="n">1</span><span class="sc">;</span>
+1004   <span class="k">for</span> <span class="i">$Label</span> <span class="s">(</span><span class="k">sort</span> <span class="i">@</span>{<span class="i">$This</span>-&gt;{<span class="w">AtomTypesToUse</span>}}<span class="s">)</span> <span class="s">{</span>
+1005     <span class="i">$Weight</span> = <span class="i">$This</span>-&gt;{<span class="w">AtomTypesWeight</span>}{<span class="i">$Label</span>}<span class="sc">;</span>
+1006     <span class="k">if</span> <span class="s">(</span><span class="i">$FirstLabel</span><span class="s">)</span> <span class="s">{</span>
+1007       <span class="i">$FirstLabel</span> = <span class="n">0</span><span class="sc">;</span>
+1008       <span class="i">$FingerprintsString</span> .= <span class="q">&quot; ${Label}: ${Weight}&quot;</span><span class="sc">;</span>
+1009     <span class="s">}</span>
+1010     <span class="k">else</span> <span class="s">{</span>
+1011       <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; ${Label}: ${Weight}&quot;</span><span class="sc">;</span>
+1012     <span class="s">}</span>
+1013   <span class="s">}</span>
+1014   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;&gt;&quot;</span><span class="sc">;</span>
+1015 
+1016   <span class="c"># Fuzzification of count...</span>
+1017   <span class="k">my</span><span class="s">(</span><span class="i">$FuzzifyFlag</span><span class="s">)</span><span class="sc">;</span>
+1018   <span class="i">$FuzzifyFlag</span> = <span class="i">$This</span>-&gt;{<span class="w">FuzzifyAtomPairsCount</span>} ? <span class="q">&quot;Yes&quot;</span> <span class="co">:</span> <span class="q">&quot;No&quot;</span><span class="sc">;</span>
+1019   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; FuzzifyAtomPairsCount: $FuzzifyFlag; FuzzificationMode: $This-&gt;{FuzzificationMode}; FuzzificationMethodology: $This-&gt;{FuzzificationMethodology}; FuzzFactor: $This-&gt;{FuzzFactor}&quot;</span><span class="sc">;</span>
+1020 
+1021   <span class="c"># Total number of pharmacophore atom pairs...</span>
+1022   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; NumOfAtomPairs: &quot;</span> . <span class="i">$This</span>-&gt;{<span class="w">FingerprintsVector</span>}<span class="i">-&gt;GetNumOfValues</span><span class="s">(</span><span class="s">)</span><span class="sc">;</span>
+1023 
+1024   <span class="c"># FingerprintsVector...</span>
+1025   <span class="i">$FingerprintsString</span> .= <span class="q">&quot;; FingerprintsVector: &lt; $This-&gt;{FingerprintsVector} &gt;&quot;</span><span class="sc">;</span>
+1026 
+1027   <span class="k">return</span> <span class="i">$FingerprintsString</span><span class="sc">;</span>
+1028 <span class="s">}</span>
+1029 
+<a name="EOF-"></a></pre>
+<p>&nbsp;</p>
+<br />
+<center>
+<img src="../../../images/h2o2.png">
+</center>
+</body>
+</html>

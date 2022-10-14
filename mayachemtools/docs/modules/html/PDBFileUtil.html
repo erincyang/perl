@@ -1,0 +1,370 @@
+<html>
+<head>
+<title>MayaChemTools:Documentation:PDBFileUtil.pm</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../../css/MayaChemTools.css">
+</head>
+<body leftmargin="20" rightmargin="20" topmargin="10" bottommargin="10">
+<br/>
+<center>
+<a href="http://www.mayachemtools.org" title="MayaChemTools Home"><img src="../../images/MayaChemToolsLogo.gif" border="0" alt="MayaChemTools"></a>
+</center>
+<br/>
+<div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./YYLexer.html" title="YYLexer.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PeriodicTable.html" title="PeriodicTable.html">Next</a></td><td width="34%" align="middle"><strong>PDBFileUtil.pm</strong></td><td width="33%" align="right"><a href="././code/PDBFileUtil.html" title="View source code">Code</a>&nbsp;|&nbsp;<a href="./../pdf/PDBFileUtil.pdf" title="PDF US Letter Size">PDF</a>&nbsp;|&nbsp;<a href="./../pdfgreen/PDBFileUtil.pdf" title="PDF US Letter Size with narrow margins: www.changethemargins.com">PDFGreen</a>&nbsp;|&nbsp;<a href="./../pdfa4/PDBFileUtil.pdf" title="PDF A4 Size">PDFA4</a>&nbsp;|&nbsp;<a href="./../pdfa4green/PDBFileUtil.pdf" title="PDF A4 Size with narrow margins: www.changethemargins.com">PDFA4Green</a></td></tr>
+</table>
+</div>
+<p>
+</p>
+<h2>NAME</h2>
+<p>PDBFileUtil</p>
+<p>
+</p>
+<h2>SYNOPSIS</h2>
+<p>use PDBFileUtil ;</p>
+<p>use PDBFileUtil qw(:all);</p>
+<p>
+</p>
+<h2>DESCRIPTION</h2>
+<p><strong>PDBFileUtil</strong> module provides the following functions:</p>
+<p> <a href="#generateatomorhetatmrecordline">GenerateAtomOrHetatmRecordLine</a>, <a href="#generateatomrecordline">GenerateAtomRecordLine</a>, <a href="#generateconectrecordline">GenerateConectRecordLine</a>
+, <a href="#generateendrecordline">GenerateEndRecordLine</a>, <a href="#generateheaderrecordline">GenerateHeaderRecordLine</a>, <a href="#generateheaderrecordtimestamp">GenerateHeaderRecordTimeStamp</a>
+, <a href="#generatehetatmrecordline">GenerateHetatmRecordLine</a>, <a href="#generateterrecordline">GenerateTerRecordLine</a>, <a href="#getallresidues">GetAllResidues</a>
+, <a href="#getchainsandresidues">GetChainsAndResidues</a>, <a href="#getconectrecordlines">GetConectRecordLines</a>, <a href="#getexperimentaltechnique">GetExperimentalTechnique</a>
+, <a href="#getexperimentaltechniqueresolution">GetExperimentalTechniqueResolution</a>, <a href="#getminmaxcoords">GetMinMaxCoords</a>, <a href="#getpdbrecordtype">GetPDBRecordType</a>
+, <a href="#getrecordtypescount">GetRecordTypesCount</a>, <a href="#isatomrecordtype">IsAtomRecordType</a>, <a href="#isconectrecordtype">IsConectRecordType</a>, <a href="#isendmdlrecordtype">IsEndmdlRecordType</a>
+, <a href="#isheaderrecordtype">IsHeaderRecordType</a>, <a href="#ishetatmrecordtype">IsHetatmRecordType</a>, <a href="#ismasterrecordtype">IsMasterRecordType</a>, <a href="#ismodelrecordtype">IsModelRecordType</a>
+, <a href="#ispdbfile">IsPDBFile</a>, <a href="#isseqresrecordtype">IsSeqresRecordType</a>, <a href="#isterrecordtype">IsTerRecordType</a>, <a href="#parseatomorhetatmrecordline">ParseAtomOrHetatmRecordLine</a>
+, <a href="#parseatomrecordline">ParseAtomRecordLine</a>, <a href="#parseconectrecordline">ParseConectRecordLine</a>, <a href="#parseexpdtarecordline">ParseExpdtaRecordLine</a>
+, <a href="#parseheaderrecordline">ParseHeaderRecordLine</a>, <a href="#parsehetatmrecordline">ParseHetatmRecordLine</a>, <a href="#parsemasterrecordline">ParseMasterRecordLine</a>
+, <a href="#parseremark2resolutionrecordline">ParseRemark2ResolutionRecordLine</a>, <a href="#parseseqresrecordline">ParseSeqresRecordLine</a>, <a href="#parseterrecordline">ParseTerRecordLine</a>
+, <a href="#readpdbfile">ReadPDBFile</a>
+</p><p>
+</p>
+<h2>METHODS</h2>
+<dl>
+<dt><strong><a name="generateatomorhetatmrecordline" class="item"><strong>GenerateAtomOrHetatmRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateAtomOrHetatmRecordLine($RecordType,
+      $AtomNumber, $AtomName, $AlternateLocation, $ResidueName,
+      $ChainID, $ResidueNumber, $InsertionCode, $X, $Y, $Z,
+      $Occupancy, $TemperatureFactor, $SegmentID,
+      $ElementSymbol, $AtomCharge);</div>
+<p>Returns ATOM or HETATM record line.</p>
+</dd>
+<dt><strong><a name="generateatomrecordline" class="item"><strong>GenerateAtomRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateAtomRecordLine($AtomNumber,
+      $AtomName, $AlternateLocation, $ResidueName, $ChainID,
+      $ResidueNumber, $InsertionCode, $X, $Y, $Z, $Occupancy,
+      $TemperatureFactor, $SegmentID, $ElementSymbol, $AtomCharge);</div>
+<p>Returns ATOM record line.</p>
+</dd>
+<dt><strong><a name="generateconectrecordline" class="item"><strong>GenerateConectRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateConectRecordLine($AtomNum, $BondedAtomNum1,
+      $BondedAtomNum2, $BondedAtomNum3, $BondedAtomNum4,
+      $HBondedAtomNum1, $HBondedAtomNum2, $SaltBridgedAtomNum1,
+      $HBondedAtomNum3, $HBondedAtomNum4, $SaltBridgedAtomNum2);</div>
+<p>Returns CONECT record line.</p>
+</dd>
+<dt><strong><a name="generateheaderrecordline" class="item"><strong>GenerateHeaderRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateHeaderRecordLine($IDCode, [$Classification,
+      $Date]);</div>
+<p>Returns HEADER record line.</p>
+</dd>
+<dt><strong><a name="generateheaderrecordtimestamp" class="item"><strong>GenerateHeaderRecordTimeStamp</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Date = GenerateHeaderRecordTimeStamp();</div>
+<p>Returns PDB header time stamp.</p>
+</dd>
+<dt><strong><a name="generatehetatmrecordline" class="item"><strong>GenerateHetatmRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateHetatmRecordLine($AtomNumber, $AtomName,
+<br/>    $AlternateLocation, $ResidueName, $ChainID, $ResidueNumber,
+<br/>    $InsertionCode, $X, $Y, $Z, $Occupancy, $TemperatureFactor,
+<br/>    $SegmentID, $ElementSymbol, $AtomCharge);</div>
+<p>Returns HETATM record line.</p>
+</dd>
+<dt><strong><a name="generateendrecordline" class="item"><strong>GenerateEndRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateEndRecordLine();</div>
+<p>Returns END record line.</p>
+</dd>
+<dt><strong><a name="generateterrecordline" class="item"><strong>GenerateTerRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordLine = GenerateTerRecordLine($SerialNumber, [$ResidueName,
+      $ChainID, $ResidueNumber, $InsertionCode]);</div>
+<p>Returns TER record line.</p>
+</dd>
+<dt><strong><a name="getallresidues" class="item"><strong>GetAllResidues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ResiduesDataRef = GetAllResidues($PDBRecordLinesRef);</div>
+<p>Gets residue information using ATOM/HETATM records and returns a reference to a hash with
+following key/value pairs:</p>
+<div class="OptionsBox">
+    $ResiduesDataRef-&gt;{ResidueNames} - Array of all the residues
+<br/>    $ResiduesDataRef-&gt;{ResidueCount}{$ResidueName} - Count of residues
+<br/>    $ResiduesDataRef-&gt;{AtomResidueNames}} - Array of all ATOM residues
+<br/>    $ResiduesDataRef-&gt;{AtomResidueCount}{$ResidueName} - Count of
+       residues in ATOM records
+<br/>    $ResiduesDataRef-&gt;{HetatomResidueNames} - List of all HETATM
+       residues
+<br/>    $ResiduesDataRef-&gt;{HetatmResidueCount}{$ResidueName} - Count of
+      residues HETATM records</div>
+<p>ATOM/HETATM records after the first ENDMDL records are simply ingnored.</p>
+</dd>
+<dt><strong><a name="getchainsandresidues" class="item"><strong>GetChainsAndResidues</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ChainsDataRef = GetChainsAndResidues($PDBRecordLinesRef,
+      [$RecordsSource, $GetChainResiduesBeyondTERFlag,
+      $GetRecordLinesFlag]);</div>
+<p>Gets chains and residue information using ATOM/HETATM or SEQRES records and returns a reference to a
+hash with these keys:</p>
+<div class="OptionsBox">
+    $ChainsDataRef-&gt;{ChainIDs} - List of chain IDs with 'None' for
+      no IDs
+<br/>    $ChainsDataRef-&gt;{Residues}{$ChainID} - List of residues in order
+      of their appearance in a chain
+<br/>    $ChainsDataRef-&gt;{ResidueCount}{$ChainID}{$ResidueName} - Count of
+      residues in a chain</div>
+<p>Chains and residue data can be extacted using either ATOM/HETATM records or SEQRES records.
+ATOM/HETATM records after the first ENDMDL records are simply ingnored.</p>
+</dd>
+<dt><strong><a name="getconectrecordlines" class="item"><strong>GetConectRecordLines</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ConectRecordLinesRef = GetConectRecordLines($PDBRecordLinesRef,
+      $AtomNumbersMapRef);</div>
+<p>Collects CONECT record lines for specific atom number, modified specified data to exclude any atom
+number not present in the list of specified atom numbers and returns a reference to list of
+CONECT record lines.</p>
+</dd>
+<dt><strong><a name="getexperimentaltechnique" class="item"><strong>GetExperimentalTechnique</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $ExperimentalTechnique = GetExperimentalTechnique($PDBRecordLinesRef);</div>
+<p>Returns <em>ExperimentalTechnique</em> value retrieved from EXPDATA record line.</p>
+</dd>
+<dt><strong><a name="getexperimentaltechniqueresolution" class="item"><strong>GetExperimentalTechniqueResolution</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($Resolution, $ResolutionUnits) = GetExperimentalTechniqueResolution(
+                                      $PDBRecordLinesRef);</div>
+<p>Returns <em>Resolution</em> and <em>ResolutionUnits</em> values from REMARK 2 RESOLUTION
+record line.</p>
+</dd>
+<dt><strong><a name="getminmaxcoords" class="item"><strong>GetMinMaxCoords</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($XMin, $YMin, $ZMin, $XMax, $YMax, $ZMax) =
+      GetMinMaxCoords($PDBRecordLinesRef);</div>
+<p>Returns minimum and maximum XYZ coordinates for ATOM/HETATM records.</p>
+</dd>
+<dt><strong><a name="getpdbrecordtype" class="item"><strong>GetPDBRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordType = GetPDBRecordType($RecordLine);</div>
+<p>Returns type of <em>RecordLine</em>.</p>
+</dd>
+<dt><strong><a name="getrecordtypescount" class="item"><strong>GetRecordTypesCount</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $RecordTypeDataRef = GetRecordTypesCount($PDBRecordLinesRef,
+      [$SpecifiedRecordType, $GetRecordLinesFlag]);</div>
+<p>Counts the number of each record type or a $SpecifiedRecordType and returns a reference to data
+type with following key/value pairs:</p>
+<div class="OptionsBox">
+    $RecordTypeDataRef-&gt;{RecordTypes} - An array of unique record types
+       in order of their presence in the file
+<br/>    $RecordTypeDataRef-&gt;{Count}{$RecordType} - Count of each record type
+<br/>    $RecordTypeDataRef-&gt;{Lines}{$RecordType} - Optional lines data for a
+      specific record type.</div>
+</dd>
+<dt><strong><a name="isatomrecordtype" class="item"><strong>IsAtomRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsAtomRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a ATOM record line.</p>
+</dd>
+<dt><strong><a name="isconectrecordtype" class="item"><strong>IsConectRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsAtomConectType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a CONECT record line.</p>
+</dd>
+<dt><strong><a name="isendmdlrecordtype" class="item"><strong>IsEndmdlRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsEndmdlRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a ENDMDL a record line.</p>
+</dd>
+<dt><strong><a name="isheaderrecordtype" class="item"><strong>IsHeaderRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsHeaderRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a HEADER a record line.</p>
+</dd>
+<dt><strong><a name="ishetatmrecordtype" class="item"><strong>IsHetatmRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsHetatmRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a HETATM a record line.</p>
+</dd>
+<dt><strong><a name="ismasterrecordtype" class="item"><strong>IsMasterRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsMasterRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a MASTER a record line.</p>
+</dd>
+<dt><strong><a name="ismodelrecordtype" class="item"><strong>IsModelRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsModelRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a MODEL record line.</p>
+</dd>
+<dt><strong><a name="ispdbfile" class="item"><strong>IsPDBFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsPDBFile($PDBFile);</div>
+<p>Returns 1 or 0 based on whether it's a PDB file.</p>
+</dd>
+<dt><strong><a name="isseqresrecordtype" class="item"><strong>IsSeqresRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsSeqresRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's SEQRES a record line.</p>
+</dd>
+<dt><strong><a name="isterrecordtype" class="item"><strong>IsTerRecordType</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $Status = IsTerRecordType($RecordLine);</div>
+<p>Returns 1 or 0 based on whether it's a TER record line.</p>
+</dd>
+<dt><strong><a name="parseatomorhetatmrecordline" class="item"><strong>ParseAtomOrHetatmRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomNumber, $AtomName, $AlternateLocation, $ResidueName, $ChainID,
+      $ResidueNumber, $InsertionCode, $X, $Y, $Z, $Occupancy,
+      $TemperatureFactor, $SegmentID, $ElementSymbol, $AtomCharge) =
+      ParseAtomOrHetatmRecordLine($RecordLine);</div>
+<p>Parses ATOM or HETATM record line.</p>
+</dd>
+<dt><strong><a name="parseatomrecordline" class="item"><strong>ParseAtomRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomNumber, $AtomName, $AlternateLocation, $ResidueName, $ChainID,
+      $ResidueNumber, $InsertionCode, $X, $Y, $Z, $Occupancy,
+      $TemperatureFactor, $SegmentID, $ElementSymbol, $AtomCharge) =
+      ParseAtomRecordLine($RecordLine);</div>
+<p>Parses ATOM record line.</p>
+</dd>
+<dt><strong><a name="parseconectrecordline" class="item"><strong>ParseConectRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomNum, $BondedAtomNum1, $BondedAtomNum2, $BondedAtomNum3,
+       $BondedAtomNum4, $HBondedAtomNum1, $HBondedAtomNum2,
+       $SaltBridgedAtomNum1, $HBondedAtomNum3, $HBondedAtomNum4,
+       $SaltBridgedAtomNum2) = ParseConectRecordLine($RecordLine);</div>
+<p>Parses CONECT record line.</p>
+</dd>
+<dt><strong><a name="parseexpdtarecordline" class="item"><strong>ParseExpdtaRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($ContinuationNum, $ExperimentalTechnique) = ParseExpdtaRecordLine($Line);</div>
+<p>Parses EXPDTA record line.</p>
+</dd>
+<dt><strong><a name="parseheaderrecordline" class="item"><strong>ParseHeaderRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($Classification, $DepositionDate, $IDCode) = ParseHeaderRecordLine($RecordLine);</div>
+<p>Parses HEADER record line</p>
+</dd>
+<dt><strong><a name="parsehetatmrecordline" class="item"><strong>ParseHetatmRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($AtomNumber, $AtomName, $AlternateLocation, $ResidueName, $ChainID,
+      $ResidueNumber, $InsertionCode, $X, $Y, $Z, $Occupancy,
+      $TemperatureFactor, $SegmentID, $ElementSymbol, $AtomCharge) =
+      ParseHetatmRecordLine($RecordLine);</div>
+<p>Parses HETATM record line.</p>
+</dd>
+<dt><strong><a name="parsemasterrecordline" class="item"><strong>ParseMasterRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($NumOfRemarkRecords, $NumOfHetRecords, $NumOfHelixRecords,
+      $NumOfSheetRecords, $NumOfTurnRecords, $NumOfSiteRecords,
+      $NumOfTransformationsRecords, $NumOfAtomAndHetatmRecords,
+      $NumOfTerRecords, $NumOfConectRecords, $NumOfSeqresRecords) =
+      ParseMasterRecordLine($RecordLine);</div>
+<p>Parses MASTER ecord line.</p>
+</dd>
+<dt><strong><a name="parseremark2resolutionrecordline" class="item"><strong>ParseRemark2ResolutionRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($Resolution, $ResolutionUnits) = ParseRemark2ResolutionRecordLine(
+                                      $RecordLine);</div>
+<p>Parses REMARK 2 RESOLUTION record line.</p>
+</dd>
+<dt><strong><a name="parseseqresrecordline" class="item"><strong>ParseSeqresRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($RecordSerialNumber, $ChainID, $NumOfResidues, $ResidueNames) =
+      ParseSeqresRecordLine($RecordLine);</div>
+<p>Parses SEQRES record line.</p>
+</dd>
+<dt><strong><a name="parseterrecordline" class="item"><strong>ParseTerRecordLine</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    ($SerialNumber, $ResidueName, $ChainID, $ResidueNumber, $InsertionCode) =
+      ParseTerRecordLine($RecordLine);</div>
+<p>Parses TER record line.</p>
+</dd>
+<dt><strong><a name="readpdbfile" class="item"><strong>ReadPDBFile</strong></a></strong></dt>
+<dd>
+<div class="OptionsBox">
+    $PDBRecordLinesRef = ReadPDBFile($PDBFile);</div>
+<p>Reads PDB file and returns reference to record lines.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2>AUTHOR</h2>
+<p><a href="mailto:msud@san.rr.com">Manish Sud</a></p>
+<p>
+</p>
+<h2>SEE ALSO</h2>
+<p><a href="./FileUtil.html">FileUtil.pm</a>,&nbsp<a href="./SequenceFileUtil.html">SequenceFileUtil.pm</a>,&nbsp<a href="./TextUtil.html">TextUtil.pm</a>
+</p>
+<p>
+</p>
+<h2>COPYRIGHT</h2>
+<p>Copyright (C) 2017 Manish Sud. All rights reserved.</p>
+<p>This file is part of MayaChemTools.</p>
+<p>MayaChemTools is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option)
+any later version.</p>
+<p>&nbsp</p><p>&nbsp</p><div class="DocNav">
+<table width="100%" border=0 cellpadding=0 cellspacing=2>
+<tr align="left" valign="top"><td width="33%" align="left"><a href="./YYLexer.html" title="YYLexer.html">Previous</a>&nbsp;&nbsp;<a href="./index.html" title="Table of Contents">TOC</a>&nbsp;&nbsp;<a href="./PeriodicTable.html" title="PeriodicTable.html">Next</a></td><td width="34%" align="middle"><strong>January 13, 2017</strong></td><td width="33%" align="right"><strong>PDBFileUtil.pm</strong></td></tr>
+</table>
+</div>
+<br />
+<center>
+<img src="../../images/h2o2.png">
+</center>
+</body>
+</html>
